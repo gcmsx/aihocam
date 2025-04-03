@@ -49,6 +49,10 @@ const SubjectGrid = () => {
 
   const handleSubjectClick = (subject: string) => {
     console.log(`Subject selected: ${subject}`);
+    // Store the current subject in sessionStorage
+    sessionStorage.setItem('currentSubject', subject);
+    // Navigate to subject page
+    navigate(`/subject/${subject}`);
   };
 
   return (
