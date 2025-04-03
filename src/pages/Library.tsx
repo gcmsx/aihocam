@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import NavBar from '@/components/NavBar';
 import VideoCard from '@/components/VideoCard';
@@ -20,9 +19,7 @@ const Library = () => {
   const [recentVideos, setRecentVideos] = useState<Video[]>([]);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
 
-  // Video data for all videos in the application
   useEffect(() => {
-    // This would typically come from an API, but for now we'll hardcode it
     const videoData = [
       {
         id: 1,
@@ -91,7 +88,6 @@ const Library = () => {
     
     setAllVideos(videoData);
     
-    // For demo, set some videos as recent
     setRecentVideos([
       {
         id: 3,
@@ -110,20 +106,17 @@ const Library = () => {
     ]);
   }, []);
 
-  // Load saved videos from localStorage
   useEffect(() => {
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     if (savedVideosFromStorage) {
       const savedIds = JSON.parse(savedVideosFromStorage);
       
-      // Update saved videos based on the IDs from localStorage
       const updatedSavedVideos = allVideos
         .filter(video => savedIds.includes(video.id))
         .map(video => ({ ...video, saved: true }));
       
       setSavedVideos(updatedSavedVideos);
       
-      // Also update saved status in other video categories
       setRecentVideos(prevVideos => 
         prevVideos.map(video => ({
           ...video,
@@ -145,28 +138,20 @@ const Library = () => {
   };
 
   const handleVideoClick = (title: string) => {
-    toast({
-      title: "Video",
-      description: `'${title}' videosu oynatılıyor...`,
-    });
   };
 
   const handleSaveVideo = (videoId: number) => {
-    // Get current saved videos from localStorage
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     let savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
     
-    // Toggle save status
     if (savedIds.includes(videoId)) {
       savedIds = savedIds.filter(id => id !== videoId);
     } else {
       savedIds.push(videoId);
     }
     
-    // Update localStorage
     localStorage.setItem('savedVideos', JSON.stringify(savedIds));
     
-    // Update UI state
     const updateVideoSavedStatus = (videos) => 
       videos.map(video => 
         video.id === videoId 
@@ -176,7 +161,6 @@ const Library = () => {
     
     setSavedVideos(prevVideos => {
       const updatedVideos = updateVideoSavedStatus(prevVideos);
-      // If a video is unsaved, remove it from the saved tab
       return activeTab === 'saved' 
         ? updatedVideos.filter(video => video.saved) 
         : updatedVideos;
@@ -184,15 +168,12 @@ const Library = () => {
     
     setRecentVideos(prevVideos => updateVideoSavedStatus(prevVideos));
     
-    // If a video was saved, make sure it appears in the saved videos list
     if (!savedIds.includes(videoId)) {
-      // Video was unsaved
       toast({
         title: "Video Kaldırıldı",
         description: "Video kaydedilenlerden kaldırıldı.",
       });
     } else {
-      // Video was saved
       const videoToAdd = allVideos.find(v => v.id === videoId);
       if (videoToAdd && !savedVideos.some(v => v.id === videoId)) {
         setSavedVideos(prev => [...prev, { ...videoToAdd, saved: true }]);
@@ -212,7 +193,7 @@ const Library = () => {
         <SearchBar placeholder="Kütüphanenizde arayın..." />
         
         <div className="mt-6">
-          <div className="flex border-b mb-4">
+          <div className="flex border-b mb-4 justify-center">
             <button 
               className={`pb-2 px-4 text-sm font-medium flex items-center gap-1 ${activeTab === 'saved' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
               onClick={() => setActiveTab('saved')}

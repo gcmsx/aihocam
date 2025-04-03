@@ -6,6 +6,7 @@ import NavBar from '@/components/NavBar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Bookmark } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface VideoDetails {
   id: number;
@@ -102,6 +103,19 @@ const VideoDetailPage = () => {
     
     // Update localStorage
     localStorage.setItem('savedVideos', JSON.stringify(savedIds));
+    
+    // Show a toast when saving/unsaving a video
+    if (newSaveStatus) {
+      toast({
+        title: "Video Kaydedildi",
+        description: "Video kütüphanenize eklendi.",
+      });
+    } else {
+      toast({
+        title: "Video Kaldırıldı",
+        description: "Video kaydedilenlerden kaldırıldı.",
+      });
+    }
   };
   
   if (!video) {
