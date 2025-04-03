@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookMarked, Clock } from 'lucide-react';
+import { Download, Clock } from 'lucide-react';
 
 interface LibraryTabsProps {
   activeTab: string;
@@ -14,8 +14,8 @@ const LibraryTabs = ({ activeTab, onTabChange }: LibraryTabsProps) => {
         className={`pb-2 px-4 text-sm font-medium flex items-center gap-1 ${activeTab === 'saved' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
         onClick={() => onTabChange('saved')}
       >
-        <BookMarked size={16} />
-        Kaydedilenler
+        <Download size={16} />
+        İndirilenler
       </button>
       <button 
         className={`pb-2 px-4 text-sm font-medium flex items-center gap-1 ${activeTab === 'recent' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}

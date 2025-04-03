@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookmarkCheck, Bookmark } from 'lucide-react';
+import { ArrowLeft, Download, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VideoHeaderProps {
@@ -23,12 +23,12 @@ const VideoHeader = ({ title, subject, duration, saved, onSave }: VideoHeaderPro
           variant="ghost" 
           size="icon" 
           onClick={onSave}
-          aria-label={saved ? "Kaydedilmiş videoyu kaldır" : "Videoyu kaydet"}
+          aria-label={saved ? "İndirilmiş video" : "Videoyu indir"}
         >
           {saved ? (
-            <BookmarkCheck size={24} className="text-primary" />
+            <CheckCircle size={24} className="text-primary" />
           ) : (
-            <Bookmark size={24} />
+            <Download size={24} />
           )}
         </Button>
       </div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Play, Clock, Bookmark, BookmarkCheck, Save } from 'lucide-react';
+import { Play, Clock, Download, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface VideoCardProps {
@@ -61,12 +61,12 @@ const VideoCard = ({
           <button 
             className="p-1.5 bg-black/40 rounded-full text-white hover:bg-black/60 transition"
             onClick={handleSave}
-            aria-label={saved ? "Kaydedilenlerden kaldır" : "Videoyu kaydet"}
+            aria-label={saved ? "İndirildi" : "İndir"}
           >
             {saved ? (
-              <BookmarkCheck size={16} className="text-white" />
+              <CheckCircle size={16} className="text-white" />
             ) : (
-              <Save size={16} />
+              <Download size={16} />
             )}
           </button>
         </div>

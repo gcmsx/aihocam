@@ -1,6 +1,32 @@
 
 import { Video } from '@/types/video';
 
+// IndexedDB database setup
+const setupDatabase = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('VideoDatabase', 1);
+    
+    request.onerror = (event) => {
+      console.error('IndexedDB error:', event);
+      reject('Error opening database');
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      
+      // Create object store for videos
+      if (!db.objectStoreNames.contains('videos')) {
+        db.createObjectStore('videos', { keyPath: 'id' });
+      }
+    };
+    
+    request.onsuccess = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      resolve(db);
+    };
+  });
+};
+
 // Mock video verileri
 const mockVideos: Video[] = [
   {
@@ -131,6 +157,58 @@ export const getRecentVideosFromStorage = (): number[] => {
   return [];
 };
 
+// Save a video to IndexedDB and localStorage
+export const downloadVideo = async (videoId: number, video: Video): Promise<number[]> => {
+  try {
+    // Get current saved videos from localStorage
+    const savedIds = getSavedVideosFromStorage();
+    
+    // Toggle download status
+    let updatedSavedIds: number[];
+    
+    if (savedIds.includes(videoId)) {
+      // If already downloaded, remove it
+      updatedSavedIds = savedIds.filter(id => id !== videoId);
+      
+      // Remove from IndexedDB
+      const db = await setupDatabase() as IDBDatabase;
+      const transaction = db.transaction(['videos'], 'readwrite');
+      const store = transaction.objectStore('videos');
+      
+      store.delete(videoId);
+    } else {
+      // If not downloaded, add it
+      updatedSavedIds = [...savedIds, videoId];
+      
+      // Add to IndexedDB for offline viewing
+      const db = await setupDatabase() as IDBDatabase;
+      const transaction = db.transaction(['videos'], 'readwrite');
+      const store = transaction.objectStore('videos');
+      
+      // Simulating video data download
+      const videoData = {
+        ...video,
+        videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        saved: true,
+        downloaded: true,
+        downloadDate: new Date().toISOString()
+      };
+      
+      store.put(videoData);
+    }
+    
+    // Update localStorage
+    localStorage.setItem('savedVideos', JSON.stringify(updatedSavedIds));
+    console.log("Updated downloaded videos IDs:", updatedSavedIds);
+    
+    return updatedSavedIds;
+  } catch (error) {
+    console.error("Error in downloadVideo:", error);
+    throw error;
+  }
+};
+
+// Original saveVideo function kept for compatibility
 export const saveVideo = (videoId: number): number[] => {
   // Get current saved videos from localStorage
   const savedIds = getSavedVideosFromStorage();
@@ -189,4 +267,28 @@ export const updateVideoSavedStatus = (
     ...video,
     saved: savedIds.includes(video.id)
   }));
+};
+
+// Get a video from IndexedDB
+export const getVideoFromIndexedDB = async (videoId: number): Promise<any> => {
+  try {
+    const db = await setupDatabase() as IDBDatabase;
+    const transaction = db.transaction(['videos'], 'readonly');
+    const store = transaction.objectStore('videos');
+    
+    return new Promise((resolve, reject) => {
+      const request = store.get(videoId);
+      
+      request.onsuccess = (event) => {
+        resolve((event.target as IDBRequest).result);
+      };
+      
+      request.onerror = (event) => {
+        reject('Error getting video from IndexedDB');
+      };
+    });
+  } catch (error) {
+    console.error("Error in getVideoFromIndexedDB:", error);
+    throw error;
+  }
 };

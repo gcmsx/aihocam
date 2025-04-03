@@ -5,7 +5,7 @@ import NavBar from '@/components/NavBar';
 import { Video } from '@/types/video';
 import { 
   getSavedVideosFromStorage, 
-  saveVideo, 
+  downloadVideo, 
   updateRecentlyViewed 
 } from '@/services/videoService';
 import SubjectHeader from '@/components/subject/SubjectHeader';
@@ -17,6 +17,7 @@ import { getSubjectVideos } from '@/utils/videoUtils';
 const SubjectPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const [videos, setVideos] = useState<Video[]>([]);
+  const [isDownloading, setIsDownloading] = useState(false);
   
   if (!subject || !subjectColors[subject]) {
     return <div className="p-4">Konu bulunamadı.</div>;
@@ -38,6 +39,23 @@ const SubjectPage = () => {
     }));
     
     setVideos(updatedVideos);
+    
+    // Listen for video download events
+    const handleVideoDownload = () => {
+      const savedVideosFromStorage = getSavedVideosFromStorage();
+      setVideos(prevVideos => 
+        prevVideos.map(video => ({
+          ...video,
+          saved: savedVideosFromStorage.includes(video.id)
+        }))
+      );
+    };
+    
+    window.addEventListener('videoDownloaded', handleVideoDownload);
+    
+    return () => {
+      window.removeEventListener('videoDownloaded', handleVideoDownload);
+    };
   }, [subject]);
   
   const handleVideoClick = (title: string, videoId: number) => {
@@ -45,18 +63,33 @@ const SubjectPage = () => {
     updateRecentlyViewed(videoId);
   };
   
-  const handleSaveVideo = (videoId: number) => {
-    // Toggle save status using the videoService
-    const updatedSavedIds = saveVideo(videoId);
-    
-    // Update UI state
-    setVideos(prevVideos => 
-      prevVideos.map(video => 
-        video.id === videoId 
-          ? { ...video, saved: updatedSavedIds.includes(videoId) } 
-          : video
-      )
-    );
+  const handleSaveVideo = async (videoId: number) => {
+    try {
+      setIsDownloading(true);
+      
+      // Find the video
+      const video = videos.find(v => v.id === videoId);
+      if (!video) return;
+      
+      // Download the video
+      const updatedSavedIds = await downloadVideo(videoId, video);
+      
+      // Update UI state
+      setVideos(prevVideos => 
+        prevVideos.map(video => 
+          video.id === videoId 
+            ? { ...video, saved: updatedSavedIds.includes(videoId) } 
+            : video
+        )
+      );
+      
+      // Dispatch event
+      window.dispatchEvent(new Event('videoDownloaded'));
+    } catch (error) {
+      console.error("Error downloading video:", error);
+    } finally {
+      setIsDownloading(false);
+    }
   };
   
   return (

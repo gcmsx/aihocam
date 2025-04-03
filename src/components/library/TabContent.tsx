@@ -25,7 +25,7 @@ const TabContent = ({ activeTab, searchQuery, videos, onVideoClick, onSaveVideo 
 
   return (
     <div>
-      {searchQuery && <h2 className="text-lg font-semibold mb-2">{activeTab === 'saved' ? 'Kaydedilenler' : 'Son İzlenenler'}</h2>}
+      {searchQuery && <h2 className="text-lg font-semibold mb-2">{activeTab === 'saved' ? 'İndirilenler' : 'Son İzlenenler'}</h2>}
       <VideoGrid 
         videos={videos}
         onVideoClick={onVideoClick}

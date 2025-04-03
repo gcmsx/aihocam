@@ -8,7 +8,8 @@ import {
   getRecentVideosFromStorage, 
   saveVideo, 
   getVideosByIds, 
-  updateVideoSavedStatus 
+  updateVideoSavedStatus,
+  downloadVideo
 } from '@/services/videoService';
 
 export const useVideoLibrary = () => {
@@ -17,6 +18,7 @@ export const useVideoLibrary = () => {
   const [recentVideos, setRecentVideos] = useState<Video[]>([]);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Tüm videoları yükle
   useEffect(() => {
@@ -27,7 +29,7 @@ export const useVideoLibrary = () => {
   useEffect(() => {
     if (allVideos.length === 0) return;
 
-    // Kaydedilen videoları yükle
+    // İndirilen videoları yükle
     const savedIds = getSavedVideosFromStorage();
     const savedVideosList = getVideosByIds(savedIds, allVideos);
     setSavedVideos(updateVideoSavedStatus(savedVideosList, savedIds));
@@ -39,7 +41,7 @@ export const useVideoLibrary = () => {
     
   }, [allVideos]);
 
-  // Video kaydetme işlemi sonrası state'i güncelle
+  // Video indirme işlemi sonrası state'i güncelle
   useEffect(() => {
     const handleStorageChange = () => {
       if (allVideos.length === 0) return;
@@ -54,15 +56,13 @@ export const useVideoLibrary = () => {
       setRecentVideos(updateVideoSavedStatus(recentVideosList, savedIds));
     };
 
-    // LocalStorage değişikliklerini dinle
+    // IndexedDB ve LocalStorage değişikliklerini dinle
     window.addEventListener('storage', handleStorageChange);
-    
-    // Özel bir event dinleyici oluştur
-    window.addEventListener('videoSaved', handleStorageChange);
+    window.addEventListener('videoDownloaded', handleStorageChange);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('videoSaved', handleStorageChange);
+      window.removeEventListener('videoDownloaded', handleStorageChange);
     };
   }, [allVideos]);
 
@@ -98,12 +98,17 @@ export const useVideoLibrary = () => {
     console.log("Video clicked:", title);
   };
 
-  const handleSaveVideo = (videoId: number) => {
+  const handleSaveVideo = async (videoId: number) => {
     try {
-      // Video kaydetme işlemini gerçekleştir
-      const updatedSavedIds = saveVideo(videoId);
+      const video = allVideos.find(v => v.id === videoId);
+      if (!video) return;
       
-      // Kaydedilen videoları güncelle
+      setIsDownloading(true);
+      
+      // Video indirme işlemini gerçekleştir
+      const updatedSavedIds = await downloadVideo(videoId, video);
+      
+      // İndirilen videoları güncelle
       const updatedSavedVideos = getVideosByIds(updatedSavedIds, allVideos);
       setSavedVideos(updateVideoSavedStatus(updatedSavedVideos, updatedSavedIds));
       
@@ -113,10 +118,12 @@ export const useVideoLibrary = () => {
       );
       
       // Değişikliği bildirmek için özel bir event yayınla
-      window.dispatchEvent(new Event('videoSaved'));
+      window.dispatchEvent(new Event('videoDownloaded'));
       
     } catch (error) {
-      console.error("Error updating saved videos:", error);
+      console.error("Error downloading video:", error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -131,6 +138,7 @@ export const useVideoLibrary = () => {
     getActiveVideos,
     filteredAllVideos,
     handleVideoClick,
-    handleSaveVideo
+    handleSaveVideo,
+    isDownloading
   };
 };
