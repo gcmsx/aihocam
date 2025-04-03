@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Video } from '@/types/video';
+import { getSavedVideosFromStorage, saveVideo } from '@/services/videoService';
 
-interface Example {
+export interface Example {
   question: string;
   options?: string[];
   answer?: string;
   explanation?: string;
 }
 
-export interface VideoDetails {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  duration: string;
-  saved: boolean;
+export interface VideoDetails extends Video {
   subject?: string;
   description?: string;
   examples?: Example[];
@@ -53,6 +50,26 @@ const getVideoDetails = (videoId: string): VideoDetails => {
   };
 };
 
+// Video izleme geçmişini güncelleme
+const updateRecentlyViewed = (videoId: number) => {
+  const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
+  let recentlyViewed = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage) : [];
+  
+  // Remove the video if it's already in the recently viewed list
+  recentlyViewed = recentlyViewed.filter((id: number) => id !== videoId);
+  
+  // Add the video to the beginning of the list
+  recentlyViewed.unshift(videoId);
+  
+  // Keep only the most recent 10 videos
+  recentlyViewed = recentlyViewed.slice(0, 10);
+  
+  // Update localStorage with stringified array
+  localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
+  
+  console.log("Recently viewed videos updated:", recentlyViewed);
+};
+
 export const useVideoDetail = (videoId: string | undefined) => {
   const [video, setVideo] = useState<VideoDetails | null>(null);
   const [saved, setSaved] = useState(false);
@@ -68,38 +85,19 @@ export const useVideoDetail = (videoId: string | undefined) => {
     setLoading(true);
     
     try {
-      // In a real app, you would fetch this from an API
+      // Video detaylarını getir
       const videoDetails = getVideoDetails(videoId);
       
-      // Check if this video is saved
-      const savedVideosFromStorage = localStorage.getItem('savedVideos');
-      if (savedVideosFromStorage) {
-        const savedIds = JSON.parse(savedVideosFromStorage);
-        videoDetails.saved = savedIds.includes(videoDetails.id);
-        setSaved(videoDetails.saved);
-      }
+      // Videonun kaydedilmiş olup olmadığını kontrol et
+      const savedIds = getSavedVideosFromStorage();
+      videoDetails.saved = savedIds.includes(videoDetails.id);
+      setSaved(videoDetails.saved);
       
       setVideo(videoDetails);
       
-      // Add to recently viewed videos in localStorage
+      // Son izlenen videolara ekle
       if (videoDetails) {
-        const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
-        let recentlyViewed = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage) : [];
-        
-        // Remove the video if it's already in the recently viewed list
-        recentlyViewed = recentlyViewed.filter((id: number) => id !== videoDetails.id);
-        
-        // Add the video to the beginning of the list
-        recentlyViewed.unshift(videoDetails.id);
-        
-        // Keep only the most recent 10 videos
-        recentlyViewed = recentlyViewed.slice(0, 10);
-        
-        // Update localStorage with stringified array
-        localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
-        
-        // Log for debugging
-        console.log("Recently viewed videos updated:", recentlyViewed);
+        updateRecentlyViewed(videoDetails.id);
       }
     } catch (error) {
       console.error("Error fetching video details:", error);
@@ -116,35 +114,20 @@ export const useVideoDetail = (videoId: string | undefined) => {
   const handleSaveVideo = () => {
     if (!video) return;
     
-    // Get current saved videos from localStorage
-    const savedVideosFromStorage = localStorage.getItem('savedVideos');
-    let savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
-    
     // Toggle save status
     const newSaveStatus = !saved;
     setSaved(newSaveStatus);
     
-    if (newSaveStatus) {
-      // Add to saved videos if not already saved
-      if (!savedIds.includes(video.id)) {
-        savedIds.push(video.id);
-      }
-      toast({
-        title: "Video kaydedildi",
-        description: "Video başarıyla kaydedildi.",
-      });
-    } else {
-      // Remove from saved videos
-      savedIds = savedIds.filter((id: number) => id !== video.id);
-      toast({
-        title: "Video kaldırıldı",
-        description: "Video kaydedilenlerden kaldırıldı.",
-      });
-    }
+    // Videoyu kaydet veya kaldır
+    saveVideo(video.id);
     
-    // Update localStorage with stringified array
-    localStorage.setItem('savedVideos', JSON.stringify(savedIds));
-    console.log("Saved videos updated:", savedIds);
+    // Kullanıcıya bildirim göster
+    toast({
+      title: newSaveStatus ? "Video kaydedildi" : "Video kaldırıldı",
+      description: newSaveStatus
+        ? "Video başarıyla kaydedildi."
+        : "Video kaydedilenlerden kaldırıldı.",
+    });
   };
   
   return { video, saved, loading, handleSaveVideo };
