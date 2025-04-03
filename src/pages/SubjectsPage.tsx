@@ -17,7 +17,7 @@ import {
   ChartTooltip, 
   ChartTooltipContent 
 } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 
 const SubjectsPage = () => {
   const { subject } = useParams<{ subject: string }>();
@@ -141,13 +141,9 @@ const SubjectsPage = () => {
                   <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]} />
-                  <ChartTooltip 
-                    content={props => (
-                      <ChartTooltipContent 
-                        {...props} 
-                        formatter={(value) => `${value}%`}
-                      />
-                    )}
+                  <Tooltip 
+                    formatter={(value) => `${value}%`}
+                    contentStyle={{ background: 'white', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '8px' }}
                   />
                 </BarChart>
               </ChartContainer>
