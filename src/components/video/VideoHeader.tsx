@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Bookmark } from 'lucide-react';
+import { ArrowLeft, BookmarkCheck, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 
 interface VideoHeaderProps {
   title: string;
@@ -13,6 +14,16 @@ interface VideoHeaderProps {
 }
 
 const VideoHeader = ({ title, subject, duration, saved, onSave }: VideoHeaderProps) => {
+  const handleSave = () => {
+    onSave();
+    toast({
+      title: saved ? "Video kaldırıldı" : "Video kaydedildi",
+      description: saved 
+        ? "Video kaydedilenlerden kaldırıldı." 
+        : "Video başarıyla kaydedildi."
+    });
+  };
+
   return (
     <div className="bg-primary/10 p-4">
       <div className="flex items-center justify-between mb-2">
@@ -22,10 +33,14 @@ const VideoHeader = ({ title, subject, duration, saved, onSave }: VideoHeaderPro
         <Button 
           variant="ghost" 
           size="icon" 
-          onClick={onSave}
+          onClick={handleSave}
           aria-label={saved ? "Kaydedilmiş videoyu kaldır" : "Videoyu kaydet"}
         >
-          <Bookmark size={24} fill={saved ? "currentColor" : "none"} />
+          {saved ? (
+            <BookmarkCheck size={24} className="text-primary" />
+          ) : (
+            <Bookmark size={24} />
+          )}
         </Button>
       </div>
       <h1 className="text-2xl font-bold">{title}</h1>

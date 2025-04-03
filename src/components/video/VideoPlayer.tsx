@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookOpen } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 interface VideoPlayerProps {
   thumbnailUrl: string;
@@ -16,8 +16,8 @@ const VideoPlayer = ({ thumbnailUrl, title }: VideoPlayerProps) => {
         className="w-full h-full object-cover"
       />
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="bg-primary/80 p-4 rounded-full">
-          <BookOpen size={32} className="text-white" />
+        <div className="bg-primary/80 p-4 rounded-full hover:bg-primary/90 transition cursor-pointer">
+          <Play size={32} className="text-white" fill="white" />
         </div>
       </div>
     </div>
