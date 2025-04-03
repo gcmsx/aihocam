@@ -1,14 +1,7 @@
 
 import React from 'react';
 import VideoCard from '@/components/VideoCard';
-
-interface Video {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  duration: string;
-  saved: boolean;
-}
+import { Video } from '@/types/video';
 
 interface HomeSearchResultsProps {
   searchQuery: string;

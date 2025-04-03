@@ -19,6 +19,10 @@ const Index = () => {
     handleSaveVideo
   } = useHomeVideos();
 
+  const handleSubjectClick = (subject: string) => {
+    console.log(`Subject selected: ${subject}`);
+  };
+
   return (
     <div className="pb-16">
       <div className="p-4">
@@ -35,7 +39,7 @@ const Index = () => {
         {(!searchQuery || filteredAllVideos.length === 0) && (
           <>
             <h2 className="text-lg font-semibold mt-6 mb-4">Konular</h2>
-            <SubjectGrid onSubjectClick={() => {}} />
+            <SubjectGrid onSubjectClick={handleSubjectClick} />
             
             <HomeTabs 
               activeTab={activeTab}

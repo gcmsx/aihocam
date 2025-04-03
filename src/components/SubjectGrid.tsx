@@ -43,8 +43,8 @@ const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
   ];
 
   const handleSubjectClick = (subject: string) => {
-    onSubjectClick(subject); // Call the existing function
-    navigate(`/subject/${subject}`); // Navigate to the subject page
+    onSubjectClick(subject);
+    navigate(`/subject/${subject}`);
   };
 
   return (
