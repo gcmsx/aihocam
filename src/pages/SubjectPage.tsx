@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import NavBar from '@/components/NavBar';
 import { Video } from '@/types/video';
 import { 
@@ -17,11 +18,13 @@ import { getSubjectVideos } from '@/utils/videoUtils';
 const SubjectPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const [videos, setVideos] = useState<Video[]>([]);
+  const navigate = useNavigate();
   
   if (!subject || !subjectColors[subject]) {
     return <div className="p-4">Konu bulunamadı.</div>;
   }
   
+  // Store current subject in sessionStorage for use in VideoDetail
   useEffect(() => {
     if (subject) {
       sessionStorage.setItem('currentSubject', subject);
@@ -37,8 +40,10 @@ const SubjectPage = () => {
   const color = subjectColors[subject];
   
   useEffect(() => {
+    // Get videos for this subject
     const subjectVideos = getSubjectVideos(subject);
     
+    // Update videos with saved state from storage
     const savedIds = getSavedVideosFromStorage();
     const updatedVideos = subjectVideos.map(video => ({
       ...video,
@@ -47,6 +52,7 @@ const SubjectPage = () => {
     
     setVideos(updatedVideos);
     
+    // Function to update saved status
     const updateSavedStatus = () => {
       const currentSavedIds = getSavedVideosFromStorage();
       setVideos(prevVideos => 
@@ -57,6 +63,7 @@ const SubjectPage = () => {
       );
     };
     
+    // Event listeners for video download and storage changes
     const handleVideoUpdate = () => {
       updateSavedStatus();
     };
@@ -79,14 +86,20 @@ const SubjectPage = () => {
   }, [subject]);
   
   const handleVideoClick = (videoId: number) => {
+    // Add to recently viewed videos
     updateRecentlyViewed(videoId);
+    
+    // Navigate to video detail page
+    navigate(`/video/${videoId}`);
   };
   
   const handleSaveVideo = async (videoId: number) => {
     try {
+      // Find the video
       const video = videos.find(v => v.id === videoId);
       if (!video) return;
       
+      // Update UI immediately for better responsiveness
       setVideos(prevVideos => 
         prevVideos.map(video => 
           video.id === videoId 
@@ -95,8 +108,10 @@ const SubjectPage = () => {
         )
       );
       
+      // Process the download
       downloadVideo(videoId, video).catch(error => {
         console.error("Error downloading video:", error);
+        // Revert UI state if there's an error
         const savedIds = getSavedVideosFromStorage();
         setVideos(prevVideos => 
           prevVideos.map(video => ({

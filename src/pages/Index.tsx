@@ -10,6 +10,7 @@ import { useHomeVideos } from '@/hooks/useHomeVideos';
 const Index = () => {
   const [version, setVersion] = useState('0.318');
   
+  // Load version from localStorage
   useEffect(() => {
     const storedVersion = localStorage.getItem('appVersion') || '0.318';
     setVersion(storedVersion);

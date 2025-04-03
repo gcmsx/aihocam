@@ -27,9 +27,10 @@ const VideoCard = ({
   const handleClick = () => {
     if (onClick) {
       onClick();
+    } else {
+      // Navigate to the video detail page with the correct ID
+      navigate(`/video/${id}`);
     }
-    // Navigate to the video detail page
-    navigate(`/video/${id}`);
   };
   
   const handleSave = (e: React.MouseEvent) => {

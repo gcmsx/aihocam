@@ -13,7 +13,7 @@ interface Video {
 interface SearchResultsProps {
   searchQuery: string;
   videos: Video[];
-  onVideoClick: (videoId: number) => void;
+  onVideoClick: (title: string) => void;
   onSaveVideo: (videoId: number) => void;
 }
 
