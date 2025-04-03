@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 interface HomeSearchResultsProps {
   searchQuery: string;
   filteredVideos: Video[];
-  handleVideoClick: (title: string, videoId: number) => void;
+  handleVideoClick: (videoId: number) => void;
   handleSaveVideo: (videoId: number) => void;
 }
 
@@ -69,7 +69,7 @@ const HomeSearchResults = ({
                 duration={video.duration}
                 saved={video.saved}
                 onSave={() => handleSaveVideo(video.id)}
-                onClick={() => handleVideoClick(video.title, video.id)}
+                onClick={() => handleVideoClick(video.id)}
               />
             ))}
           </div>
@@ -88,7 +88,7 @@ const HomeSearchResults = ({
               duration={video.duration}
               saved={video.saved}
               onSave={() => handleSaveVideo(video.id)}
-              onClick={() => handleVideoClick(video.title, video.id)}
+              onClick={() => handleVideoClick(video.id)}
             />
           ))}
         </div>

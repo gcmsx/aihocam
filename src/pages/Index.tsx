@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import SubjectGrid from '@/components/SubjectGrid';
 import SearchBar from '@/components/SearchBar';

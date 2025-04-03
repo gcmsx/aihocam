@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 interface VideoSectionProps {
   videos: Video[];
   onSaveVideo: (videoId: number) => void;
-  onVideoClick: (title: string, videoId: number) => void;
+  onVideoClick: (videoId: number) => void;
 }
 
 const VideoSection = ({ videos, onSaveVideo, onVideoClick }: VideoSectionProps) => {
@@ -55,7 +55,7 @@ const VideoSection = ({ videos, onSaveVideo, onVideoClick }: VideoSectionProps) 
             duration={video.duration}
             saved={video.saved}
             onSave={() => onSaveVideo(video.id)}
-            onClick={() => onVideoClick(video.title, video.id)}
+            onClick={() => onVideoClick(video.id)}
           />
         ))}
       </div>
