@@ -1,44 +1,22 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookText, Globe, Brain, Calculator, Atom, Beaker, Leaf, Languages, BookOpen, CheckCircle, Download } from 'lucide-react';
-import { getSavedVideosFromStorage, downloadVideo } from '@/services/videoService';
-import { getVideos } from '@/services/videoService';
-import { useState, useEffect } from 'react';
+import { BookText, Globe, Brain, Calculator, Atom, Beaker, Leaf, Languages, BookOpen } from 'lucide-react';
 
 interface SubjectCardProps {
   icon: React.ReactNode;
   title: string;
   color: string;
   onClick: () => void;
-  id: number;
-  onSave: () => void;
-  saved: boolean;
 }
 
-const SubjectCard = ({ icon, title, color, onClick, onSave, saved }: SubjectCardProps) => {
+const SubjectCard = ({ icon, title, color, onClick }: SubjectCardProps) => {
   return (
     <div 
-      className="card flex flex-col items-center justify-center p-4 cursor-pointer hover:scale-105 transition-transform relative"
+      className="card flex flex-col items-center justify-center p-4 cursor-pointer hover:scale-105 transition-transform"
       style={{ backgroundColor: color }}
       onClick={onClick}
     >
-      <div className="absolute top-2 right-2">
-        <button 
-          className="p-1 rounded-full bg-white/20 hover:bg-white/30 transition-all"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSave();
-          }}
-          aria-label={saved ? "İndirilmiş ders" : "Dersi indir"}
-        >
-          {saved ? (
-            <CheckCircle size={16} className="text-white" />
-          ) : (
-            <Download size={16} className="text-white" />
-          )}
-        </button>
-      </div>
       <div className="text-white mb-2">{icon}</div>
       <span className="text-white font-medium text-sm">{title}</span>
     </div>
@@ -51,28 +29,6 @@ interface SubjectGridProps {
 
 const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
   const navigate = useNavigate();
-  const [savedVideoIds, setSavedVideoIds] = useState<number[]>([]);
-  const allVideos = getVideos();
-  
-  useEffect(() => {
-    // Load saved videos from storage
-    const savedIds = getSavedVideosFromStorage();
-    setSavedVideoIds(savedIds);
-    
-    // Listen for changes to saved videos
-    const handleStorageChange = () => {
-      const updatedSavedIds = getSavedVideosFromStorage();
-      setSavedVideoIds(updatedSavedIds);
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('videoDownloaded', handleStorageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('videoDownloaded', handleStorageChange);
-    };
-  }, []);
   
   const subjects = [
     { id: 1, title: 'Tarih', icon: <BookText size={28} />, color: '#1A1B41' },
@@ -87,25 +43,8 @@ const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
   ];
 
   const handleSubjectClick = (subject: string) => {
-    onSubjectClick(subject); // Mevcut fonksiyonu çağır
-    navigate(`/subject/${subject}`); // Konu sayfasına yönlendir
-  };
-
-  const handleSaveSubject = async (subjectId: number) => {
-    try {
-      // Find a video related to this subject to use as a representation
-      const video = allVideos.find(v => v.id === subjectId);
-      if (!video) return;
-      
-      // Download or remove the video
-      const updatedSavedIds = await downloadVideo(subjectId, video);
-      setSavedVideoIds(updatedSavedIds);
-      
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new Event('videoDownloaded'));
-    } catch (error) {
-      console.error("Error downloading subject video:", error);
-    }
+    onSubjectClick(subject); // Call the existing function
+    navigate(`/subject/${subject}`); // Navigate to the subject page
   };
 
   return (
@@ -113,12 +52,9 @@ const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
       {subjects.map((subject) => (
         <SubjectCard 
           key={subject.id}
-          id={subject.id}
           icon={subject.icon}
           title={subject.title}
           color={subject.color}
-          saved={savedVideoIds.includes(subject.id)}
-          onSave={() => handleSaveSubject(subject.id)}
           onClick={() => handleSubjectClick(subject.title)}
         />
       ))}
