@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookText, Globe, Brain, Calculator, Atom, Flask, Leaf, Languages, BookOpen } from 'lucide-react';
+import { BookText, Globe, Brain, Calculator, Atom, Beaker, Leaf, Languages, BookOpen } from 'lucide-react';
 
 interface SubjectCardProps {
   icon: React.ReactNode;
@@ -33,7 +33,7 @@ const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
     { title: 'Felsefe', icon: <Brain size={28} />, color: '#6A3FB2' },
     { title: 'Matematik', icon: <Calculator size={28} />, color: '#00B8D4' },
     { title: 'Fizik', icon: <Atom size={28} />, color: '#3E1F47' },
-    { title: 'Kimya', icon: <Flask size={28} />, color: '#1A1B41' },
+    { title: 'Kimya', icon: <Beaker size={28} />, color: '#1A1B41' },
     { title: 'Biyoloji', icon: <Leaf size={28} />, color: '#00B8D4' },
     { title: 'İngilizce', icon: <Languages size={28} />, color: '#6A3FB2' },
     { title: 'Edebiyat', icon: <BookOpen size={28} />, color: '#3E1F47' },
