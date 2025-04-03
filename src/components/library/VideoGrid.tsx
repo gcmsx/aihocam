@@ -13,7 +13,7 @@ interface Video {
 
 interface VideoGridProps {
   videos: Video[];
-  onVideoClick: (title: string) => void;
+  onVideoClick: (videoId: number) => void;
   onSaveVideo: (videoId: number) => void;
   emptyMessage?: string;
 }
@@ -24,7 +24,7 @@ const VideoGrid = ({ videos, onVideoClick, onSaveVideo, emptyMessage }: VideoGri
   }
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="flex flex-col space-y-4">
       {videos.map(video => (
         <VideoCard 
           key={video.id}
@@ -34,7 +34,7 @@ const VideoGrid = ({ videos, onVideoClick, onSaveVideo, emptyMessage }: VideoGri
           duration={video.duration}
           saved={video.saved}
           onSave={() => onSaveVideo(video.id)}
-          onClick={() => onVideoClick(video.title)}
+          onClick={() => onVideoClick(video.id)}
         />
       ))}
     </div>
