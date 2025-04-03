@@ -17,7 +17,6 @@ const AIAssistant = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const OPENAI_API_KEY = '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';
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const quickQuestions = [
@@ -44,64 +43,104 @@ const AIAssistant = () => {
     setIsTyping(true);
     
     try {
-      // Get previous messages for context (limit to last 10 messages)
-      const recentMessages = messages.slice(-10).map(msg => ({
-        role: msg.sender === 'user' ? 'user' : 'assistant',
-        content: msg.text
-      }));
+      // Simulate AI response without relying on OpenAI API
+      // We'll have hardcoded responses based on keywords
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
       
-      // Add current user message
-      recentMessages.push({
-        role: 'user',
-        content: input
-      });
+      let aiResponse = "";
+      const userInput = input.toLowerCase();
       
-      // Make OpenAI API request
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Sen bir öğrenme asistanısın. Kullanıcılara Türkçe olarak yardımcı ol. Eğitim konularında yardımcı ol ve kısa ve öz cevaplar ver.'
-            },
-            ...recentMessages
-          ],
-          temperature: 0.7,
-          max_tokens: 1000
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'OpenAI API hatası');
+      if (userInput.includes("etkili çalış") || userInput.includes("verimli çalış")) {
+        aiResponse = "Etkili çalışmak için bazı öneriler:\n\n" +
+          "1. Pomodoro tekniğini deneyin: 25 dakika çalışıp 5 dakika ara verin\n" +
+          "2. Çalışma ortamınızı dikkat dağıtıcılardan arındırın\n" +
+          "3. Günlük ve haftalık çalışma planları yapın\n" +
+          "4. Zor konuları sabah saatlerinde çalışın\n" +
+          "5. Aktif öğrenme teknikleri kullanın: notlar alın, özetler çıkarın";
+      }
+      else if (userInput.includes("video") || userInput.includes("özetle")) {
+        aiResponse = "Son izlediğiniz video hakkında bilgim yok, ancak ana noktaları hatırlamak için video izlerken not almayı deneyebilirsiniz. Videoyu izledikten sonra kendi cümlelerinizle özetlemeye çalışın.";
+      }
+      else if (userInput.includes("tarih")) {
+        aiResponse = "Tarih konularında zorlanıyorsanız şunları deneyebilirsiniz:\n\n" +
+          "1. Tarih şeritleri ve zaman çizelgeleri oluşturun\n" +
+          "2. Olayları hikayeleştirin ve bağlantılar kurun\n" +
+          "3. Tarihsel romanlar ve belgeseller izleyin\n" +
+          "4. Konular arasında neden-sonuç ilişkileri kurun\n" +
+          "5. Dönem dönem çalışın, tüm tarihi birden öğrenmeye çalışmayın";
+      }
+      else if (userInput.includes("fizik") || userInput.includes("formül")) {
+        aiResponse = "Fizik formüllerini ezberlemek için ipuçları:\n\n" +
+          "1. Formülleri anlamaya çalışın, ezberlemeyin\n" +
+          "2. Her bir sembolün ne anlama geldiğini öğrenin\n" +
+          "3. Formülleri türetmeye çalışın\n" +
+          "4. Pratik yapın: formülleri uygulayın\n" +
+          "5. Görsel kartlar hazırlayın ve düzenli tekrar edin";
+      }
+      else if (userInput.includes("matematik")) {
+        aiResponse = "Matematik çalışırken:\n\n" +
+          "1. Temel kavramları sağlam öğrenin\n" +
+          "2. Bol örnek çözün\n" +
+          "3. Zorlandığınız konularda video derslerden faydalanın\n" +
+          "4. Formülleri not kartlarına yazıp düzenli tekrar edin\n" +
+          "5. Öğrendiğiniz konuyu başkalarına anlatmaya çalışın";
+      }
+      else if (userInput.includes("motivasyon") || userInput.includes("motive")) {
+        aiResponse = "Motivasyonunuzu artırmak için:\n\n" +
+          "1. Küçük, ulaşılabilir hedefler belirleyin\n" +
+          "2. Kendinizi ödüllendirin\n" +
+          "3. Çalışma arkadaşı edinin\n" +
+          "4. İlerlemenizi takip edin\n" +
+          "5. Neden çalıştığınızı hatırlayın ve hedeflerinizi görünür bir yere asın";
+      }
+      else if (userInput.includes("sınav") || userInput.includes("test")) {
+        aiResponse = "Sınavlara hazırlanırken:\n\n" +
+          "1. Düzenli ve planlı çalışın\n" +
+          "2. Bol soru çözün\n" +
+          "3. Deneme sınavları yapın\n" +
+          "4. Hata analizleri yapın\n" +
+          "5. Stres yönetimi tekniklerini öğrenin";
+      }
+      else if (userInput.includes("kitap") || userInput.includes("okuma")) {
+        aiResponse = "Kitap okuma alışkanlığı için öneriler:\n\n" +
+          "1. Her gün belirli bir süre okumaya ayırın\n" +
+          "2. İlgi alanlarınıza göre kitaplar seçin\n" +
+          "3. Not alarak okuyun\n" +
+          "4. Kitap kulüplerine katılın\n" +
+          "5. E-kitap ve sesli kitapları da değerlendirin";
+      }
+      else if (userInput.includes("not") || userInput.includes("not alma")) {
+        aiResponse = "Etkili not alma teknikleri:\n\n" +
+          "1. Cornell not alma sistemi\n" +
+          "2. Harita ve şemalar kullanın\n" +
+          "3. Kendi kelimelilerinizle yazın\n" +
+          "4. Renkli kalemler ve işaretleyiciler kullanın\n" +
+          "5. Dijital not alma araçlarını deneyin (Notion, Evernote vb.)";
+      }
+      else {
+        aiResponse = "Bu konu hakkında size yardımcı olmak isterim. Daha spesifik bir soru sorabilir misiniz? Eğitim, çalışma teknikleri, veya belirli dersler hakkında sorularınızı yanıtlayabilirim.";
       }
       
-      const data = await response.json();
-      const aiResponse = { 
+      // Add AI response to messages
+      const aiResponseObj = { 
         id: messages.length + 2, 
-        text: data.choices[0].message.content, 
+        text: aiResponse, 
         sender: 'ai' as const 
       };
       
-      setMessages(prev => [...prev, aiResponse]);
+      setMessages(prev => [...prev, aiResponseObj]);
     } catch (error) {
-      console.error('OpenAI API hatası:', error);
+      console.error('Hata:', error);
       toast({
         title: "Hata",
-        description: error instanceof Error ? error.message : "OpenAI API ile iletişim kurulamadı.",
+        description: "Bir sorun oluştu, lütfen daha sonra tekrar deneyin.",
         variant: "destructive",
       });
       
       // Add fallback error message
       const errorResponse = { 
         id: messages.length + 2, 
-        text: "Üzgünüm, OpenAI API ile iletişim kurarken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
+        text: "Üzgünüm, bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
         sender: 'ai' as const 
       };
       
