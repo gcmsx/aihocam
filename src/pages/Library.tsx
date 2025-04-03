@@ -18,6 +18,7 @@ const Library = () => {
   const [savedVideos, setSavedVideos] = useState<Video[]>([]);
   const [recentVideos, setRecentVideos] = useState<Video[]>([]);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const videoData = [
@@ -84,29 +85,35 @@ const Library = () => {
         duration: "1:00",
         saved: false
       },
-    ];
-    
-    setAllVideos(videoData);
-    
-    setRecentVideos([
+      // Additional videos for searching
       {
-        id: 3,
-        title: "Modern Türkiye Tarihinin Dönüm Noktaları - Cumhuriyetin İlanı",
-        thumbnailUrl: "https://images.unsplash.com/photo-1596005554384-d293674c91d7",
+        id: 10,
+        title: "Kimya: Soru Çözüm Teknikleri",
+        thumbnailUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6",
         duration: "1:00",
         saved: false
       },
       {
-        id: 4,
-        title: "Matematik: Türev Kavramı ve Uygulamaları",
+        id: 11,
+        title: "Fizik: Soru Çözüm Stratejileri",
         thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
         duration: "1:00",
         saved: false
       },
-    ]);
+      {
+        id: 12,
+        title: "Matematik: Soru Çözüm Yaklaşımları",
+        thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
+        duration: "1:00",
+        saved: false
+      },
+    ];
+    
+    setAllVideos(videoData);
   }, []);
 
   useEffect(() => {
+    // Load saved videos
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     if (savedVideosFromStorage) {
       const savedIds = JSON.parse(savedVideosFromStorage);
@@ -116,28 +123,64 @@ const Library = () => {
         .map(video => ({ ...video, saved: true }));
       
       setSavedVideos(updatedSavedVideos);
+    }
+    
+    // Load recently viewed videos
+    const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
+    if (recentlyViewedFromStorage && allVideos.length > 0) {
+      const recentIds = JSON.parse(recentlyViewedFromStorage);
       
-      setRecentVideos(prevVideos => 
-        prevVideos.map(video => ({
-          ...video,
-          saved: savedIds.includes(video.id)
-        }))
-      );
+      // Get the recently viewed videos from allVideos by ID
+      const recentlyViewedVideos: Video[] = [];
+      
+      recentIds.forEach((id: number) => {
+        const video = allVideos.find(v => v.id === id);
+        if (video) {
+          recentlyViewedVideos.push({
+            ...video,
+            saved: savedVideos.some(saved => saved.id === id)
+          });
+        }
+      });
+      
+      setRecentVideos(recentlyViewedVideos);
     }
-  }, [allVideos]);
+  }, [allVideos, savedVideos.length]);
 
-  const getActiveVideos = () => {
-    switch(activeTab) {
-      case 'saved':
-        return savedVideos;
-      case 'recent':
-        return recentVideos;
-      default:
-        return savedVideos;
-    }
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
+  const getActiveVideos = () => {
+    let videos;
+    switch(activeTab) {
+      case 'saved':
+        videos = savedVideos;
+        break;
+      case 'recent':
+        videos = recentVideos;
+        break;
+      default:
+        videos = savedVideos;
+    }
+    
+    if (!searchQuery) {
+      return videos;
+    }
+    
+    return videos.filter(video => 
+      video.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
+  const filteredAllVideos = searchQuery 
+    ? allVideos.filter(video => 
+        video.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
   const handleVideoClick = (title: string) => {
+    // Video click handler (empty for now)
   };
 
   const handleSaveVideo = (videoId: number) => {
@@ -183,7 +226,10 @@ const Library = () => {
     <div className="pb-16">
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Kütüphane</h1>
-        <SearchBar placeholder="Kütüphanenizde arayın..." />
+        <SearchBar 
+          placeholder="Tüm videolarda arayın..." 
+          onChange={handleSearch}
+        />
         
         <div className="mt-6">
           <div className="flex border-b mb-4 justify-center">
@@ -203,20 +249,43 @@ const Library = () => {
             </button>
           </div>
           
-          {getActiveVideos().length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {getActiveVideos().map(video => (
-                <VideoCard 
-                  key={video.id}
-                  id={video.id}
-                  title={video.title}
-                  thumbnailUrl={video.thumbnailUrl}
-                  duration={video.duration}
-                  saved={video.saved}
-                  onSave={() => handleSaveVideo(video.id)}
-                  onClick={() => handleVideoClick(video.title)}
-                />
-              ))}
+          {searchQuery && filteredAllVideos.length > 0 && (
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold mb-2">Arama Sonuçları</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredAllVideos.map(video => (
+                  <VideoCard 
+                    key={video.id}
+                    id={video.id}
+                    title={video.title}
+                    thumbnailUrl={video.thumbnailUrl}
+                    duration={video.duration}
+                    saved={savedVideos.some(v => v.id === video.id)}
+                    onSave={() => handleSaveVideo(video.id)}
+                    onClick={() => handleVideoClick(video.title)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {(getActiveVideos().length > 0 && (!searchQuery || searchQuery && getActiveVideos().length > 0)) ? (
+            <div>
+              {searchQuery && <h2 className="text-lg font-semibold mb-2">{activeTab === 'saved' ? 'Kaydedilenler' : 'Son İzlenenler'}</h2>}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {getActiveVideos().map(video => (
+                  <VideoCard 
+                    key={video.id}
+                    id={video.id}
+                    title={video.title}
+                    thumbnailUrl={video.thumbnailUrl}
+                    duration={video.duration}
+                    saved={video.saved}
+                    onSave={() => handleSaveVideo(video.id)}
+                    onClick={() => handleVideoClick(video.title)}
+                  />
+                ))}
+              </div>
             </div>
           ) : (
             <div className="py-8 text-center">

@@ -1,13 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import SubjectGrid from '@/components/SubjectGrid';
 import SearchBar from '@/components/SearchBar';
 import VideoCard from '@/components/VideoCard';
 import NavBar from '@/components/NavBar';
-import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('trend');
   const [searchQuery, setSearchQuery] = useState('');
+  const [allVideos, setAllVideos] = useState<any[]>([]);
   const [videos, setVideos] = useState({
     trend: [
       {
@@ -80,7 +81,42 @@ const Index = () => {
     ]
   });
 
+  // Additional videos for comprehensive search
+  const additionalVideos = [
+    {
+      id: 10,
+      title: "Kimya: Soru Çözüm Teknikleri",
+      thumbnailUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6",
+      duration: "1:00",
+      saved: false
+    },
+    {
+      id: 11,
+      title: "Fizik: Soru Çözüm Stratejileri",
+      thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
+      duration: "1:00",
+      saved: false
+    },
+    {
+      id: 12,
+      title: "Matematik: Soru Çözüm Yaklaşımları",
+      thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
+      duration: "1:00",
+      saved: false
+    },
+  ];
+
   useEffect(() => {
+    // Combine all videos for comprehensive search
+    const combinedVideos = [
+      ...videos.trend,
+      ...videos.recommended,
+      ...videos.popular,
+      ...additionalVideos
+    ];
+    
+    setAllVideos(combinedVideos);
+    
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     if (savedVideosFromStorage) {
       const savedIds = JSON.parse(savedVideosFromStorage);
@@ -97,14 +133,19 @@ const Index = () => {
         
         return updatedVideos;
       });
+
+      // Also update the saved status in allVideos
+      setAllVideos(prevAllVideos => 
+        prevAllVideos.map(video => ({
+          ...video,
+          saved: savedIds.includes(video.id)
+        }))
+      );
     }
   }, []);
   
   const handleVideoClick = (title: string) => {
-    toast({
-      title: "Video",
-      description: `'${title}' videosu açılıyor...`,
-    });
+    // Video click handler (empty now that we've removed toast)
   };
 
   const handleSaveVideo = (videoId: number) => {
@@ -117,8 +158,21 @@ const Index = () => {
         );
       }
       
-      const allVideos = Object.values(updatedVideos).flat();
-      const savedIds = allVideos.filter(video => video.saved).map(video => video.id);
+      // Update allVideos as well
+      setAllVideos(prevAllVideos => 
+        prevAllVideos.map(video => 
+          video.id === videoId ? { ...video, saved: !video.saved } : video
+        )
+      );
+      
+      const allVideosFlat = [
+        ...updatedVideos.trend,
+        ...updatedVideos.recommended,
+        ...updatedVideos.popular,
+        ...additionalVideos
+      ];
+      
+      const savedIds = allVideosFlat.filter(video => video.saved).map(video => video.id);
       localStorage.setItem('savedVideos', JSON.stringify(savedIds));
       
       return updatedVideos;
@@ -141,44 +195,24 @@ const Index = () => {
     );
   };
 
+  // Search results from all videos
+  const filteredAllVideos = searchQuery 
+    ? allVideos.filter(video => 
+        video.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+
   return (
     <div className="pb-16">
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Hızlı Öğrenme</h1>
-        <SearchBar onChange={handleSearch} />
+        <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         
-        <h2 className="text-lg font-semibold mt-6 mb-4">Konular</h2>
-        <SubjectGrid onSubjectClick={() => {}} />
-        
-        <div className="mt-8">
-          <div className="flex border-b mb-4">
-            <button 
-              className={`pb-2 px-4 text-sm font-medium ${activeTab === 'trend' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-              onClick={() => setActiveTab('trend')}
-            >
-              Trend
-            </button>
-            <button 
-              className={`pb-2 px-4 text-sm font-medium ${activeTab === 'recommended' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-              onClick={() => setActiveTab('recommended')}
-            >
-              Önerilen
-            </button>
-            <button 
-              className={`pb-2 px-4 text-sm font-medium ${activeTab === 'popular' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-              onClick={() => setActiveTab('popular')}
-            >
-              Popüler
-            </button>
-          </div>
-          
-          {getActiveVideos().length === 0 ? (
-            <div className="text-center py-10 text-muted-foreground">
-              Arama sonucu bulunamadı.
-            </div>
-          ) : (
+        {searchQuery && filteredAllVideos.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold mb-4">Arama Sonuçları</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {getActiveVideos().map(video => (
+              {filteredAllVideos.map(video => (
                 <VideoCard 
                   key={video.id}
                   id={video.id}
@@ -191,8 +225,59 @@ const Index = () => {
                 />
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+        
+        {(!searchQuery || filteredAllVideos.length === 0) && (
+          <>
+            <h2 className="text-lg font-semibold mt-6 mb-4">Konular</h2>
+            <SubjectGrid onSubjectClick={() => {}} />
+            
+            <div className="mt-8">
+              <div className="flex border-b mb-4">
+                <button 
+                  className={`pb-2 px-4 text-sm font-medium ${activeTab === 'trend' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+                  onClick={() => setActiveTab('trend')}
+                >
+                  Trend
+                </button>
+                <button 
+                  className={`pb-2 px-4 text-sm font-medium ${activeTab === 'recommended' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+                  onClick={() => setActiveTab('recommended')}
+                >
+                  Önerilen
+                </button>
+                <button 
+                  className={`pb-2 px-4 text-sm font-medium ${activeTab === 'popular' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
+                  onClick={() => setActiveTab('popular')}
+                >
+                  Popüler
+                </button>
+              </div>
+              
+              {getActiveVideos().length === 0 ? (
+                <div className="text-center py-10 text-muted-foreground">
+                  Arama sonucu bulunamadı.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {getActiveVideos().map(video => (
+                    <VideoCard 
+                      key={video.id}
+                      id={video.id}
+                      title={video.title}
+                      thumbnailUrl={video.thumbnailUrl}
+                      duration={video.duration}
+                      saved={video.saved}
+                      onSave={() => handleSaveVideo(video.id)}
+                      onClick={() => handleVideoClick(video.title)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
       <NavBar />
     </div>

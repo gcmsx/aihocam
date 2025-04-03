@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -77,6 +76,24 @@ const VideoDetailPage = () => {
     }
     
     setVideo(videoDetails);
+    
+    // Add to recently viewed videos in localStorage
+    if (videoDetails) {
+      const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
+      let recentlyViewed = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage) : [];
+      
+      // Remove the video if it's already in the recently viewed list
+      recentlyViewed = recentlyViewed.filter((id: number) => id !== videoDetails.id);
+      
+      // Add the video to the beginning of the list
+      recentlyViewed.unshift(videoDetails.id);
+      
+      // Keep only the most recent 10 videos
+      recentlyViewed = recentlyViewed.slice(0, 10);
+      
+      // Update localStorage
+      localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
+    }
   }, [videoId]);
   
   const handleSaveVideo = () => {
