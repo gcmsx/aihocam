@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Send, Image, Sparkles, X } from 'lucide-react';
+import { Send, Image, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
@@ -16,6 +16,7 @@ const AIAssistant = () => {
     { id: 1, text: 'Merhaba! Ben öğrenme asistanınız. Size nasıl yardımcı olabilirim?', sender: 'ai' }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   const quickQuestions = [
     "Nasıl daha etkili çalışabilirim?",
@@ -24,7 +25,7 @@ const AIAssistant = () => {
     "Fizik formüllerini ezberlemek için ipuçları"
   ];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
     
     // Add user message
@@ -32,19 +33,70 @@ const AIAssistant = () => {
     setMessages([...messages, newUserMessage]);
     setInput('');
     
-    // Simulate AI responding
+    // Show AI is typing
     setIsTyping(true);
     
-    // This is a placeholder - in a real app, you would make an API call to your AI service
-    setTimeout(() => {
+    try {
+      // OpenAI API call
+      const apiKey = "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";
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: 'Sen bir eğitim asistanısın. Öğrencilere derslerinde yardımcı olan, anlaşılır ve destekleyici cevaplar veren bir yapay zekasın. Cevapların kısa, özlü ve Türkçe olmalı.'
+            },
+            {
+              role: 'user',
+              content: input
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Add AI response to messages
+      const aiResponseText = data.choices[0].message.content;
       const aiResponse = { 
         id: messages.length + 2, 
-        text: `${input} hakkında size yardımcı olmak için buradayım. Daha spesifik sorularınız var mı?`, 
+        text: aiResponseText, 
         sender: 'ai' as const 
       };
+      
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('Error calling OpenAI API:', error);
+      toast({
+        title: "Hata",
+        description: "Yanıt alınamadı. Lütfen daha sonra tekrar deneyin.",
+        variant: "destructive",
+      });
+      
+      // Add fallback error message
+      const errorResponse = { 
+        id: messages.length + 2, 
+        text: "Üzgünüm, bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
+        sender: 'ai' as const 
+      };
+      
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -63,6 +115,7 @@ const AIAssistant = () => {
       title: "Görsel yükleme",
       description: "Görsel yükleme özelliği hazırlanıyor...",
     });
+    // This would be implemented with OpenAI's vision capabilities in a future update
   };
 
   return (
@@ -80,7 +133,7 @@ const AIAssistant = () => {
                   : 'bg-muted text-foreground'
               }`}
             >
-              <p className="text-sm">{message.text}</p>
+              <p className="text-sm whitespace-pre-wrap">{message.text}</p>
             </div>
           </div>
         ))}
@@ -117,6 +170,7 @@ const AIAssistant = () => {
             size="icon" 
             className="shrink-0"
             onClick={handleImageUpload}
+            disabled={isTyping || isUploading}
           >
             <Image size={20} />
           </Button>
@@ -130,6 +184,7 @@ const AIAssistant = () => {
               className="w-full rounded-full px-4 pr-12 py-2 resize-none bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
               rows={1}
               style={{ minHeight: '40px', maxHeight: '120px' }}
+              disabled={isTyping}
             />
             {input && (
               <button 
@@ -145,6 +200,7 @@ const AIAssistant = () => {
             size="icon" 
             className="shrink-0 rounded-full"
             onClick={handleSend}
+            disabled={isTyping || !input.trim()}
           >
             <Send size={20} />
           </Button>

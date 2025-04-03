@@ -5,8 +5,10 @@ import AIAssistant from '@/components/AIAssistant';
 
 const Assistant = () => {
   return (
-    <div>
-      <AIAssistant />
+    <div className="h-screen flex flex-col">
+      <div className="flex-1 overflow-hidden">
+        <AIAssistant />
+      </div>
       <NavBar />
     </div>
   );
