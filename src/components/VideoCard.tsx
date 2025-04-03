@@ -52,9 +52,9 @@ const VideoCard = ({
           className="w-full h-full object-cover rounded-lg"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-3">
-          <h3 className="text-white font-medium text-sm line-clamp-2">{title}</h3>
+          <h3 className="text-white font-medium text-sm line-clamp-2 truncate">{title}</h3>
         </div>
-        <div className="video-duration flex items-center gap-1 absolute bottom-2 right-2 bg-black/60 text-white px-1.5 py-0.5 rounded text-xs">
+        <div className="video-duration flex items-center gap-1 absolute bottom-2 right-2 bg-black/60 text-white px-1.5 py-0.5 rounded text-xs truncate">
           <Clock size={12} />
           <span>{duration}</span>
         </div>
