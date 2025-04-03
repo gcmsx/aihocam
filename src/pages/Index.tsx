@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SubjectGrid from '@/components/SubjectGrid';
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
@@ -8,6 +8,26 @@ import HomeSearchResults from '@/components/home/HomeSearchResults';
 import { useHomeVideos } from '@/hooks/useHomeVideos';
 
 const Index = () => {
+  const [version, setVersion] = useState('0.318');
+  
+  // Load version from localStorage
+  useEffect(() => {
+    const storedVersion = localStorage.getItem('appVersion') || '0.318';
+    setVersion(storedVersion);
+    
+    const handleVersionUpdate = (e: CustomEvent) => {
+      if (e.detail && e.detail.version) {
+        setVersion(e.detail.version);
+      }
+    };
+    
+    window.addEventListener('versionUpdated', handleVersionUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('versionUpdated', handleVersionUpdate as EventListener);
+    };
+  }, []);
+  
   const { 
     activeTab,
     setActiveTab,
@@ -26,7 +46,9 @@ const Index = () => {
   return (
     <div className="pb-16">
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Hızlı Öğrenme <span className="text-sm text-muted-foreground">(Kapalı Beta v0.318)</span></h1>
+        <h1 className="text-2xl font-bold mb-4">
+          Hızlı Öğrenme <span className="text-sm text-muted-foreground">(Kapalı Beta v{version})</span>
+        </h1>
         <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         
         <HomeSearchResults 

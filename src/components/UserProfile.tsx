@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Award, Target, BarChart3, Share2, Edit } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,11 @@ const UserProfile = () => {
   const [username, setUsername] = useState('Kullanıcı Adı');
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [stats, setStats] = useState([
+    { title: 'Videolar', value: '0', icon: <BarChart3 size={20} className="text-primary" /> },
+    { title: 'Başarılar', value: '0', icon: <Award size={20} className="text-primary" /> },
+    { title: 'Günler', value: '0', icon: <Calendar size={20} className="text-primary" /> },
+  ]);
   
   const subjects = [
     { subject: 'Tarih', progress: 65, color: '#1A1B41' },
@@ -42,11 +47,77 @@ const UserProfile = () => {
     { subject: 'Fizik', progress: 50, color: '#3E1F47' },
   ];
 
-  const stats = [
-    { title: 'Videolar', value: '32', icon: <BarChart3 size={20} className="text-primary" /> },
-    { title: 'Başarılar', value: '7', icon: <Award size={20} className="text-primary" /> },
-    { title: 'Günler', value: '14', icon: <Calendar size={20} className="text-primary" /> },
-  ];
+  // Load user stats from localStorage
+  useEffect(() => {
+    // Get watched videos count
+    const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
+    const watchedVideos = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage).length : 0;
+    
+    // Get achievements count
+    const achievementsFromStorage = localStorage.getItem('achievements');
+    const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage).count : 0;
+    
+    // Get active days (for now, we'll just set it to a fixed value)
+    const activeDays = 14;
+    
+    // Update stats
+    setStats([
+      { title: 'Videolar', value: watchedVideos.toString(), icon: <BarChart3 size={20} className="text-primary" /> },
+      { title: 'Başarılar', value: achievements.toString(), icon: <Award size={20} className="text-primary" /> },
+      { title: 'Günler', value: activeDays.toString(), icon: <Calendar size={20} className="text-primary" /> },
+    ]);
+  }, []);
+
+  // Listen for updates to watched videos and achievements
+  useEffect(() => {
+    const handleQuestionsCompleted = () => {
+      // Update achievements count
+      const achievementsFromStorage = localStorage.getItem('achievements');
+      const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage).count : 0;
+      
+      setStats(prev => {
+        const newStats = [...prev];
+        const achievementStat = newStats.find(s => s.title === 'Başarılar');
+        if (achievementStat) {
+          achievementStat.value = achievements.toString();
+        }
+        return newStats;
+      });
+    };
+    
+    const handleVideoWatched = () => {
+      // Update watched videos count
+      const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
+      const watchedVideos = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage).length : 0;
+      
+      setStats(prev => {
+        const newStats = [...prev];
+        const videoStat = newStats.find(s => s.title === 'Videolar');
+        if (videoStat) {
+          videoStat.value = watchedVideos.toString();
+        }
+        return newStats;
+      });
+    };
+    
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'achievements') {
+        handleQuestionsCompleted();
+      } else if (e.key === 'recentlyViewedVideos') {
+        handleVideoWatched();
+      }
+    };
+    
+    window.addEventListener('questionsCompleted', handleQuestionsCompleted);
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('videoWatched', handleVideoWatched);
+    
+    return () => {
+      window.removeEventListener('questionsCompleted', handleQuestionsCompleted);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('videoWatched', handleVideoWatched);
+    };
+  }, []);
 
   const getInitials = (name: string) => {
     return name

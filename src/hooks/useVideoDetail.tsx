@@ -84,6 +84,11 @@ export const useVideoDetail = (videoId: string | undefined) => {
       // Son izlenen videolara ekle
       if (videoDetails) {
         updateRecentlyViewed(videoDetails.id);
+        
+        // Dispatch an event to notify other components about the watched video
+        window.dispatchEvent(new CustomEvent('videoWatched', {
+          detail: { videoId: videoDetails.id }
+        }));
       }
     } catch (error) {
       console.error("Error fetching video details:", error);

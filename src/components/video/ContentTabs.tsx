@@ -13,9 +13,10 @@ interface Example {
 interface ContentTabsProps {
   description?: string;
   examples?: Example[];
+  videoId?: number;
 }
 
-const ContentTabs = ({ description, examples = [] }: ContentTabsProps) => {
+const ContentTabs = ({ description, examples = [], videoId }: ContentTabsProps) => {
   return (
     <Tabs defaultValue="content" className="w-full">
       <TabsList className="w-full grid grid-cols-2">
@@ -31,7 +32,7 @@ const ContentTabs = ({ description, examples = [] }: ContentTabsProps) => {
       
       <TabsContent value="questions" className="mt-4">
         {examples && examples.length > 0 ? (
-          <VideoExamples examples={examples} />
+          <VideoExamples examples={examples} videoId={videoId} />
         ) : (
           <div className="text-center py-6 text-muted-foreground">
             Bu video için örnek soru bulunmamaktadır.
