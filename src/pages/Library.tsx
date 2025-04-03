@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import NavBar from '@/components/NavBar';
 import VideoCard from '@/components/VideoCard';
 import SearchBar from '@/components/SearchBar';
-import { BookOpen, BookMarked, Clock, Star } from 'lucide-react';
+import { BookOpen, BookMarked, Clock } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 interface Video {
@@ -18,7 +18,6 @@ const Library = () => {
   const [activeTab, setActiveTab] = useState('saved');
   const [savedVideos, setSavedVideos] = useState<Video[]>([]);
   const [recentVideos, setRecentVideos] = useState<Video[]>([]);
-  const [favoriteVideos, setFavoriteVideos] = useState<Video[]>([]);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
 
   // Video data for all videos in the application
@@ -109,17 +108,6 @@ const Library = () => {
         saved: false
       },
     ]);
-    
-    // Set some favorites for demo
-    setFavoriteVideos([
-      {
-        id: 5,
-        title: "Fizik: Hareket Kanunları ve Uygulamaları",
-        thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
-        duration: "1:00",
-        saved: true
-      },
-    ]);
   }, []);
 
   // Load saved videos from localStorage
@@ -142,13 +130,6 @@ const Library = () => {
           saved: savedIds.includes(video.id)
         }))
       );
-      
-      setFavoriteVideos(prevVideos => 
-        prevVideos.map(video => ({
-          ...video,
-          saved: savedIds.includes(video.id)
-        }))
-      );
     }
   }, [allVideos]);
 
@@ -158,8 +139,6 @@ const Library = () => {
         return savedVideos;
       case 'recent':
         return recentVideos;
-      case 'favorites':
-        return favoriteVideos;
       default:
         return savedVideos;
     }
@@ -204,7 +183,6 @@ const Library = () => {
     });
     
     setRecentVideos(prevVideos => updateVideoSavedStatus(prevVideos));
-    setFavoriteVideos(prevVideos => updateVideoSavedStatus(prevVideos));
     
     // If a video was saved, make sure it appears in the saved videos list
     if (!savedIds.includes(videoId)) {
@@ -248,13 +226,6 @@ const Library = () => {
             >
               <Clock size={16} />
               Son İzlenenler
-            </button>
-            <button 
-              className={`pb-2 px-4 text-sm font-medium flex items-center gap-1 ${activeTab === 'favorites' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-              onClick={() => setActiveTab('favorites')}
-            >
-              <Star size={16} />
-              Favoriler
             </button>
           </div>
           
