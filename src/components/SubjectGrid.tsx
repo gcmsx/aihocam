@@ -13,7 +13,7 @@ interface SubjectCardProps {
 const SubjectCard = ({ icon, title, color, onClick }: SubjectCardProps) => {
   return (
     <div 
-      className="card flex flex-col items-center justify-center p-4 cursor-pointer hover:scale-105 transition-transform"
+      className="card flex flex-col items-center justify-center p-4 cursor-pointer hover:scale-105 transition-transform mb-2"
       style={{ backgroundColor: color }}
       onClick={onClick}
     >
@@ -48,7 +48,7 @@ const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
   };
 
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="flex flex-col space-y-2">
       {subjects.map((subject) => (
         <SubjectCard 
           key={subject.id}
