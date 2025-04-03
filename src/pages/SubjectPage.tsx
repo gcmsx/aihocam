@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Play } from 'lucide-react';
@@ -130,9 +129,10 @@ const SubjectPage = () => {
   }, [subject]);
   
   const handleVideoClick = (title: string) => {
+    // We'll keep this for logging purposes but navigation is now handled by VideoCard
     toast({
       title: "Video",
-      description: `'${title}' videosu oynatılıyor...`,
+      description: `'${title}' videosu açılıyor...`,
     });
   };
   
@@ -159,18 +159,6 @@ const SubjectPage = () => {
           : video
       )
     );
-    
-    if (savedIds.includes(videoId)) {
-      toast({
-        title: "Video Kaydedildi",
-        description: "Video kütüphanenize eklendi.",
-      });
-    } else {
-      toast({
-        title: "Video Kaldırıldı",
-        description: "Video kaydedilenlerden kaldırıldı.",
-      });
-    }
   };
   
   return (

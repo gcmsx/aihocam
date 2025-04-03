@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Play, Clock, Bookmark } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface VideoCardProps {
   title: string;
@@ -8,8 +9,8 @@ interface VideoCardProps {
   duration: string;
   saved?: boolean;
   onSave?: () => void;
-  onClick: () => void;
-  id: number; // Added id prop
+  onClick?: () => void;
+  id: number;
 }
 
 const VideoCard = ({ 
@@ -21,12 +22,21 @@ const VideoCard = ({
   onClick,
   id
 }: VideoCardProps) => {
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+    // Navigate to the video detail page
+    navigate(`/video/${id}`);
+  };
   
   return (
     <div className="video-card w-full aspect-video">
       <div 
         className="relative w-full h-full cursor-pointer"
-        onClick={onClick}
+        onClick={handleClick}
       >
         <img 
           src={thumbnailUrl} 

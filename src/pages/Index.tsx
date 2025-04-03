@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import SubjectGrid from '@/components/SubjectGrid';
 import SearchBar from '@/components/SearchBar';
@@ -81,13 +80,11 @@ const Index = () => {
     ]
   });
 
-  // Initialize videos from localStorage on component mount
   useEffect(() => {
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     if (savedVideosFromStorage) {
       const savedIds = JSON.parse(savedVideosFromStorage);
       
-      // Update each category's videos with saved state from localStorage
       setVideos(prevVideos => {
         const updatedVideos = { ...prevVideos };
         
@@ -106,12 +103,11 @@ const Index = () => {
   const handleVideoClick = (title: string) => {
     toast({
       title: "Video",
-      description: `'${title}' videosu oynatılıyor...`,
+      description: `'${title}' videosu açılıyor...`,
     });
   };
 
   const handleSaveVideo = (videoId: number) => {
-    // Update saved status across all video categories
     setVideos(prevVideos => {
       const updatedVideos = { ...prevVideos };
       
@@ -121,15 +117,12 @@ const Index = () => {
         );
       }
       
-      // Update localStorage with new saved videos
       const allVideos = Object.values(updatedVideos).flat();
       const savedIds = allVideos.filter(video => video.saved).map(video => video.id);
       localStorage.setItem('savedVideos', JSON.stringify(savedIds));
       
       return updatedVideos;
     });
-    
-    // Toast notification removed as requested
   };
 
   const handleSearch = (query: string) => {
@@ -143,7 +136,6 @@ const Index = () => {
       return activeVideos;
     }
     
-    // Filter videos based on search query
     return activeVideos.filter(video => 
       video.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
