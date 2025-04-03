@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Library from "./pages/Library";
 import Assistant from "./pages/Assistant";
 import Profile from "./pages/Profile";
+import SubjectPage from "./pages/SubjectPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/subject/:subject" element={<SubjectPage />} />
           <Route path="/library" element={<Library />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/profile" element={<Profile />} />

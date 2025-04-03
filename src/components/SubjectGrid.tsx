@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BookText, Globe, Brain, Calculator, Atom, Beaker, Leaf, Languages, BookOpen } from 'lucide-react';
 
 interface SubjectCardProps {
@@ -27,6 +28,8 @@ interface SubjectGridProps {
 }
 
 const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
+  const navigate = useNavigate();
+  
   const subjects = [
     { title: 'Tarih', icon: <BookText size={28} />, color: '#1A1B41' },
     { title: 'Coğrafya', icon: <Globe size={28} />, color: '#3E1F47' },
@@ -39,6 +42,11 @@ const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
     { title: 'Edebiyat', icon: <BookOpen size={28} />, color: '#3E1F47' },
   ];
 
+  const handleSubjectClick = (subject: string) => {
+    onSubjectClick(subject); // Mevcut fonksiyonu çağır
+    navigate(`/subject/${subject}`); // Konu sayfasına yönlendir
+  };
+
   return (
     <div className="grid-container">
       {subjects.map((subject, index) => (
@@ -47,7 +55,7 @@ const SubjectGrid = ({ onSubjectClick }: SubjectGridProps) => {
           icon={subject.icon}
           title={subject.title}
           color={subject.color}
-          onClick={() => onSubjectClick(subject.title)}
+          onClick={() => handleSubjectClick(subject.title)}
         />
       ))}
     </div>
