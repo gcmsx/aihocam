@@ -1,12 +1,13 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 import VideoCard from '@/components/VideoCard';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
-import { Video } from '@/types/video';  // Use only the imported Video type
+import { Video } from '@/types/video';
 import { 
   getSavedVideosFromStorage, 
   saveVideo, 
@@ -102,7 +103,7 @@ const SubjectStat = ({ topic, progress, color }: SubjectStatProps) => {
 
 const SubjectPage = () => {
   const { subject } = useParams<{ subject: string }>();
-  const [videos, setVideos] = useState<Video[]>([]);  // Use imported Video type
+  const [videos, setVideos] = useState<Video[]>([]);
   
   if (!subject || !subjectColors[subject]) {
     return <div className="p-4">Konu bulunamadı.</div>;
