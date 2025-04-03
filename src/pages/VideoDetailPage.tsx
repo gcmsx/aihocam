@@ -165,7 +165,7 @@ const VideoDetailPage = () => {
                     {example.options.map((option, optionIndex) => (
                       <div 
                         key={optionIndex}
-                        className={`p-2 border rounded cursor-pointer ${option === example.answer ? 'bg-green-100 border-green-300' : 'hover:bg-muted'}`}
+                        className={`p-2 border rounded cursor-pointer ${option === example.answer ? 'bg-green-100 border-green-300 dark:bg-green-900/30 dark:border-green-800' : 'hover:bg-muted'}`}
                       >
                         {option}
                       </div>
