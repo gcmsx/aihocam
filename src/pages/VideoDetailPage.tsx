@@ -6,7 +6,7 @@ import VideoHeader from '@/components/video/VideoHeader';
 import VideoPlayer from '@/components/video/VideoPlayer';
 import ContentTabs from '@/components/video/ContentTabs';
 import { useVideoDetail } from '@/hooks/useVideoDetail';
-import { getVideoFromIndexedDB } from '@/services/videoService';
+import { getVideoFromIndexedDB } from '@/services/video';
 
 const VideoDetailPage = () => {
   const { videoId } = useParams<{ videoId: string }>();
@@ -80,6 +80,7 @@ const VideoDetailPage = () => {
         <ContentTabs 
           description={videoToDisplay.description}
           examples={videoToDisplay.examples}
+          videoId={videoToDisplay.id}
         />
       </div>
       
