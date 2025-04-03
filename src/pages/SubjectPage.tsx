@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Play } from 'lucide-react';
@@ -7,7 +6,7 @@ import VideoCard from '@/components/VideoCard';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
-import { Video } from '@/types/video';  // Imported Video type
+import { Video } from '@/types/video';  // Use only the imported Video type
 import { 
   getSavedVideosFromStorage, 
   saveVideo, 
@@ -39,15 +38,6 @@ const subjectTopics: Record<string, string[]> = {
   'İngilizce': ['Temel İngilizce', 'Gramer', 'Kelime Bilgisi', 'Konuşma'],
   'Edebiyat': ['Şiir', 'Roman', 'Öykü', 'Tiyatro'],
 };
-
-interface Video {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  duration: string;
-  saved: boolean;
-  subject: string;
-}
 
 // Örnek video verileri
 const getSubjectVideos = (subject: string): Video[] => {
@@ -241,4 +231,3 @@ const SubjectPage = () => {
 };
 
 export default SubjectPage;
-
