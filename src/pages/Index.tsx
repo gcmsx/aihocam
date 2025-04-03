@@ -26,7 +26,7 @@ const Index = () => {
   return (
     <div className="pb-16">
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Hızlı Öğrenme</h1>
+        <h1 className="text-2xl font-bold mb-4">Hızlı Öğrenme <span className="text-sm text-muted-foreground">(Kapalı Beta v0.318)</span></h1>
         <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         
         <HomeSearchResults 
