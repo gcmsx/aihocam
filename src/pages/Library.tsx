@@ -113,39 +113,60 @@ const Library = () => {
   }, []);
 
   useEffect(() => {
-    // Load saved videos
+    // Load saved videos from localStorage
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
+    
     if (savedVideosFromStorage) {
-      const savedIds = JSON.parse(savedVideosFromStorage);
-      
-      const updatedSavedVideos = allVideos
-        .filter(video => savedIds.includes(video.id))
-        .map(video => ({ ...video, saved: true }));
-      
-      setSavedVideos(updatedSavedVideos);
+      try {
+        const savedIds = JSON.parse(savedVideosFromStorage);
+        console.log("Saved IDs from storage:", savedIds);
+        
+        // Find videos with IDs in the savedIds array
+        const updatedSavedVideos = allVideos
+          .filter(video => savedIds.includes(video.id))
+          .map(video => ({ ...video, saved: true }));
+        
+        console.log("Updated saved videos:", updatedSavedVideos);
+        setSavedVideos(updatedSavedVideos);
+      } catch (error) {
+        console.error("Error parsing saved videos:", error);
+        setSavedVideos([]);
+      }
     }
     
-    // Load recently viewed videos
+    // Load recently viewed videos from localStorage
     const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
+    
     if (recentlyViewedFromStorage && allVideos.length > 0) {
-      const recentIds = JSON.parse(recentlyViewedFromStorage);
-      
-      // Get the recently viewed videos from allVideos by ID
-      const recentlyViewedVideos: Video[] = [];
-      
-      recentIds.forEach((id: number) => {
-        const video = allVideos.find(v => v.id === id);
-        if (video) {
-          recentlyViewedVideos.push({
-            ...video,
-            saved: savedVideos.some(saved => saved.id === id)
-          });
-        }
-      });
-      
-      setRecentVideos(recentlyViewedVideos);
+      try {
+        const recentIds = JSON.parse(recentlyViewedFromStorage);
+        console.log("Recent IDs from storage:", recentIds);
+        
+        // Get the recently viewed videos from allVideos by ID
+        const recentlyViewedVideos: Video[] = [];
+        
+        recentIds.forEach((id: number) => {
+          const video = allVideos.find(v => v.id === id);
+          if (video) {
+            // Check if this video is in savedVideos to set saved status
+            const isSaved = savedVideosFromStorage ? 
+              JSON.parse(savedVideosFromStorage).includes(id) : false;
+            
+            recentlyViewedVideos.push({
+              ...video,
+              saved: isSaved
+            });
+          }
+        });
+        
+        console.log("Updated recent videos:", recentlyViewedVideos);
+        setRecentVideos(recentlyViewedVideos);
+      } catch (error) {
+        console.error("Error parsing recently viewed videos:", error);
+        setRecentVideos([]);
+      }
     }
-  }, [allVideos, savedVideos.length]);
+  }, [allVideos]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -180,45 +201,47 @@ const Library = () => {
     : [];
 
   const handleVideoClick = (title: string) => {
-    // Video click handler (empty for now)
+    // Empty handler as navigation is handled by VideoCard
+    console.log("Video clicked:", title);
   };
 
   const handleSaveVideo = (videoId: number) => {
-    const savedVideosFromStorage = localStorage.getItem('savedVideos');
-    let savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
-    
-    if (savedIds.includes(videoId)) {
-      savedIds = savedIds.filter(id => id !== videoId);
-    } else {
-      savedIds.push(videoId);
-    }
-    
-    localStorage.setItem('savedVideos', JSON.stringify(savedIds));
-    
-    const updateVideoSavedStatus = (videos) => 
-      videos.map(video => 
-        video.id === videoId 
-          ? { ...video, saved: !video.saved } 
-          : video
-      );
-    
-    setSavedVideos(prevVideos => {
-      const updatedVideos = updateVideoSavedStatus(prevVideos);
-      return activeTab === 'saved' 
-        ? updatedVideos.filter(video => video.saved) 
-        : updatedVideos;
-    });
-    
-    setRecentVideos(prevVideos => updateVideoSavedStatus(prevVideos));
-    
-    if (!savedIds.includes(videoId)) {
-      // Video was unsaved - no toast
-    } else {
-      const videoToAdd = allVideos.find(v => v.id === videoId);
-      if (videoToAdd && !savedVideos.some(v => v.id === videoId)) {
-        setSavedVideos(prev => [...prev, { ...videoToAdd, saved: true }]);
+    try {
+      // Get current saved videos from localStorage
+      const savedVideosFromStorage = localStorage.getItem('savedVideos');
+      let savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
+      
+      // Toggle save status
+      if (savedIds.includes(videoId)) {
+        savedIds = savedIds.filter(id => id !== videoId);
+      } else {
+        savedIds.push(videoId);
       }
-      // Video was saved - no toast
+      
+      // Update localStorage
+      localStorage.setItem('savedVideos', JSON.stringify(savedIds));
+      console.log("Updated saved IDs:", savedIds);
+      
+      // Update the UI for saved videos
+      setSavedVideos(prevVideos => {
+        // Find videos that should be in the saved list
+        const updatedVideos = allVideos
+          .filter(video => savedIds.includes(video.id))
+          .map(video => ({ ...video, saved: true }));
+        
+        return updatedVideos;
+      });
+      
+      // Update the UI for recent videos
+      setRecentVideos(prevVideos => 
+        prevVideos.map(video => ({
+          ...video,
+          saved: savedIds.includes(video.id)
+        }))
+      );
+      
+    } catch (error) {
+      console.error("Error updating saved videos:", error);
     }
   };
 

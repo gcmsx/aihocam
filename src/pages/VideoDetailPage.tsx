@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -91,8 +92,11 @@ const VideoDetailPage = () => {
       // Keep only the most recent 10 videos
       recentlyViewed = recentlyViewed.slice(0, 10);
       
-      // Update localStorage
+      // Update localStorage with stringified array
       localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
+      
+      // Log for debugging
+      console.log("Recently viewed videos updated:", recentlyViewed);
     }
   }, [videoId]);
   
@@ -117,8 +121,9 @@ const VideoDetailPage = () => {
       savedIds = savedIds.filter((id: number) => id !== video.id);
     }
     
-    // Update localStorage
+    // Update localStorage with stringified array
     localStorage.setItem('savedVideos', JSON.stringify(savedIds));
+    console.log("Saved videos updated:", savedIds);
   };
   
   if (!video) {

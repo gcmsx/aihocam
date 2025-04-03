@@ -117,38 +117,70 @@ const Index = () => {
     
     setAllVideos(combinedVideos);
     
+    // Load saved video IDs from localStorage
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     if (savedVideosFromStorage) {
-      const savedIds = JSON.parse(savedVideosFromStorage);
-      
-      setVideos(prevVideos => {
-        const updatedVideos = { ...prevVideos };
+      try {
+        const savedIds = JSON.parse(savedVideosFromStorage);
+        console.log("Index page - Saved IDs from storage:", savedIds);
         
-        for (const category in updatedVideos) {
-          updatedVideos[category] = updatedVideos[category].map(video => ({
+        // Update videos state with saved status
+        setVideos(prevVideos => {
+          const updatedVideos = { ...prevVideos };
+          
+          for (const category in updatedVideos) {
+            updatedVideos[category] = updatedVideos[category].map(video => ({
+              ...video,
+              saved: savedIds.includes(video.id)
+            }));
+          }
+          
+          return updatedVideos;
+        });
+
+        // Update allVideos with saved status
+        setAllVideos(prevAllVideos => 
+          prevAllVideos.map(video => ({
             ...video,
             saved: savedIds.includes(video.id)
-          }));
-        }
-        
-        return updatedVideos;
-      });
-
-      // Also update the saved status in allVideos
-      setAllVideos(prevAllVideos => 
-        prevAllVideos.map(video => ({
-          ...video,
-          saved: savedIds.includes(video.id)
-        }))
-      );
+          }))
+        );
+      } catch (error) {
+        console.error("Error parsing saved videos:", error);
+      }
     }
   }, []);
   
   const handleVideoClick = (title: string) => {
-    // Video click handler (empty now that we've removed toast)
+    // Empty function as we don't need any specific logic here
+    // Navigation is handled by VideoCard component
+    console.log("Video clicked:", title);
   };
 
   const handleSaveVideo = (videoId: number) => {
+    // Get current saved videos from localStorage
+    const savedVideosFromStorage = localStorage.getItem('savedVideos');
+    let savedIds = [];
+    
+    try {
+      savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
+    } catch (error) {
+      console.error("Error parsing saved videos:", error);
+      savedIds = [];
+    }
+    
+    // Toggle save status
+    if (savedIds.includes(videoId)) {
+      savedIds = savedIds.filter(id => id !== videoId);
+    } else {
+      savedIds.push(videoId);
+    }
+    
+    // Update localStorage with stringified array
+    localStorage.setItem('savedVideos', JSON.stringify(savedIds));
+    console.log("Index page - Updated saved IDs:", savedIds);
+    
+    // Update UI state for all video categories
     setVideos(prevVideos => {
       const updatedVideos = { ...prevVideos };
       
@@ -158,25 +190,15 @@ const Index = () => {
         );
       }
       
-      // Update allVideos as well
-      setAllVideos(prevAllVideos => 
-        prevAllVideos.map(video => 
-          video.id === videoId ? { ...video, saved: !video.saved } : video
-        )
-      );
-      
-      const allVideosFlat = [
-        ...updatedVideos.trend,
-        ...updatedVideos.recommended,
-        ...updatedVideos.popular,
-        ...additionalVideos
-      ];
-      
-      const savedIds = allVideosFlat.filter(video => video.saved).map(video => video.id);
-      localStorage.setItem('savedVideos', JSON.stringify(savedIds));
-      
       return updatedVideos;
     });
+    
+    // Update allVideos state as well
+    setAllVideos(prevAllVideos => 
+      prevAllVideos.map(video => 
+        video.id === videoId ? { ...video, saved: !video.saved } : video
+      )
+    );
   };
 
   const handleSearch = (query: string) => {
