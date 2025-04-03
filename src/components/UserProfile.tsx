@@ -1,7 +1,10 @@
 
-import React from 'react';
-import { Calendar, Award, Target, BarChart3, Share2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Award, Target, BarChart3, Share2, Edit } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import ProfileEditor from './ProfileEditor';
 
 interface ProgressItemProps {
   subject: string;
@@ -27,6 +30,10 @@ const ProgressItem = ({ subject, progress, color }: ProgressItemProps) => {
 };
 
 const UserProfile = () => {
+  const [username, setUsername] = useState('Kullanıcı Adı');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  
   const subjects = [
     { subject: 'Tarih', progress: 65, color: '#1A1B41' },
     { subject: 'Coğrafya', progress: 40, color: '#3E1F47' },
@@ -41,16 +48,50 @@ const UserProfile = () => {
     { title: 'Günler', value: '14', icon: <Calendar size={20} className="text-primary" /> },
   ];
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const handleSaveProfile = (newUsername: string, newImageUrl: string | null) => {
+    setUsername(newUsername);
+    setProfileImage(newImageUrl);
+    setIsEditing(false);
+  };
+
+  const initials = getInitials(username);
+
   return (
     <div className="p-4">
-      <div className="flex items-center mb-8">
-        <div className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center text-white text-2xl font-bold">
-          US
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center">
+          <Avatar className="w-20 h-20">
+            {profileImage ? (
+              <AvatarImage src={profileImage} alt={username} className="object-cover" />
+            ) : (
+              <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-white text-2xl font-bold">
+                {initials}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className="ml-4">
+            <h2 className="text-xl font-bold">{username}</h2>
+            <p className="text-muted-foreground">14 gündür öğreniyor</p>
+          </div>
         </div>
-        <div className="ml-4">
-          <h2 className="text-xl font-bold">Kullanıcı Adı</h2>
-          <p className="text-muted-foreground">14 gündür öğreniyor</p>
-        </div>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1"
+          onClick={() => setIsEditing(true)}
+        >
+          <Edit size={16} />
+          <span className="hidden sm:inline">Düzenle</span>
+        </Button>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-8">
@@ -95,6 +136,15 @@ const UserProfile = () => {
           İlerlemeni Paylaş
         </button>
       </div>
+
+      <ProfileEditor 
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        currentUsername={username}
+        currentInitials={initials}
+        currentImageUrl={profileImage || undefined}
+        onSave={handleSaveProfile}
+      />
     </div>
   );
 };
