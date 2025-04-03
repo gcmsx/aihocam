@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookText, Globe, Brain, Calculator, Atom, Beaker, Leaf, Languages, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { getVideos } from '@/services/video';
 
 interface SubjectCardProps {
   icon: React.ReactNode;
@@ -34,6 +35,18 @@ const SubjectCard = ({ icon, title, color, onClick }: SubjectCardProps) => {
 
 const SubjectGrid = () => {
   const navigate = useNavigate();
+  
+  // Get all videos and organize them by subject
+  const allVideos = getVideos();
+  const videosBySubject = allVideos.reduce((acc, video) => {
+    if (video.subject) {
+      if (!acc[video.subject]) {
+        acc[video.subject] = [];
+      }
+      acc[video.subject].push(video);
+    }
+    return acc;
+  }, {} as Record<string, typeof allVideos>);
   
   const subjects = [
     { id: 1, title: 'Tarih', icon: <BookText size={20} />, color: '#1A1B41' },

@@ -33,6 +33,7 @@ const Index = () => {
     setActiveTab,
     searchQuery,
     videos,
+    allVideos,
     filteredAllVideos,
     handleSearch,
     handleVideoClick,
