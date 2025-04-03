@@ -1,4 +1,3 @@
-
 import { Video } from '@/types/video';
 
 // Mock video verileri
@@ -66,7 +65,6 @@ const mockVideos: Video[] = [
     duration: "1:00",
     saved: false
   },
-  // İlave videolar
   {
     id: 10,
     title: "Kimya: Soru Çözüm Teknikleri",
@@ -150,6 +148,27 @@ export const saveVideo = (videoId: number): number[] => {
   console.log("Updated saved IDs:", updatedSavedIds);
   
   return updatedSavedIds;
+};
+
+export const updateRecentlyViewed = (videoId: number): number[] => {
+  const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
+  let recentlyViewed = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage) : [];
+  
+  // Remove the video if it's already in the recently viewed list
+  recentlyViewed = recentlyViewed.filter((id: number) => id !== videoId);
+  
+  // Add the video to the beginning of the list
+  recentlyViewed.unshift(videoId);
+  
+  // Keep only the most recent 10 videos
+  recentlyViewed = recentlyViewed.slice(0, 10);
+  
+  // Update localStorage with stringified array
+  localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
+  
+  console.log("Recently viewed videos updated:", recentlyViewed);
+  
+  return recentlyViewed;
 };
 
 export const getVideosByIds = (ids: number[], allVideos: Video[]): Video[] => {

@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Video } from '@/types/video';
-import { getSavedVideosFromStorage, saveVideo } from '@/services/videoService';
+import { getSavedVideosFromStorage, saveVideo, updateRecentlyViewed } from '@/services/videoService';
 
 export interface Example {
   question: string;
@@ -11,7 +12,6 @@ export interface Example {
 }
 
 export interface VideoDetails extends Video {
-  subject?: string;
   description?: string;
   examples?: Example[];
 }
@@ -48,26 +48,6 @@ const getVideoDetails = (videoId: string): VideoDetails => {
       }
     ]
   };
-};
-
-// Video izleme geçmişini güncelleme
-const updateRecentlyViewed = (videoId: number) => {
-  const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
-  let recentlyViewed = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage) : [];
-  
-  // Remove the video if it's already in the recently viewed list
-  recentlyViewed = recentlyViewed.filter((id: number) => id !== videoId);
-  
-  // Add the video to the beginning of the list
-  recentlyViewed.unshift(videoId);
-  
-  // Keep only the most recent 10 videos
-  recentlyViewed = recentlyViewed.slice(0, 10);
-  
-  // Update localStorage with stringified array
-  localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
-  
-  console.log("Recently viewed videos updated:", recentlyViewed);
 };
 
 export const useVideoDetail = (videoId: string | undefined) => {
@@ -115,11 +95,9 @@ export const useVideoDetail = (videoId: string | undefined) => {
     if (!video) return;
     
     // Toggle save status
-    const newSaveStatus = !saved;
+    const updatedSavedIds = saveVideo(video.id);
+    const newSaveStatus = updatedSavedIds.includes(video.id);
     setSaved(newSaveStatus);
-    
-    // Videoyu kaydet veya kaldır
-    saveVideo(video.id);
     
     // Kullanıcıya bildirim göster
     toast({

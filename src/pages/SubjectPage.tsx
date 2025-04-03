@@ -5,6 +5,13 @@ import NavBar from '@/components/NavBar';
 import VideoCard from '@/components/VideoCard';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
+import { Toaster } from '@/components/ui/toaster';
+import { Video } from '@/types/video';
+import { 
+  getSavedVideosFromStorage, 
+  saveVideo, 
+  updateRecentlyViewed 
+} from '@/services/videoService';
 
 // Konu başlıklarına göre arkaplan renkleri
 const subjectColors: Record<string, string> = {
@@ -38,6 +45,7 @@ interface Video {
   thumbnailUrl: string;
   duration: string;
   saved: boolean;
+  subject: string;
 }
 
 // Örnek video verileri
@@ -48,28 +56,32 @@ const getSubjectVideos = (subject: string): Video[] => {
       title: `${subject}: Temel Kavramlar ve Giriş`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1596005554384-d293674c91d7',
       duration: '18:30',
-      saved: false
+      saved: false,
+      subject: subject
     },
     {
       id: 100 + Math.floor(Math.random() * 900),
       title: `${subject}: İleri Düzey Konular`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1589519160732-57fc498494f8',
       duration: '24:15',
-      saved: false
+      saved: false,
+      subject: subject
     },
     {
       id: 100 + Math.floor(Math.random() * 900),
       title: `${subject}: Soru Çözüm Teknikleri`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
       duration: '15:45',
-      saved: false
+      saved: false,
+      subject: subject
     },
     {
       id: 100 + Math.floor(Math.random() * 900),
       title: `${subject}: Konu Özeti`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6',
       duration: '12:20',
-      saved: false
+      saved: false,
+      subject: subject
     },
   ];
 };
@@ -112,24 +124,21 @@ const SubjectPage = () => {
     const subjectVideos = getSubjectVideos(subject);
     
     // Check localStorage for saved videos
-    const savedVideosFromStorage = localStorage.getItem('savedVideos');
-    if (savedVideosFromStorage) {
-      const savedIds = JSON.parse(savedVideosFromStorage);
-      
-      // Update videos with saved state
-      const updatedVideos = subjectVideos.map(video => ({
-        ...video,
-        saved: savedIds.includes(video.id)
-      }));
-      
-      setVideos(updatedVideos);
-    } else {
-      setVideos(subjectVideos);
-    }
+    const savedVideosFromStorage = getSavedVideosFromStorage();
+    
+    // Update videos with saved state
+    const updatedVideos = subjectVideos.map(video => ({
+      ...video,
+      saved: savedVideosFromStorage.includes(video.id)
+    }));
+    
+    setVideos(updatedVideos);
   }, [subject]);
   
-  const handleVideoClick = (title: string) => {
-    // We'll keep this for logging purposes but navigation is now handled by VideoCard
+  const handleVideoClick = (title: string, videoId: number) => {
+    // Add to recently viewed videos
+    updateRecentlyViewed(videoId);
+    
     toast({
       title: "Video",
       description: `'${title}' videosu açılıyor...`,
@@ -137,28 +146,26 @@ const SubjectPage = () => {
   };
   
   const handleSaveVideo = (videoId: number) => {
-    // Get current saved videos from localStorage
-    const savedVideosFromStorage = localStorage.getItem('savedVideos');
-    let savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
-    
-    // Toggle save status
-    if (savedIds.includes(videoId)) {
-      savedIds = savedIds.filter(id => id !== videoId);
-    } else {
-      savedIds.push(videoId);
-    }
-    
-    // Update localStorage
-    localStorage.setItem('savedVideos', JSON.stringify(savedIds));
+    // Toggle save status using the videoService
+    const updatedSavedIds = saveVideo(videoId);
     
     // Update UI state
     setVideos(prevVideos => 
       prevVideos.map(video => 
         video.id === videoId 
-          ? { ...video, saved: !video.saved } 
+          ? { ...video, saved: updatedSavedIds.includes(videoId) } 
           : video
       )
     );
+    
+    // Show toast notification
+    const isNowSaved = updatedSavedIds.includes(videoId);
+    toast({
+      title: isNowSaved ? "Video kaydedildi" : "Video kaldırıldı",
+      description: isNowSaved 
+        ? "Video başarıyla kaydedildi." 
+        : "Video kaydedilenlerden kaldırıldı.",
+    });
   };
   
   return (
@@ -188,7 +195,7 @@ const SubjectPage = () => {
                 duration={video.duration}
                 saved={video.saved}
                 onSave={() => handleSaveVideo(video.id)}
-                onClick={() => handleVideoClick(video.title)}
+                onClick={() => handleVideoClick(video.title, video.id)}
               />
             ))}
           </div>
@@ -227,6 +234,7 @@ const SubjectPage = () => {
         </div>
       </div>
       <NavBar />
+      <Toaster />
     </div>
   );
 };

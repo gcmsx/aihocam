@@ -5,4 +5,5 @@ export interface Video {
   thumbnailUrl: string;
   duration: string;
   saved: boolean;
+  subject?: string;
 }
