@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import NavBar from '@/components/NavBar';
 import VideoCard from '@/components/VideoCard';
 import SearchBar from '@/components/SearchBar';
 import { BookOpen, BookMarked, Clock } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
 
 interface Video {
   id: number;
@@ -169,20 +169,13 @@ const Library = () => {
     setRecentVideos(prevVideos => updateVideoSavedStatus(prevVideos));
     
     if (!savedIds.includes(videoId)) {
-      toast({
-        title: "Video Kaldırıldı",
-        description: "Video kaydedilenlerden kaldırıldı.",
-      });
+      // Video was unsaved - no toast
     } else {
       const videoToAdd = allVideos.find(v => v.id === videoId);
       if (videoToAdd && !savedVideos.some(v => v.id === videoId)) {
         setSavedVideos(prev => [...prev, { ...videoToAdd, saved: true }]);
       }
-      
-      toast({
-        title: "Video Kaydedildi",
-        description: "Video kütüphanenize eklendi.",
-      });
+      // Video was saved - no toast
     }
   };
 
