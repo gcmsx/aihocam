@@ -23,6 +23,18 @@ const SubjectPage = () => {
     return <div className="p-4">Konu bulunamadı.</div>;
   }
   
+  // Store current subject in sessionStorage for use in VideoDetail
+  useEffect(() => {
+    if (subject) {
+      sessionStorage.setItem('currentSubject', subject);
+    }
+    
+    return () => {
+      // Optional: clear when leaving the page if needed
+      // sessionStorage.removeItem('currentSubject');
+    };
+  }, [subject]);
+  
   const topics = subjectTopics[subject] || [];
   const color = subjectColors[subject];
   
