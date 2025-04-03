@@ -56,6 +56,8 @@ const Index = () => {
         
         {(!searchQuery || filteredAllVideos.length === 0) && (
           <>
+            <SubjectGrid />
+            
             <HomeTabs 
               activeTab={activeTab}
               setActiveTab={setActiveTab}
@@ -63,8 +65,6 @@ const Index = () => {
               handleVideoClick={handleVideoClick}
               handleSaveVideo={handleSaveVideo}
             />
-            
-            <SubjectGrid />
           </>
         )}
       </div>
