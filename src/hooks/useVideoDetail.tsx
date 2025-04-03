@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Video } from '@/types/video';
-import { getSavedVideosFromStorage, saveVideo, updateRecentlyViewed } from '@/services/videoService';
+import { getSavedVideosFromStorage, saveVideo, updateRecentlyViewed, downloadVideo } from '@/services/videoService';
 
 export interface Example {
   question: string;
@@ -54,6 +54,14 @@ export const useVideoDetail = (videoId: string | undefined) => {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
   
+  // Function to update saved status
+  const updateSavedStatus = () => {
+    if (!video) return;
+    
+    const savedIds = getSavedVideosFromStorage();
+    setSaved(savedIds.includes(video.id));
+  };
+  
   useEffect(() => {
     if (!videoId) {
       setLoading(false);
@@ -84,13 +92,50 @@ export const useVideoDetail = (videoId: string | undefined) => {
     }
   }, [videoId]);
   
-  const handleSaveVideo = () => {
+  // Listen for saved status changes
+  useEffect(() => {
     if (!video) return;
     
-    // Toggle save status
-    const updatedSavedIds = saveVideo(video.id);
-    const newSaveStatus = updatedSavedIds.includes(video.id);
-    setSaved(newSaveStatus);
+    const handleVideoSaved = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && video && customEvent.detail.videoId === video.id) {
+        setSaved(customEvent.detail.saved);
+      } else {
+        updateSavedStatus();
+      }
+    };
+    
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'savedVideos') {
+        updateSavedStatus();
+      }
+    };
+    
+    window.addEventListener('videoSaved', handleVideoSaved);
+    window.addEventListener('videoDownloaded', handleVideoSaved);
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('videoSaved', handleVideoSaved);
+      window.removeEventListener('videoDownloaded', handleVideoSaved);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [video]);
+  
+  const handleSaveVideo = async () => {
+    if (!video) return;
+    
+    // Update UI immediately for responsiveness
+    setSaved(!saved);
+    
+    // If we're using the newer download functionality
+    try {
+      await downloadVideo(video.id, video);
+    } catch (error) {
+      console.error("Error saving video:", error);
+      // Revert UI state if error occurs
+      setSaved(!saved);
+    }
   };
   
   return { video, saved, loading, handleSaveVideo };

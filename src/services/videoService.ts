@@ -157,7 +157,7 @@ export const getRecentVideosFromStorage = (): number[] => {
   return [];
 };
 
-// Save a video to IndexedDB and localStorage
+// Save a video to IndexedDB and localStorage - Make sure this completes even if user navigates away
 export const downloadVideo = async (videoId: number, video: Video): Promise<number[]> => {
   try {
     // Get current saved videos from localStorage
@@ -175,7 +175,14 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
       const transaction = db.transaction(['videos'], 'readwrite');
       const store = transaction.objectStore('videos');
       
-      store.delete(videoId);
+      const deleteRequest = store.delete(videoId);
+      
+      // Wait for deletion to complete
+      await new Promise((resolve, reject) => {
+        deleteRequest.onsuccess = resolve;
+        deleteRequest.onerror = reject;
+        transaction.oncomplete = resolve;
+      });
     } else {
       // If not downloaded, add it
       updatedSavedIds = [...savedIds, videoId];
@@ -194,12 +201,24 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
         downloadDate: new Date().toISOString()
       };
       
-      store.put(videoData);
+      const putRequest = store.put(videoData);
+      
+      // Wait for put to complete
+      await new Promise((resolve, reject) => {
+        putRequest.onsuccess = resolve;
+        putRequest.onerror = reject;
+        transaction.oncomplete = resolve;
+      });
     }
     
-    // Update localStorage
+    // Make sure localStorage updates immediately and synchronously
     localStorage.setItem('savedVideos', JSON.stringify(updatedSavedIds));
     console.log("Updated downloaded videos IDs:", updatedSavedIds);
+    
+    // Dispatch an event to notify all components about the change
+    window.dispatchEvent(new CustomEvent('videoSaved', { 
+      detail: { videoId, saved: !savedIds.includes(videoId) } 
+    }));
     
     return updatedSavedIds;
   } catch (error) {
@@ -225,6 +244,11 @@ export const saveVideo = (videoId: number): number[] => {
   // Update localStorage
   localStorage.setItem('savedVideos', JSON.stringify(updatedSavedIds));
   console.log("Updated saved IDs:", updatedSavedIds);
+  
+  // Dispatch an event to notify all components about the change
+  window.dispatchEvent(new CustomEvent('videoSaved', { 
+    detail: { videoId, saved: !savedIds.includes(videoId) } 
+  }));
   
   return updatedSavedIds;
 };

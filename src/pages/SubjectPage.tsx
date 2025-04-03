@@ -40,21 +40,40 @@ const SubjectPage = () => {
     
     setVideos(updatedVideos);
     
-    // Listen for video download events
-    const handleVideoDownload = () => {
-      const savedVideosFromStorage = getSavedVideosFromStorage();
+    // Function to update videos when save status changes
+    const updateSavedStatus = () => {
+      const currentSavedIds = getSavedVideosFromStorage();
       setVideos(prevVideos => 
         prevVideos.map(video => ({
           ...video,
-          saved: savedVideosFromStorage.includes(video.id)
+          saved: currentSavedIds.includes(video.id)
         }))
       );
     };
     
+    // Listen for video download events
+    const handleVideoDownload = () => {
+      updateSavedStatus();
+    };
+    
+    const handleVideoSaved = () => {
+      updateSavedStatus();
+    };
+    
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'savedVideos') {
+        updateSavedStatus();
+      }
+    };
+    
     window.addEventListener('videoDownloaded', handleVideoDownload);
+    window.addEventListener('videoSaved', handleVideoSaved);
+    window.addEventListener('storage', handleStorageChange);
     
     return () => {
       window.removeEventListener('videoDownloaded', handleVideoDownload);
+      window.removeEventListener('videoSaved', handleVideoSaved);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [subject]);
   
@@ -65,30 +84,34 @@ const SubjectPage = () => {
   
   const handleSaveVideo = async (videoId: number) => {
     try {
-      setIsDownloading(true);
-      
       // Find the video
       const video = videos.find(v => v.id === videoId);
       if (!video) return;
       
-      // Download the video
-      const updatedSavedIds = await downloadVideo(videoId, video);
-      
-      // Update UI state
+      // Update UI immediately for better responsiveness
       setVideos(prevVideos => 
         prevVideos.map(video => 
           video.id === videoId 
-            ? { ...video, saved: updatedSavedIds.includes(videoId) } 
+            ? { ...video, saved: !video.saved } 
             : video
         )
       );
       
-      // Dispatch event
-      window.dispatchEvent(new Event('videoDownloaded'));
+      // Process the download without waiting for the response
+      // The event listeners will handle updating the UI when the operation completes
+      downloadVideo(videoId, video).catch(error => {
+        console.error("Error downloading video:", error);
+        // Revert UI state if there's an error
+        setVideos(prevVideos => 
+          prevVideos.map(video => 
+            video.id === videoId 
+              ? { ...video, saved: !video.saved } 
+              : video
+          )
+        );
+      });
     } catch (error) {
       console.error("Error downloading video:", error);
-    } finally {
-      setIsDownloading(false);
     }
   };
   

@@ -19,6 +19,11 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
     setAllVideos(combinedVideos);
     
     // Update saved status from localStorage
+    updateVideoSavedStatus();
+  }, []);
+
+  // Function to update saved status
+  const updateVideoSavedStatus = () => {
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     if (savedVideosFromStorage) {
       try {
@@ -47,6 +52,30 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
         console.error("Error parsing saved videos:", error);
       }
     }
+  };
+
+  // Listen for video save/download events
+  useEffect(() => {
+    const handleVideoSaved = () => {
+      updateVideoSavedStatus();
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'savedVideos') {
+        updateVideoSavedStatus();
+      }
+    };
+    
+    // Listen for both custom event and storage event
+    window.addEventListener('videoSaved', handleVideoSaved);
+    window.addEventListener('videoDownloaded', handleVideoSaved);
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('videoSaved', handleVideoSaved);
+      window.removeEventListener('videoDownloaded', handleVideoSaved);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleVideoClick = (title: string) => {
@@ -58,6 +87,13 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
       const video = allVideos.find(v => v.id === videoId);
       if (!video) return;
       
+      // Start the download process without waiting for it to complete
+      // We'll rely on the events to update the UI state
+      downloadVideo(videoId, video).catch(error => {
+        console.error("Error saving video:", error);
+      });
+      
+      // Immediately update UI to reflect that the video is being downloaded
       setVideos(prevVideos => {
         const updatedVideos = { ...prevVideos };
         
@@ -76,11 +112,8 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
         )
       );
       
-      await downloadVideo(videoId, video);
-      
-      window.dispatchEvent(new Event('videoDownloaded'));
     } catch (error) {
-      console.error("Error saving video:", error);
+      console.error("Error handling save video:", error);
     }
   };
 
