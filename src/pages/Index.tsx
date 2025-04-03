@@ -5,6 +5,7 @@ import NavBar from '@/components/NavBar';
 import HomeTabs from '@/components/home/HomeTabs';
 import HomeSearchResults from '@/components/home/HomeSearchResults';
 import { useHomeVideos } from '@/hooks/useHomeVideos';
+import SubjectGrid from '@/components/SubjectGrid';
 
 const Index = () => {
   const [version, setVersion] = useState('0.318');
@@ -55,6 +56,10 @@ const Index = () => {
         
         {(!searchQuery || filteredAllVideos.length === 0) && (
           <>
+            <h2 className="text-lg font-semibold mt-6 mb-4">Dersler</h2>
+            <SubjectGrid />
+            
+            <h2 className="text-lg font-semibold mt-6 mb-4">Videolar</h2>
             <HomeTabs 
               activeTab={activeTab}
               setActiveTab={setActiveTab}
