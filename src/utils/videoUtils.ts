@@ -1,4 +1,3 @@
-
 import { mockVideos } from '@/services/video/mockData';
 import { Video } from '@/types/video';
 
@@ -12,20 +11,36 @@ export const getSubjectVideos = (subject: string): Video[] => {
   if (subjectVideos.length < 4) {
     const additionalVideos: Video[] = [];
     
-    for (let i = subjectVideos.length; i < 4; i++) {
+    // Calculate how many additional videos we need
+    const videosToAdd = 4 - subjectVideos.length;
+    
+    // Create unique IDs for new videos
+    const maxId = mockVideos.length > 0 ? Math.max(...mockVideos.map(v => v.id)) : 0;
+    
+    // List of placeholder images we can use
+    const placeholderImages = [
+      '/placeholder.svg',
+      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
+      'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
+      'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
+      'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158'
+    ];
+    
+    for (let i = 0; i < videosToAdd; i++) {
+      const videoNumber = subjectVideos.length + i + 1;
       additionalVideos.push({
-        id: Math.max(...mockVideos.map(v => v.id)) + i + 1,
-        title: `${subject} Dersi ${i + 1}. Video`,
+        id: maxId + i + 1,
+        title: `${subject} Dersi ${videoNumber}. Video`,
         subject: subject,
-        thumbnailUrl: '/placeholder.svg', // Use a placeholder image
+        thumbnailUrl: placeholderImages[i % placeholderImages.length], 
         duration: `${Math.floor(Math.random() * 20 + 5)} dk`,
         saved: false
       });
     }
 
+    console.log(`Added ${additionalVideos.length} videos for ${subject}. Total: ${subjectVideos.length + additionalVideos.length}`);
     return [...subjectVideos, ...additionalVideos];
   }
 
   return subjectVideos;
 };
-

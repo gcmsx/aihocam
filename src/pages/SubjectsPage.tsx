@@ -3,7 +3,6 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import VideoCard from '@/components/VideoCard';
 import NavBar from '@/components/NavBar';
-import { mockVideos } from '@/services/video/mockData';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { subjectIcons } from '@/data/subjectIcons';
@@ -13,20 +12,17 @@ import { Card } from '@/components/ui/card';
 import { 
   ChartContainer, 
   ChartLegend, 
-  ChartLegendContent, 
-  ChartTooltip, 
-  ChartTooltipContent 
+  ChartLegendContent,
 } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
+import { getSubjectVideos } from '@/utils/videoUtils';
 
 const SubjectsPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const navigate = useNavigate();
   
-  // Get videos for this subject
-  const subjectVideos = mockVideos.filter(
-    video => video.subject && video.subject === subject
-  );
+  // Get videos for this subject using the utility function
+  const subjectVideos = subject ? getSubjectVideos(subject) : [];
   
   // Handle back button
   const handleBack = () => {
