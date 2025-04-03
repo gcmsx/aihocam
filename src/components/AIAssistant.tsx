@@ -19,6 +19,8 @@ const AIAssistant = () => {
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  const OPENAI_API_KEY = "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";
+  
   const quickQuestions = [
     "Nasıl daha etkili çalışabilirim?",
     "Son izlediğim videoyu özetle",
@@ -43,13 +45,59 @@ const AIAssistant = () => {
     setIsTyping(true);
     
     try {
-      // Simulate AI response without relying on OpenAI API
-      // We'll have hardcoded responses based on keywords
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      // Make a real OpenAI API call
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Sen bir eğitim asistanısın. Öğrencilere ders çalışma, motivasyon, eğitim içerikleri hakkında Türkçe yardım ediyorsun. Eğitimle ilgili olmayan sorulara "Üzgünüm, ben bir eğitim asistanıyım ve sadece eğitimle ilgili konularda yardımcı olabilirim." diye yanıt ver.'
+            },
+            ...messages.map(msg => ({
+              role: msg.sender === 'user' ? 'user' : 'assistant',
+              content: msg.text
+            })),
+            {
+              role: 'user',
+              content: input
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('OpenAI API Error:', errorData);
+        throw new Error(`API error: ${response.status} ${errorData.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      const aiMessage = data.choices[0].message.content;
       
+      // Add AI response to messages
+      const aiResponseObj = { 
+        id: messages.length + 2, 
+        text: aiMessage, 
+        sender: 'ai' as const 
+      };
+      
+      setMessages(prev => [...prev, aiResponseObj]);
+    } catch (error) {
+      console.error('OpenAI API Error:', error);
+      
+      // Fallback to offline mode in case of API error
       let aiResponse = "";
       const userInput = input.toLowerCase();
       
+      // Fallback logic with hardcoded responses
       if (userInput.includes("etkili çalış") || userInput.includes("verimli çalış")) {
         aiResponse = "Etkili çalışmak için bazı öneriler:\n\n" +
           "1. Pomodoro tekniğini deneyin: 25 dakika çalışıp 5 dakika ara verin\n" +
@@ -118,29 +166,19 @@ const AIAssistant = () => {
           "5. Dijital not alma araçlarını deneyin (Notion, Evernote vb.)";
       }
       else {
-        aiResponse = "Bu konu hakkında size yardımcı olmak isterim. Daha spesifik bir soru sorabilir misiniz? Eğitim, çalışma teknikleri, veya belirli dersler hakkında sorularınızı yanıtlayabilirim.";
+        aiResponse = "Üzgünüm, şu anda API ile bağlantı kuramıyorum. Daha sonra tekrar deneyebilir misiniz? Alternatif olarak, eğitim teknikleri, çalışma yöntemleri veya belirli dersler hakkında sorular sorabilirsiniz.";
       }
       
-      // Add AI response to messages
-      const aiResponseObj = { 
-        id: messages.length + 2, 
-        text: aiResponse, 
-        sender: 'ai' as const 
-      };
-      
-      setMessages(prev => [...prev, aiResponseObj]);
-    } catch (error) {
-      console.error('Hata:', error);
       toast({
-        title: "Hata",
-        description: "Bir sorun oluştu, lütfen daha sonra tekrar deneyin.",
+        title: "Bağlantı Hatası",
+        description: "OpenAI API ile iletişim kurarken bir sorun oluştu. Offline mod kullanılıyor.",
         variant: "destructive",
       });
       
-      // Add fallback error message
+      // Add fallback AI response
       const errorResponse = { 
         id: messages.length + 2, 
-        text: "Üzgünüm, bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
+        text: aiResponse, 
         sender: 'ai' as const 
       };
       
