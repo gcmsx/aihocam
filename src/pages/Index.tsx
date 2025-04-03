@@ -8,11 +8,11 @@ import SubjectGrid from '@/components/SubjectGrid';
 import { useHomeVideos } from '@/hooks/useHomeVideos';
 
 const Index = () => {
-  const [version, setVersion] = useState('0.318');
+  const [version, setVersion] = useState('0.341');
   
   // Load version from localStorage
   useEffect(() => {
-    const storedVersion = localStorage.getItem('appVersion') || '0.318';
+    const storedVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0341';
     setVersion(storedVersion);
     
     const handleVersionUpdate = (e: CustomEvent) => {
@@ -43,7 +43,7 @@ const Index = () => {
     <div className="pb-16">
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">
-          AI Hocam <span className="text-sm text-muted-foreground">(Kapalı Beta v{version})</span>
+          AI Hocam <span className="text-sm text-muted-foreground">(Kapalı Beta GEN-1 final v.{version})</span>
         </h1>
         <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         
