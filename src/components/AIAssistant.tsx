@@ -36,67 +36,56 @@ const AIAssistant = () => {
     // Show AI is typing
     setIsTyping(true);
     
-    try {
-      // OpenAI API call
-      const apiKey = "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";
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'Sen bir eğitim asistanısın. Öğrencilere derslerinde yardımcı olan, anlaşılır ve destekleyici cevaplar veren bir yapay zekasın. Cevapların kısa, özlü ve Türkçe olmalı.'
-            },
-            {
-              role: 'user',
-              content: input
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 500
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
+    // Simulate AI response instead of using real API
+    setTimeout(() => {
+      try {
+        // Create simulated responses based on keywords in the input
+        let responseText = "Bu soruyu şu anda yanıtlayamıyorum. Daha sonra tekrar deneyebilir misiniz?";
+        
+        const inputLower = input.toLowerCase();
+        
+        if (inputLower.includes("merhaba") || inputLower.includes("selam")) {
+          responseText = "Merhaba! Nasıl yardımcı olabilirim?";
+        } else if (inputLower.includes("nasıl") && inputLower.includes("çalışabilirim")) {
+          responseText = "Etkili çalışmak için Pomodoro tekniğini deneyebilirsiniz. 25 dakika çalışıp 5 dakika mola verin. 4 pomodoro tamamladıktan sonra daha uzun bir mola verin.";
+        } else if (inputLower.includes("özetle") || inputLower.includes("özet")) {
+          responseText = "Son izlediğiniz video, matematik dersinde türev konusunu anlatıyordu. Özellikle türevin günlük hayattaki uygulamaları ve anlık değişim hızını hesaplama konularına odaklanmıştı.";
+        } else if (inputLower.includes("tarih")) {
+          responseText = "Tarih konularında zorlanmak yaygındır. Olayları bir zaman çizelgesi üzerinde görselleştirmek ve her olayı bir hikaye ile ilişkilendirmek hatırlamanızı kolaylaştırabilir.";
+        } else if (inputLower.includes("fizik") || inputLower.includes("formül")) {
+          responseText = "Fizik formüllerini ezberlemek yerine, onları anlamaya çalışın. Her formülün ne anlama geldiğini ve hangi durumlarda kullanıldığını bilirseniz, daha kolay hatırlarsınız. Ayrıca, formülleri görselleştirmeye çalışın ve kendi notlarınızı oluşturun.";
+        } else if (inputLower.includes("teşekkür")) {
+          responseText = "Rica ederim! Başka sorunuz varsa, sormaktan çekinmeyin.";
+        }
+        
+        // Add AI response to messages
+        const aiResponse = { 
+          id: messages.length + 2, 
+          text: responseText, 
+          sender: 'ai' as const 
+        };
+        
+        setMessages(prev => [...prev, aiResponse]);
+      } catch (error) {
+        console.error('Error with AI response:', error);
+        toast({
+          title: "Hata",
+          description: "Yanıt alınamadı. Lütfen daha sonra tekrar deneyin.",
+          variant: "destructive",
+        });
+        
+        // Add fallback error message
+        const errorResponse = { 
+          id: messages.length + 2, 
+          text: "Üzgünüm, bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
+          sender: 'ai' as const 
+        };
+        
+        setMessages(prev => [...prev, errorResponse]);
+      } finally {
+        setIsTyping(false);
       }
-      
-      const data = await response.json();
-      
-      // Add AI response to messages
-      const aiResponseText = data.choices[0].message.content;
-      const aiResponse = { 
-        id: messages.length + 2, 
-        text: aiResponseText, 
-        sender: 'ai' as const 
-      };
-      
-      setMessages(prev => [...prev, aiResponse]);
-    } catch (error) {
-      console.error('Error calling OpenAI API:', error);
-      toast({
-        title: "Hata",
-        description: "Yanıt alınamadı. Lütfen daha sonra tekrar deneyin.",
-        variant: "destructive",
-      });
-      
-      // Add fallback error message
-      const errorResponse = { 
-        id: messages.length + 2, 
-        text: "Üzgünüm, bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
-        sender: 'ai' as const 
-      };
-      
-      setMessages(prev => [...prev, errorResponse]);
-    } finally {
-      setIsTyping(false);
-    }
+    }, 1000); // Simulate response delay
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
