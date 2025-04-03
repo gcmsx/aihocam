@@ -1,249 +1,23 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import NavBar from '@/components/NavBar';
-import VideoCard from '@/components/VideoCard';
 import SearchBar from '@/components/SearchBar';
-import { BookOpen, BookMarked, Clock } from 'lucide-react';
-
-interface Video {
-  id: number;
-  title: string;
-  thumbnailUrl: string;
-  duration: string;
-  saved: boolean;
-}
+import LibraryTabs from '@/components/library/LibraryTabs';
+import SearchResults from '@/components/library/SearchResults';
+import TabContent from '@/components/library/TabContent';
+import { useVideoLibrary } from '@/hooks/useVideoLibrary';
 
 const Library = () => {
-  const [activeTab, setActiveTab] = useState('saved');
-  const [savedVideos, setSavedVideos] = useState<Video[]>([]);
-  const [recentVideos, setRecentVideos] = useState<Video[]>([]);
-  const [allVideos, setAllVideos] = useState<Video[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    const videoData = [
-      {
-        id: 1,
-        title: "Modern Türkiye Tarihinin Dönüm Noktaları - Cumhuriyetin İlanı",
-        thumbnailUrl: "https://images.unsplash.com/photo-1596005554384-d293674c91d7",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 2,
-        title: "Dünya Coğrafyası: Kıtalar ve Okyanuslar",
-        thumbnailUrl: "https://images.unsplash.com/photo-1589519160732-57fc498494f8",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 3,
-        title: "Matematik: Türev Kavramı ve Uygulamaları",
-        thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 4,
-        title: "Fizik: Hareket Kanunları ve Uygulamaları",
-        thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 5,
-        title: "Biyoloji: Hücre Yapısı ve İşlevi",
-        thumbnailUrl: "https://images.unsplash.com/photo-1581093588401-fbb62a02f120",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 6,
-        title: "İngilizce: Günlük Konuşma Kalıpları",
-        thumbnailUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 7,
-        title: "Kimya: Periyodik Tablo ve Elementler",
-        thumbnailUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 8,
-        title: "Edebiyat: Şiir Analizi Teknikleri",
-        thumbnailUrl: "https://images.unsplash.com/photo-1476275466078-4007374efbbe",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 9,
-        title: "Felsefe: Varoluşçuluk Akımı",
-        thumbnailUrl: "https://images.unsplash.com/photo-1580894894513-541e068a3e2b",
-        duration: "1:00",
-        saved: false
-      },
-      // Additional videos for searching
-      {
-        id: 10,
-        title: "Kimya: Soru Çözüm Teknikleri",
-        thumbnailUrl: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 11,
-        title: "Fizik: Soru Çözüm Stratejileri",
-        thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
-        duration: "1:00",
-        saved: false
-      },
-      {
-        id: 12,
-        title: "Matematik: Soru Çözüm Yaklaşımları",
-        thumbnailUrl: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
-        duration: "1:00",
-        saved: false
-      },
-    ];
-    
-    setAllVideos(videoData);
-  }, []);
-
-  useEffect(() => {
-    // Load saved videos from localStorage
-    const savedVideosFromStorage = localStorage.getItem('savedVideos');
-    
-    if (savedVideosFromStorage) {
-      try {
-        const savedIds = JSON.parse(savedVideosFromStorage);
-        console.log("Saved IDs from storage:", savedIds);
-        
-        // Find videos with IDs in the savedIds array
-        const updatedSavedVideos = allVideos
-          .filter(video => savedIds.includes(video.id))
-          .map(video => ({ ...video, saved: true }));
-        
-        console.log("Updated saved videos:", updatedSavedVideos);
-        setSavedVideos(updatedSavedVideos);
-      } catch (error) {
-        console.error("Error parsing saved videos:", error);
-        setSavedVideos([]);
-      }
-    }
-    
-    // Load recently viewed videos from localStorage
-    const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
-    
-    if (recentlyViewedFromStorage && allVideos.length > 0) {
-      try {
-        const recentIds = JSON.parse(recentlyViewedFromStorage);
-        console.log("Recent IDs from storage:", recentIds);
-        
-        // Get the recently viewed videos from allVideos by ID
-        const recentlyViewedVideos: Video[] = [];
-        
-        recentIds.forEach((id: number) => {
-          const video = allVideos.find(v => v.id === id);
-          if (video) {
-            // Check if this video is in savedVideos to set saved status
-            const isSaved = savedVideosFromStorage ? 
-              JSON.parse(savedVideosFromStorage).includes(id) : false;
-            
-            recentlyViewedVideos.push({
-              ...video,
-              saved: isSaved
-            });
-          }
-        });
-        
-        console.log("Updated recent videos:", recentlyViewedVideos);
-        setRecentVideos(recentlyViewedVideos);
-      } catch (error) {
-        console.error("Error parsing recently viewed videos:", error);
-        setRecentVideos([]);
-      }
-    }
-  }, [allVideos]);
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
-  const getActiveVideos = () => {
-    let videos;
-    switch(activeTab) {
-      case 'saved':
-        videos = savedVideos;
-        break;
-      case 'recent':
-        videos = recentVideos;
-        break;
-      default:
-        videos = savedVideos;
-    }
-    
-    if (!searchQuery) {
-      return videos;
-    }
-    
-    return videos.filter(video => 
-      video.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
-
-  const filteredAllVideos = searchQuery 
-    ? allVideos.filter(video => 
-        video.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
-
-  const handleVideoClick = (title: string) => {
-    // Empty handler as navigation is handled by VideoCard
-    console.log("Video clicked:", title);
-  };
-
-  const handleSaveVideo = (videoId: number) => {
-    try {
-      // Get current saved videos from localStorage
-      const savedVideosFromStorage = localStorage.getItem('savedVideos');
-      let savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
-      
-      // Toggle save status
-      if (savedIds.includes(videoId)) {
-        savedIds = savedIds.filter(id => id !== videoId);
-      } else {
-        savedIds.push(videoId);
-      }
-      
-      // Update localStorage
-      localStorage.setItem('savedVideos', JSON.stringify(savedIds));
-      console.log("Updated saved IDs:", savedIds);
-      
-      // Update the UI for saved videos
-      setSavedVideos(prevVideos => {
-        // Find videos that should be in the saved list
-        const updatedVideos = allVideos
-          .filter(video => savedIds.includes(video.id))
-          .map(video => ({ ...video, saved: true }));
-        
-        return updatedVideos;
-      });
-      
-      // Update the UI for recent videos
-      setRecentVideos(prevVideos => 
-        prevVideos.map(video => ({
-          ...video,
-          saved: savedIds.includes(video.id)
-        }))
-      );
-      
-    } catch (error) {
-      console.error("Error updating saved videos:", error);
-    }
-  };
+  const {
+    activeTab,
+    setActiveTab,
+    searchQuery,
+    handleSearch,
+    filteredAllVideos,
+    getActiveVideos,
+    handleVideoClick,
+    handleSaveVideo
+  } = useVideoLibrary();
 
   return (
     <div className="pb-16">
@@ -255,67 +29,25 @@ const Library = () => {
         />
         
         <div className="mt-6">
-          <div className="flex border-b mb-4 justify-center">
-            <button 
-              className={`pb-2 px-4 text-sm font-medium flex items-center gap-1 ${activeTab === 'saved' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-              onClick={() => setActiveTab('saved')}
-            >
-              <BookMarked size={16} />
-              Kaydedilenler
-            </button>
-            <button 
-              className={`pb-2 px-4 text-sm font-medium flex items-center gap-1 ${activeTab === 'recent' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-              onClick={() => setActiveTab('recent')}
-            >
-              <Clock size={16} />
-              Son İzlenenler
-            </button>
-          </div>
+          <LibraryTabs 
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
           
-          {searchQuery && filteredAllVideos.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-2">Arama Sonuçları</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredAllVideos.map(video => (
-                  <VideoCard 
-                    key={video.id}
-                    id={video.id}
-                    title={video.title}
-                    thumbnailUrl={video.thumbnailUrl}
-                    duration={video.duration}
-                    saved={savedVideos.some(v => v.id === video.id)}
-                    onSave={() => handleSaveVideo(video.id)}
-                    onClick={() => handleVideoClick(video.title)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          <SearchResults 
+            searchQuery={searchQuery}
+            videos={filteredAllVideos}
+            onVideoClick={handleVideoClick}
+            onSaveVideo={handleSaveVideo}
+          />
           
-          {(getActiveVideos().length > 0 && (!searchQuery || searchQuery && getActiveVideos().length > 0)) ? (
-            <div>
-              {searchQuery && <h2 className="text-lg font-semibold mb-2">{activeTab === 'saved' ? 'Kaydedilenler' : 'Son İzlenenler'}</h2>}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {getActiveVideos().map(video => (
-                  <VideoCard 
-                    key={video.id}
-                    id={video.id}
-                    title={video.title}
-                    thumbnailUrl={video.thumbnailUrl}
-                    duration={video.duration}
-                    saved={video.saved}
-                    onSave={() => handleSaveVideo(video.id)}
-                    onClick={() => handleVideoClick(video.title)}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="py-8 text-center">
-              <BookOpen size={48} className="mx-auto text-muted-foreground mb-2" />
-              <p className="text-muted-foreground">Bu kategoride henüz video yok.</p>
-            </div>
-          )}
+          <TabContent 
+            activeTab={activeTab}
+            searchQuery={searchQuery}
+            videos={getActiveVideos()}
+            onVideoClick={handleVideoClick}
+            onSaveVideo={handleSaveVideo}
+          />
         </div>
       </div>
       <NavBar />
