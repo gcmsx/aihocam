@@ -54,7 +54,7 @@ const Index = () => {
         <HomeSearchResults 
           searchQuery={searchQuery}
           filteredVideos={filteredAllVideos}
-          handleVideoClick={handleVideoClick}
+          handleVideoClick={(title, videoId) => handleVideoClick(videoId)}
           handleSaveVideo={handleSaveVideo}
         />
         

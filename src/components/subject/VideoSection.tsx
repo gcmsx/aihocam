@@ -16,6 +16,12 @@ const VideoSection = ({ videos, onSaveVideo, onVideoClick }: VideoSectionProps) 
   const subject = videos.length > 0 ? videos[0].subject : undefined;
   // Get topics for this subject or empty array if not found
   const topics = subject ? subjectTopics[subject] || [] : [];
+  
+  // Filter by clicked topic (would be implemented here)
+  const handleTopicClick = (topic: string) => {
+    console.log(`Selected topic: ${topic}`);
+    // Future implementation: filter videos by topic
+  };
 
   return (
     <div className="mb-6">
@@ -28,7 +34,7 @@ const VideoSection = ({ videos, onSaveVideo, onVideoClick }: VideoSectionProps) 
               <Card 
                 key={index}
                 className="p-4 cursor-pointer hover:bg-gray-100 transition-colors"
-                onClick={() => console.log(`Selected topic: ${topic}`)}
+                onClick={() => handleTopicClick(topic)}
               >
                 <p className="text-sm font-medium text-center">{topic}</p>
               </Card>
