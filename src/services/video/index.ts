@@ -1,16 +1,40 @@
 
 // Main entry point for video services
 
-// Re-export all functionality from the sub-modules
-export * from './mockData';
-export * from './videoDatabase';
-export * from './videoStorage';
-export * from './videoUtils';
+// Import specific functions from modules instead of re-exporting everything
+import { mockVideos } from './mockData';
+import { setupDatabase } from './videoDatabase';
+import { 
+  getSavedVideosFromStorage, 
+  getRecentVideosFromStorage, 
+  downloadVideo,
+  updateRecentlyViewed,
+  getAllSavedVideos,
+  getAllRecentVideos,
+  getVideoFromIndexedDB 
+} from './videoStorage';
+import { 
+  getSubjectExamples, 
+  getSubjectDescription 
+} from './videoUtils';
+
+// Export the imported functions
+export {
+  mockVideos,
+  setupDatabase,
+  getSavedVideosFromStorage,
+  getRecentVideosFromStorage,
+  downloadVideo,
+  updateRecentlyViewed,
+  getAllSavedVideos,
+  getAllRecentVideos,
+  getVideoFromIndexedDB,
+  getSubjectExamples,
+  getSubjectDescription
+};
 
 // Provide a centralized API for getting videos
-import { mockVideos } from './mockData';
 import { Video } from '@/types/video';
-import { getSavedVideosFromStorage, getRecentVideosFromStorage, getVideoFromIndexedDB } from './videoStorage';
 
 /**
  * Get all available videos
