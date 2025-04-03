@@ -17,7 +17,7 @@ const AIAssistant = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai_api_key') || '');
+  const OPENAI_API_KEY = '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';
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const quickQuestions = [
@@ -32,13 +32,6 @@ const AIAssistant = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Save API key to localStorage when it changes
-  useEffect(() => {
-    if (apiKey) {
-      localStorage.setItem('openai_api_key', apiKey);
-    }
-  }, [apiKey]);
-
   const handleSend = async () => {
     if (!input.trim()) return;
     
@@ -46,16 +39,6 @@ const AIAssistant = () => {
     const newUserMessage = { id: messages.length + 1, text: input, sender: 'user' as const };
     setMessages([...messages, newUserMessage]);
     setInput('');
-    
-    // Check if API key is set
-    if (!apiKey) {
-      toast({
-        title: "API Key Gerekli",
-        description: "Lütfen OpenAI API anahtarınızı girin.",
-        variant: "destructive",
-      });
-      return;
-    }
     
     // Show AI is typing
     setIsTyping(true);
@@ -78,7 +61,7 @@ const AIAssistant = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${OPENAI_API_KEY}`
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
@@ -118,7 +101,7 @@ const AIAssistant = () => {
       // Add fallback error message
       const errorResponse = { 
         id: messages.length + 2, 
-        text: "Üzgünüm, OpenAI API ile iletişim kurarken bir sorun oluştu. Lütfen API anahtarınızı kontrol edin veya daha sonra tekrar deneyin.", 
+        text: "Üzgünüm, OpenAI API ile iletişim kurarken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
         sender: 'ai' as const 
       };
       
@@ -149,32 +132,6 @@ const AIAssistant = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
-      {!apiKey && (
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 m-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700">
-                Kullanmak için OpenAI API anahtarınızı girmeniz gerekiyor
-              </p>
-              <div className="mt-2">
-                <input
-                  type="password"
-                  className="w-full p-2 border rounded"
-                  placeholder="OpenAI API Anahtarınız"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
       <div className="flex-1 p-4 overflow-y-auto">
         {messages.map((message) => (
           <div 
@@ -267,4 +224,3 @@ const AIAssistant = () => {
 };
 
 export default AIAssistant;
-
