@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Play } from 'lucide-react';
 import NavBar from '@/components/NavBar';
@@ -33,32 +33,40 @@ const subjectTopics: Record<string, string[]> = {
   'Edebiyat': ['Şiir', 'Roman', 'Öykü', 'Tiyatro'],
 };
 
+interface Video {
+  id: number;
+  title: string;
+  thumbnailUrl: string;
+  duration: string;
+  saved: boolean;
+}
+
 // Örnek video verileri
-const getSubjectVideos = (subject: string) => {
+const getSubjectVideos = (subject: string): Video[] => {
   return [
     {
-      id: 1,
+      id: 100 + Math.floor(Math.random() * 900),
       title: `${subject}: Temel Kavramlar ve Giriş`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1596005554384-d293674c91d7',
       duration: '18:30',
       saved: false
     },
     {
-      id: 2,
+      id: 100 + Math.floor(Math.random() * 900),
       title: `${subject}: İleri Düzey Konular`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1589519160732-57fc498494f8',
       duration: '24:15',
-      saved: true
+      saved: false
     },
     {
-      id: 3,
+      id: 100 + Math.floor(Math.random() * 900),
       title: `${subject}: Soru Çözüm Teknikleri`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb',
       duration: '15:45',
       saved: false
     },
     {
-      id: 4,
+      id: 100 + Math.floor(Math.random() * 900),
       title: `${subject}: Konu Özeti`,
       thumbnailUrl: 'https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6',
       duration: '12:20',
@@ -92,14 +100,34 @@ const SubjectStat = ({ topic, progress, color }: SubjectStatProps) => {
 
 const SubjectPage = () => {
   const { subject } = useParams<{ subject: string }>();
+  const [videos, setVideos] = useState<Video[]>([]);
   
   if (!subject || !subjectColors[subject]) {
     return <div className="p-4">Konu bulunamadı.</div>;
   }
   
-  const videos = getSubjectVideos(subject);
   const topics = subjectTopics[subject] || [];
   const color = subjectColors[subject];
+  
+  useEffect(() => {
+    const subjectVideos = getSubjectVideos(subject);
+    
+    // Check localStorage for saved videos
+    const savedVideosFromStorage = localStorage.getItem('savedVideos');
+    if (savedVideosFromStorage) {
+      const savedIds = JSON.parse(savedVideosFromStorage);
+      
+      // Update videos with saved state
+      const updatedVideos = subjectVideos.map(video => ({
+        ...video,
+        saved: savedIds.includes(video.id)
+      }));
+      
+      setVideos(updatedVideos);
+    } else {
+      setVideos(subjectVideos);
+    }
+  }, [subject]);
   
   const handleVideoClick = (title: string) => {
     toast({
@@ -109,10 +137,40 @@ const SubjectPage = () => {
   };
   
   const handleSaveVideo = (videoId: number) => {
-    toast({
-      title: "Video Kaydedildi",
-      description: "Video kütüphanenize eklendi.",
-    });
+    // Get current saved videos from localStorage
+    const savedVideosFromStorage = localStorage.getItem('savedVideos');
+    let savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
+    
+    // Toggle save status
+    if (savedIds.includes(videoId)) {
+      savedIds = savedIds.filter(id => id !== videoId);
+    } else {
+      savedIds.push(videoId);
+    }
+    
+    // Update localStorage
+    localStorage.setItem('savedVideos', JSON.stringify(savedIds));
+    
+    // Update UI state
+    setVideos(prevVideos => 
+      prevVideos.map(video => 
+        video.id === videoId 
+          ? { ...video, saved: !video.saved } 
+          : video
+      )
+    );
+    
+    if (savedIds.includes(videoId)) {
+      toast({
+        title: "Video Kaydedildi",
+        description: "Video kütüphanenize eklendi.",
+      });
+    } else {
+      toast({
+        title: "Video Kaldırıldı",
+        description: "Video kaydedilenlerden kaldırıldı.",
+      });
+    }
   };
   
   return (
@@ -136,6 +194,7 @@ const SubjectPage = () => {
             {videos.map(video => (
               <VideoCard 
                 key={video.id}
+                id={video.id}
                 title={video.title}
                 thumbnailUrl={video.thumbnailUrl}
                 duration={video.duration}

@@ -9,6 +9,7 @@ interface VideoCardProps {
   saved?: boolean;
   onSave?: () => void;
   onClick: () => void;
+  id: number; // Added id prop
 }
 
 const VideoCard = ({ 
@@ -17,7 +18,8 @@ const VideoCard = ({
   duration, 
   saved = false,
   onSave,
-  onClick 
+  onClick,
+  id
 }: VideoCardProps) => {
   
   return (
@@ -34,7 +36,7 @@ const VideoCard = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-3">
           <h3 className="text-white font-medium text-sm line-clamp-2">{title}</h3>
         </div>
-        <div className="video-duration flex items-center gap-1">
+        <div className="video-duration flex items-center gap-1 absolute bottom-2 right-2 bg-black/60 text-white px-1.5 py-0.5 rounded text-xs">
           <Clock size={12} />
           <span>{duration}</span>
         </div>
@@ -45,6 +47,7 @@ const VideoCard = ({
               e.stopPropagation();
               onSave && onSave();
             }}
+            aria-label={saved ? "Remove from saved" : "Save video"}
           >
             <Bookmark size={16} fill={saved ? 'white' : 'none'} />
           </button>
