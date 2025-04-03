@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { VideoCard } from '@/components/VideoCard';
+import VideoCard from '@/components/VideoCard';
 import NavBar from '@/components/NavBar';
 import { mockVideos } from '@/services/video/mockData';
 import { Video } from '@/types/video';
