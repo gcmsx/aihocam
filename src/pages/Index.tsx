@@ -1,9 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import SubjectGrid from '@/components/SubjectGrid';
 import SearchBar from '@/components/SearchBar';
 import VideoCard from '@/components/VideoCard';
 import NavBar from '@/components/NavBar';
+import { 
+  getSavedVideosFromStorage, 
+  downloadVideo 
+} from '@/services/videoService';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('trend');
@@ -81,7 +84,6 @@ const Index = () => {
     ]
   });
 
-  // Additional videos for comprehensive search
   const additionalVideos = [
     {
       id: 10,
@@ -107,7 +109,6 @@ const Index = () => {
   ];
 
   useEffect(() => {
-    // Combine all videos for comprehensive search
     const combinedVideos = [
       ...videos.trend,
       ...videos.recommended,
@@ -117,14 +118,12 @@ const Index = () => {
     
     setAllVideos(combinedVideos);
     
-    // Load saved video IDs from localStorage
     const savedVideosFromStorage = localStorage.getItem('savedVideos');
     if (savedVideosFromStorage) {
       try {
         const savedIds = JSON.parse(savedVideosFromStorage);
         console.log("Index page - Saved IDs from storage:", savedIds);
         
-        // Update videos state with saved status
         setVideos(prevVideos => {
           const updatedVideos = { ...prevVideos };
           
@@ -138,7 +137,6 @@ const Index = () => {
           return updatedVideos;
         });
 
-        // Update allVideos with saved status
         setAllVideos(prevAllVideos => 
           prevAllVideos.map(video => ({
             ...video,
@@ -152,53 +150,38 @@ const Index = () => {
   }, []);
   
   const handleVideoClick = (title: string) => {
-    // Empty function as we don't need any specific logic here
-    // Navigation is handled by VideoCard component
     console.log("Video clicked:", title);
   };
 
-  const handleSaveVideo = (videoId: number) => {
-    // Get current saved videos from localStorage
-    const savedVideosFromStorage = localStorage.getItem('savedVideos');
-    let savedIds = [];
-    
+  const handleSaveVideo = async (videoId: number) => {
     try {
-      savedIds = savedVideosFromStorage ? JSON.parse(savedVideosFromStorage) : [];
-    } catch (error) {
-      console.error("Error parsing saved videos:", error);
-      savedIds = [];
-    }
-    
-    // Toggle save status
-    if (savedIds.includes(videoId)) {
-      savedIds = savedIds.filter(id => id !== videoId);
-    } else {
-      savedIds.push(videoId);
-    }
-    
-    // Update localStorage with stringified array
-    localStorage.setItem('savedVideos', JSON.stringify(savedIds));
-    console.log("Index page - Updated saved IDs:", savedIds);
-    
-    // Update UI state for all video categories
-    setVideos(prevVideos => {
-      const updatedVideos = { ...prevVideos };
+      const video = allVideos.find(v => v.id === videoId);
+      if (!video) return;
       
-      for (const category in updatedVideos) {
-        updatedVideos[category] = updatedVideos[category].map(video => 
+      setVideos(prevVideos => {
+        const updatedVideos = { ...prevVideos };
+        
+        for (const category in updatedVideos) {
+          updatedVideos[category] = updatedVideos[category].map(video => 
+            video.id === videoId ? { ...video, saved: !video.saved } : video
+          );
+        }
+        
+        return updatedVideos;
+      });
+      
+      setAllVideos(prevAllVideos => 
+        prevAllVideos.map(video => 
           video.id === videoId ? { ...video, saved: !video.saved } : video
-        );
-      }
+        )
+      );
       
-      return updatedVideos;
-    });
-    
-    // Update allVideos state as well
-    setAllVideos(prevAllVideos => 
-      prevAllVideos.map(video => 
-        video.id === videoId ? { ...video, saved: !video.saved } : video
-      )
-    );
+      await downloadVideo(videoId, video);
+      
+      window.dispatchEvent(new Event('videoDownloaded'));
+    } catch (error) {
+      console.error("Error saving video:", error);
+    }
   };
 
   const handleSearch = (query: string) => {
@@ -217,7 +200,6 @@ const Index = () => {
     );
   };
 
-  // Search results from all videos
   const filteredAllVideos = searchQuery 
     ? allVideos.filter(video => 
         video.title.toLowerCase().includes(searchQuery.toLowerCase())

@@ -19,17 +19,19 @@ interface TabContentProps {
 }
 
 const TabContent = ({ activeTab, searchQuery, videos, onVideoClick, onSaveVideo }: TabContentProps) => {
-  if (videos.length === 0) {
+  // Return null only if there are no videos and no search query
+  if (videos.length === 0 && !searchQuery) {
     return null;
   }
 
   return (
     <div>
-      {searchQuery && <h2 className="text-lg font-semibold mb-2">{activeTab === 'saved' ? 'İndirilenler' : 'Son İzlenenler'}</h2>}
+      {!searchQuery && <h2 className="text-lg font-semibold mb-2">{activeTab === 'saved' ? 'İndirilenler' : 'Son İzlenenler'}</h2>}
       <VideoGrid 
         videos={videos}
         onVideoClick={onVideoClick}
         onSaveVideo={onSaveVideo}
+        emptyMessage={activeTab === 'saved' ? 'Henüz indirilmiş video bulunmamaktadır.' : 'Henüz izlenmiş video bulunmamaktadır.'}
       />
     </div>
   );
