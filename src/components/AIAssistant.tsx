@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send, Image, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
@@ -17,6 +17,8 @@ const AIAssistant = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('openai_api_key') || '');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const quickQuestions = [
     "Nasıl daha etkili çalışabilirim?",
@@ -24,6 +26,18 @@ const AIAssistant = () => {
     "Tarih konularında zorlanıyorum",
     "Fizik formüllerini ezberlemek için ipuçları"
   ];
+
+  useEffect(() => {
+    // Scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Save API key to localStorage when it changes
+  useEffect(() => {
+    if (apiKey) {
+      localStorage.setItem('openai_api_key', apiKey);
+    }
+  }, [apiKey]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -33,59 +47,85 @@ const AIAssistant = () => {
     setMessages([...messages, newUserMessage]);
     setInput('');
     
+    // Check if API key is set
+    if (!apiKey) {
+      toast({
+        title: "API Key Gerekli",
+        description: "Lütfen OpenAI API anahtarınızı girin.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Show AI is typing
     setIsTyping(true);
     
-    // Simulate AI response instead of using real API
-    setTimeout(() => {
-      try {
-        // Create simulated responses based on keywords in the input
-        let responseText = "Bu soruyu şu anda yanıtlayamıyorum. Daha sonra tekrar deneyebilir misiniz?";
-        
-        const inputLower = input.toLowerCase();
-        
-        if (inputLower.includes("merhaba") || inputLower.includes("selam")) {
-          responseText = "Merhaba! Nasıl yardımcı olabilirim?";
-        } else if (inputLower.includes("nasıl") && inputLower.includes("çalışabilirim")) {
-          responseText = "Etkili çalışmak için Pomodoro tekniğini deneyebilirsiniz. 25 dakika çalışıp 5 dakika mola verin. 4 pomodoro tamamladıktan sonra daha uzun bir mola verin.";
-        } else if (inputLower.includes("özetle") || inputLower.includes("özet")) {
-          responseText = "Son izlediğiniz video, matematik dersinde türev konusunu anlatıyordu. Özellikle türevin günlük hayattaki uygulamaları ve anlık değişim hızını hesaplama konularına odaklanmıştı.";
-        } else if (inputLower.includes("tarih")) {
-          responseText = "Tarih konularında zorlanmak yaygındır. Olayları bir zaman çizelgesi üzerinde görselleştirmek ve her olayı bir hikaye ile ilişkilendirmek hatırlamanızı kolaylaştırabilir.";
-        } else if (inputLower.includes("fizik") || inputLower.includes("formül")) {
-          responseText = "Fizik formüllerini ezberlemek yerine, onları anlamaya çalışın. Her formülün ne anlama geldiğini ve hangi durumlarda kullanıldığını bilirseniz, daha kolay hatırlarsınız. Ayrıca, formülleri görselleştirmeye çalışın ve kendi notlarınızı oluşturun.";
-        } else if (inputLower.includes("teşekkür")) {
-          responseText = "Rica ederim! Başka sorunuz varsa, sormaktan çekinmeyin.";
-        }
-        
-        // Add AI response to messages
-        const aiResponse = { 
-          id: messages.length + 2, 
-          text: responseText, 
-          sender: 'ai' as const 
-        };
-        
-        setMessages(prev => [...prev, aiResponse]);
-      } catch (error) {
-        console.error('Error with AI response:', error);
-        toast({
-          title: "Hata",
-          description: "Yanıt alınamadı. Lütfen daha sonra tekrar deneyin.",
-          variant: "destructive",
-        });
-        
-        // Add fallback error message
-        const errorResponse = { 
-          id: messages.length + 2, 
-          text: "Üzgünüm, bir sorun oluştu. Lütfen daha sonra tekrar deneyin.", 
-          sender: 'ai' as const 
-        };
-        
-        setMessages(prev => [...prev, errorResponse]);
-      } finally {
-        setIsTyping(false);
+    try {
+      // Get previous messages for context (limit to last 10 messages)
+      const recentMessages = messages.slice(-10).map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+      
+      // Add current user message
+      recentMessages.push({
+        role: 'user',
+        content: input
+      });
+      
+      // Make OpenAI API request
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Sen bir öğrenme asistanısın. Kullanıcılara Türkçe olarak yardımcı ol. Eğitim konularında yardımcı ol ve kısa ve öz cevaplar ver.'
+            },
+            ...recentMessages
+          ],
+          temperature: 0.7,
+          max_tokens: 1000
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'OpenAI API hatası');
       }
-    }, 1000); // Simulate response delay
+      
+      const data = await response.json();
+      const aiResponse = { 
+        id: messages.length + 2, 
+        text: data.choices[0].message.content, 
+        sender: 'ai' as const 
+      };
+      
+      setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('OpenAI API hatası:', error);
+      toast({
+        title: "Hata",
+        description: error instanceof Error ? error.message : "OpenAI API ile iletişim kurulamadı.",
+        variant: "destructive",
+      });
+      
+      // Add fallback error message
+      const errorResponse = { 
+        id: messages.length + 2, 
+        text: "Üzgünüm, OpenAI API ile iletişim kurarken bir sorun oluştu. Lütfen API anahtarınızı kontrol edin veya daha sonra tekrar deneyin.", 
+        sender: 'ai' as const 
+      };
+      
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -109,6 +149,32 @@ const AIAssistant = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
+      {!apiKey && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 m-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                Kullanmak için OpenAI API anahtarınızı girmeniz gerekiyor
+              </p>
+              <div className="mt-2">
+                <input
+                  type="password"
+                  className="w-full p-2 border rounded"
+                  placeholder="OpenAI API Anahtarınız"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="flex-1 p-4 overflow-y-auto">
         {messages.map((message) => (
           <div 
@@ -138,6 +204,7 @@ const AIAssistant = () => {
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
       
       <div className="p-4 bg-background border-t border-border">
@@ -200,3 +267,4 @@ const AIAssistant = () => {
 };
 
 export default AIAssistant;
+
