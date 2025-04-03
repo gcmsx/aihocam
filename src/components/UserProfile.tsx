@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProfileEditor from './ProfileEditor';
+import { toast } from '@/hooks/use-toast';
 
 interface ProgressItemProps {
   subject: string;
@@ -35,9 +36,11 @@ const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [stats, setStats] = useState([
     { title: 'Videolar', value: '0', icon: <BarChart3 size={20} className="text-primary" /> },
-    { title: 'Başarılar', value: '0', icon: <Award size={20} className="text-primary" /> },
+    { title: 'Puan', value: '0', icon: <Award size={20} className="text-primary" /> },
     { title: 'Günler', value: '0', icon: <Calendar size={20} className="text-primary" /> },
   ]);
+  const [dailyVideosWatched, setDailyVideosWatched] = useState(0);
+  const [dailyGoalReached, setDailyGoalReached] = useState(false);
   
   const subjects = [
     { subject: 'Tarih', progress: 65, color: '#1A1B41' },
@@ -47,13 +50,32 @@ const UserProfile = () => {
     { subject: 'Fizik', progress: 50, color: '#3E1F47' },
   ];
 
+  // Load daily goal progress from localStorage
+  useEffect(() => {
+    const today = new Date().toLocaleDateString();
+    const dailyProgress = localStorage.getItem(`dailyProgress_${today}`);
+    if (dailyProgress) {
+      const { videosWatched, goalReached } = JSON.parse(dailyProgress);
+      setDailyVideosWatched(videosWatched);
+      setDailyGoalReached(goalReached);
+    } else {
+      // Reset daily progress for a new day
+      setDailyVideosWatched(0);
+      setDailyGoalReached(false);
+      localStorage.setItem(`dailyProgress_${today}`, JSON.stringify({
+        videosWatched: 0,
+        goalReached: false
+      }));
+    }
+  }, []);
+
   // Load user stats from localStorage
   useEffect(() => {
     // Get watched videos count
     const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
     const watchedVideos = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage).length : 0;
     
-    // Get achievements count
+    // Get achievements/points count
     const achievementsFromStorage = localStorage.getItem('achievements');
     const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage).count : 0;
     
@@ -63,7 +85,7 @@ const UserProfile = () => {
     // Update stats
     setStats([
       { title: 'Videolar', value: watchedVideos.toString(), icon: <BarChart3 size={20} className="text-primary" /> },
-      { title: 'Başarılar', value: achievements.toString(), icon: <Award size={20} className="text-primary" /> },
+      { title: 'Puan', value: achievements.toString(), icon: <Award size={20} className="text-primary" /> },
       { title: 'Günler', value: activeDays.toString(), icon: <Calendar size={20} className="text-primary" /> },
     ]);
   }, []);
@@ -77,7 +99,7 @@ const UserProfile = () => {
       
       setStats(prev => {
         const newStats = [...prev];
-        const achievementStat = newStats.find(s => s.title === 'Başarılar');
+        const achievementStat = newStats.find(s => s.title === 'Puan');
         if (achievementStat) {
           achievementStat.value = achievements.toString();
         }
@@ -90,6 +112,7 @@ const UserProfile = () => {
       const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
       const watchedVideos = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage).length : 0;
       
+      // Update videos stat
       setStats(prev => {
         const newStats = [...prev];
         const videoStat = newStats.find(s => s.title === 'Videolar');
@@ -98,6 +121,51 @@ const UserProfile = () => {
         }
         return newStats;
       });
+      
+      // Update daily progress
+      const today = new Date().toLocaleDateString();
+      const dailyProgressStr = localStorage.getItem(`dailyProgress_${today}`);
+      const dailyProgress = dailyProgressStr ? JSON.parse(dailyProgressStr) : { videosWatched: 0, goalReached: false };
+      
+      if (!dailyProgress.goalReached) {
+        const newVideosWatched = dailyProgress.videosWatched + 1;
+        setDailyVideosWatched(newVideosWatched);
+        
+        // Check if goal is reached
+        if (newVideosWatched >= 5 && !dailyProgress.goalReached) {
+          // Add 3 points for completing daily goal
+          const achievementsFromStorage = localStorage.getItem('achievements');
+          const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage) : { count: 0 };
+          achievements.count += 3;
+          localStorage.setItem('achievements', JSON.stringify(achievements));
+          
+          // Mark goal as reached
+          setDailyGoalReached(true);
+          
+          // Update point stat
+          setStats(prev => {
+            const newStats = [...prev];
+            const pointStat = newStats.find(s => s.title === 'Puan');
+            if (pointStat) {
+              pointStat.value = achievements.count.toString();
+            }
+            return newStats;
+          });
+          
+          // Show a toast notification
+          toast({
+            title: "Günlük Hedef Tamamlandı!",
+            description: "5 video izlediniz ve 3 puan kazandınız.",
+            variant: "default",
+          });
+        }
+        
+        // Save updated progress
+        localStorage.setItem(`dailyProgress_${today}`, JSON.stringify({
+          videosWatched: newVideosWatched,
+          goalReached: newVideosWatched >= 5
+        }));
+      }
     };
     
     const handleStorageChange = (e: StorageEvent) => {
@@ -135,6 +203,8 @@ const UserProfile = () => {
   };
 
   const initials = getInitials(username);
+
+  const dailyGoalPercentage = (dailyVideosWatched / 5) * 100;
 
   return (
     <div className="p-4">
@@ -184,9 +254,15 @@ const UserProfile = () => {
           <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">5 video</span>
         </div>
         <div className="w-full bg-muted rounded-full h-2.5">
-          <div className="bg-primary h-2.5 rounded-full" style={{ width: '60%' }}></div>
+          <div 
+            className={`h-2.5 rounded-full transition-all duration-500 ${dailyGoalReached ? 'bg-green-500' : 'bg-primary'}`} 
+            style={{ width: `${Math.min(dailyGoalPercentage, 100)}%` }}
+          ></div>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">Bugün 3/5 video tamamlandı</p>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Bugün {dailyVideosWatched}/5 video tamamlandı
+          {dailyGoalReached && ' (Hedefe ulaşıldı!)'}
+        </p>
       </div>
 
       <h3 className="font-semibold mb-4">Konu İlerlemesi</h3>
