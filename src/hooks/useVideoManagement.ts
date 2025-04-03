@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Video } from '@/types/video';
 import { getSavedVideosFromStorage, downloadVideo, getAllSavedVideos } from '@/services/videoService';
@@ -7,22 +6,18 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
   const [videos, setVideos] = useState<{[key: string]: Video[]}>(initialVideos);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
 
-  // Combine all videos into a single array
   useEffect(() => {
     const combinedVideos = [
       ...videos.trend,
       ...videos.recommended,
       ...videos.popular,
-      // Additional videos could be added here
     ];
     
     setAllVideos(combinedVideos);
     
-    // Update saved status from localStorage
     updateVideoSavedStatus();
   }, []);
 
-  // Function to update saved status
   const updateVideoSavedStatus = () => {
     const savedIds = getSavedVideosFromStorage();
     
@@ -47,7 +42,6 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
     );
   };
 
-  // Listen for video save/download events
   useEffect(() => {
     const handleVideoUpdate = () => {
       updateVideoSavedStatus();
@@ -59,7 +53,6 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
       }
     };
     
-    // Listen for both custom events and storage events
     window.addEventListener('videoSaved', handleVideoUpdate);
     window.addEventListener('videoDownloaded', handleVideoUpdate);
     window.addEventListener('storage', handleStorageChange);
@@ -71,8 +64,8 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
     };
   }, []);
 
-  const handleVideoClick = (title: string) => {
-    console.log("Video clicked:", title);
+  const handleVideoClick = (videoId: number) => {
+    console.log("Video clicked:", videoId);
   };
 
   const handleSaveVideo = async (videoId: number) => {
@@ -80,7 +73,6 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
       const video = allVideos.find(v => v.id === videoId);
       if (!video) return;
       
-      // Immediately update UI to reflect that the video saving state is changing
       setVideos(prevVideos => {
         const updatedVideos = { ...prevVideos };
         
@@ -99,16 +91,13 @@ export const useVideoManagement = (initialVideos: { [key: string]: Video[] }) =>
         )
       );
       
-      // Process the download
       downloadVideo(videoId, video).catch(error => {
         console.error("Error saving video:", error);
-        // Revert UI state if there's an error
         updateVideoSavedStatus();
       });
       
     } catch (error) {
       console.error("Error handling save video:", error);
-      // Make sure to revert the UI state on error
       updateVideoSavedStatus();
     }
   };

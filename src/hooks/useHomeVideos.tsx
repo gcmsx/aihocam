@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useHomeTabState } from './useHomeTabState';
 import { useHomeSearch } from './useHomeSearch';
@@ -85,7 +84,7 @@ export const useHomeVideos = () => {
       },
     ]
   };
-
+  
   // Use our refactored hooks
   const { activeTab, setActiveTab } = useHomeTabState();
   const { videos, allVideos, handleVideoClick, handleSaveVideo } = useVideoManagement(initialVideos);
