@@ -14,7 +14,7 @@ interface HomeTabsProps {
       saved: boolean;
     }[];
   };
-  handleVideoClick: (title: string) => void;
+  handleVideoClick: (videoId: number) => void;
   handleSaveVideo: (videoId: number) => void;
 }
 
@@ -62,7 +62,7 @@ const HomeTabs = ({ activeTab, setActiveTab, videos, handleVideoClick, handleSav
               duration={video.duration}
               saved={video.saved}
               onSave={() => handleSaveVideo(video.id)}
-              onClick={() => handleVideoClick(video.title)}
+              onClick={() => handleVideoClick(video.id)}
             />
           ))}
         </div>

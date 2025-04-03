@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import SubjectGrid from '@/components/SubjectGrid';
 import SearchBar from '@/components/SearchBar';
@@ -10,7 +9,6 @@ import { useHomeVideos } from '@/hooks/useHomeVideos';
 const Index = () => {
   const [version, setVersion] = useState('0.318');
   
-  // Load version from localStorage
   useEffect(() => {
     const storedVersion = localStorage.getItem('appVersion') || '0.318';
     setVersion(storedVersion);
@@ -54,7 +52,7 @@ const Index = () => {
         <HomeSearchResults 
           searchQuery={searchQuery}
           filteredVideos={filteredAllVideos}
-          handleVideoClick={(title, videoId) => handleVideoClick(videoId)}
+          handleVideoClick={handleVideoClick}
           handleSaveVideo={handleSaveVideo}
         />
         
