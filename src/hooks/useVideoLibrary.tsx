@@ -8,7 +8,8 @@ import {
   getRecentVideosFromStorage, 
   getAllSavedVideos,
   getAllRecentVideos,
-  downloadVideo
+  downloadVideo,
+  updateRecentlyViewed
 } from '@/services/videoService';
 
 export const useVideoLibrary = () => {
@@ -97,8 +98,10 @@ export const useVideoLibrary = () => {
     ? searchVideos(searchQuery, allVideos)
     : [];
 
-  const handleVideoClick = (title: string) => {
-    console.log("Video clicked:", title);
+  const handleVideoClick = (videoId: number) => {
+    // Add to recently viewed videos
+    updateRecentlyViewed(videoId);
+    console.log("Video clicked:", videoId);
   };
 
   const handleSaveVideo = async (videoId: number) => {
