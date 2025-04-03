@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Video } from '@/types/video';
-import { getSavedVideosFromStorage, saveVideo, updateRecentlyViewed, downloadVideo } from '@/services/videoService';
+import { getSavedVideosFromStorage, updateRecentlyViewed, downloadVideo } from '@/services/videoService';
 import { getSubjectExamples, getSubjectDescription } from '@/services/video/videoUtils';
 
 export interface Example {
@@ -85,10 +85,11 @@ export const useVideoDetail = (videoId: string | undefined) => {
   useEffect(() => {
     if (!video) return;
     
-    const handleVideoSaved = (e: Event) => {
+    const handleVideoUpdate = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (customEvent.detail && video && customEvent.detail.videoId === video.id) {
         setSaved(customEvent.detail.saved);
+        setVideo(prev => prev ? {...prev, saved: customEvent.detail.saved} : null);
       } else {
         updateSavedStatus();
       }
@@ -100,13 +101,13 @@ export const useVideoDetail = (videoId: string | undefined) => {
       }
     };
     
-    window.addEventListener('videoSaved', handleVideoSaved);
-    window.addEventListener('videoDownloaded', handleVideoSaved);
+    window.addEventListener('videoSaved', handleVideoUpdate);
+    window.addEventListener('videoDownloaded', handleVideoUpdate);
     window.addEventListener('storage', handleStorageChange);
     
     return () => {
-      window.removeEventListener('videoSaved', handleVideoSaved);
-      window.removeEventListener('videoDownloaded', handleVideoSaved);
+      window.removeEventListener('videoSaved', handleVideoUpdate);
+      window.removeEventListener('videoDownloaded', handleVideoUpdate);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [video]);
@@ -116,14 +117,15 @@ export const useVideoDetail = (videoId: string | undefined) => {
     
     // Update UI immediately for responsiveness
     setSaved(!saved);
+    setVideo(prev => prev ? {...prev, saved: !saved} : null);
     
-    // If we're using the newer download functionality
     try {
       await downloadVideo(video.id, video);
     } catch (error) {
       console.error("Error saving video:", error);
       // Revert UI state if error occurs
       setSaved(!saved);
+      setVideo(prev => prev ? {...prev, saved: saved} : null);
     }
   };
   

@@ -6,7 +6,8 @@ import { Video } from '@/types/video';
 import { 
   getSavedVideosFromStorage, 
   downloadVideo, 
-  updateRecentlyViewed 
+  updateRecentlyViewed,
+  getAllSavedVideos
 } from '@/services/videoService';
 import SubjectHeader from '@/components/subject/SubjectHeader';
 import VideoSection from '@/components/subject/VideoSection';
@@ -17,7 +18,6 @@ import { getSubjectVideos } from '@/utils/videoUtils';
 const SubjectPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const [videos, setVideos] = useState<Video[]>([]);
-  const [isDownloading, setIsDownloading] = useState(false);
   
   if (!subject || !subjectColors[subject]) {
     return <div className="p-4">Konu bulunamadı.</div>;
@@ -39,20 +39,19 @@ const SubjectPage = () => {
   const color = subjectColors[subject];
   
   useEffect(() => {
+    // Get videos for this subject
     const subjectVideos = getSubjectVideos(subject);
     
-    // Check localStorage for saved videos
-    const savedVideosFromStorage = getSavedVideosFromStorage();
-    
-    // Update videos with saved state
+    // Update videos with saved state from storage
+    const savedIds = getSavedVideosFromStorage();
     const updatedVideos = subjectVideos.map(video => ({
       ...video,
-      saved: savedVideosFromStorage.includes(video.id)
+      saved: savedIds.includes(video.id)
     }));
     
     setVideos(updatedVideos);
     
-    // Function to update videos when save status changes
+    // Function to update saved status
     const updateSavedStatus = () => {
       const currentSavedIds = getSavedVideosFromStorage();
       setVideos(prevVideos => 
@@ -63,12 +62,8 @@ const SubjectPage = () => {
       );
     };
     
-    // Listen for video download events
-    const handleVideoDownload = () => {
-      updateSavedStatus();
-    };
-    
-    const handleVideoSaved = () => {
+    // Event listeners for video download and storage changes
+    const handleVideoUpdate = () => {
       updateSavedStatus();
     };
     
@@ -78,13 +73,13 @@ const SubjectPage = () => {
       }
     };
     
-    window.addEventListener('videoDownloaded', handleVideoDownload);
-    window.addEventListener('videoSaved', handleVideoSaved);
+    window.addEventListener('videoDownloaded', handleVideoUpdate);
+    window.addEventListener('videoSaved', handleVideoUpdate);
     window.addEventListener('storage', handleStorageChange);
     
     return () => {
-      window.removeEventListener('videoDownloaded', handleVideoDownload);
-      window.removeEventListener('videoSaved', handleVideoSaved);
+      window.removeEventListener('videoDownloaded', handleVideoUpdate);
+      window.removeEventListener('videoSaved', handleVideoUpdate);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [subject]);
@@ -109,17 +104,16 @@ const SubjectPage = () => {
         )
       );
       
-      // Process the download without waiting for the response
-      // The event listeners will handle updating the UI when the operation completes
+      // Process the download
       downloadVideo(videoId, video).catch(error => {
         console.error("Error downloading video:", error);
         // Revert UI state if there's an error
+        const savedIds = getSavedVideosFromStorage();
         setVideos(prevVideos => 
-          prevVideos.map(video => 
-            video.id === videoId 
-              ? { ...video, saved: !video.saved } 
-              : video
-          )
+          prevVideos.map(video => ({
+            ...video,
+            saved: savedIds.includes(video.id)
+          }))
         );
       });
     } catch (error) {

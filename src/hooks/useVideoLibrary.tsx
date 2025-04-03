@@ -6,9 +6,8 @@ import {
   searchVideos, 
   getSavedVideosFromStorage, 
   getRecentVideosFromStorage, 
-  saveVideo, 
-  getVideosByIds, 
-  updateVideoSavedStatus,
+  getAllSavedVideos,
+  getAllRecentVideos,
   downloadVideo
 } from '@/services/videoService';
 
@@ -20,49 +19,52 @@ export const useVideoLibrary = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Tüm videoları yükle
+  // Load all videos
   useEffect(() => {
     setAllVideos(getVideos());
   }, []);
 
-  // Kaydedilen ve son izlenen videoları yükle
+  // Load saved and recent videos
   useEffect(() => {
     if (allVideos.length === 0) return;
 
-    // İndirilen videoları yükle
-    const savedIds = getSavedVideosFromStorage();
-    const savedVideosList = getVideosByIds(savedIds, allVideos);
-    setSavedVideos(updateVideoSavedStatus(savedVideosList, savedIds));
+    // Load saved videos
+    setSavedVideos(getAllSavedVideos(allVideos));
     
-    // Son izlenen videoları yükle
-    const recentIds = getRecentVideosFromStorage();
-    const recentVideosList = getVideosByIds(recentIds, allVideos);
-    setRecentVideos(updateVideoSavedStatus(recentVideosList, savedIds));
+    // Load recent videos
+    setRecentVideos(getAllRecentVideos(allVideos));
     
   }, [allVideos]);
 
-  // Video indirme işlemi sonrası state'i güncelle
+  // Listen for video download/save events and storage changes
   useEffect(() => {
-    const handleStorageChange = () => {
+    const handleVideoSaved = () => {
       if (allVideos.length === 0) return;
       
-      const savedIds = getSavedVideosFromStorage();
-      const savedVideosList = getVideosByIds(savedIds, allVideos);
-      setSavedVideos(updateVideoSavedStatus(savedVideosList, savedIds));
-      
-      // Son izlenen videoları da güncelle
-      const recentIds = getRecentVideosFromStorage();
-      const recentVideosList = getVideosByIds(recentIds, allVideos);
-      setRecentVideos(updateVideoSavedStatus(recentVideosList, savedIds));
+      // Reload saved and recent videos
+      setSavedVideos(getAllSavedVideos(allVideos));
+      setRecentVideos(getAllRecentVideos(allVideos));
     };
 
-    // IndexedDB ve LocalStorage değişikliklerini dinle
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'savedVideos' || e.key === 'recentlyViewedVideos') {
+        if (allVideos.length === 0) return;
+        
+        // Reload saved and recent videos
+        setSavedVideos(getAllSavedVideos(allVideos));
+        setRecentVideos(getAllRecentVideos(allVideos));
+      }
+    };
+    
+    // Listen for both custom events and storage events
+    window.addEventListener('videoSaved', handleVideoSaved);
+    window.addEventListener('videoDownloaded', handleVideoSaved);
     window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('videoDownloaded', handleStorageChange);
     
     return () => {
+      window.removeEventListener('videoSaved', handleVideoSaved);
+      window.removeEventListener('videoDownloaded', handleVideoSaved);
       window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('videoDownloaded', handleStorageChange);
     };
   }, [allVideos]);
 
@@ -90,6 +92,7 @@ export const useVideoLibrary = () => {
     return searchVideos(searchQuery, videos);
   };
 
+  // Search through all videos, including subject-specific ones
   const filteredAllVideos = searchQuery 
     ? searchVideos(searchQuery, allVideos)
     : [];
@@ -105,20 +108,22 @@ export const useVideoLibrary = () => {
       
       setIsDownloading(true);
       
-      // Video indirme işlemini gerçekleştir
-      const updatedSavedIds = await downloadVideo(videoId, video);
+      // Immediately update UI for better responsiveness
+      setSavedVideos(prevVideos => {
+        const videoExists = prevVideos.some(v => v.id === videoId);
+        if (videoExists) {
+          return prevVideos.filter(v => v.id !== videoId);
+        } else {
+          return [...prevVideos, {...video, saved: true}];
+        }
+      });
       
-      // İndirilen videoları güncelle
-      const updatedSavedVideos = getVideosByIds(updatedSavedIds, allVideos);
-      setSavedVideos(updateVideoSavedStatus(updatedSavedVideos, updatedSavedIds));
-      
-      // Son izlenen videoları güncelle
-      setRecentVideos(prevVideos => 
-        updateVideoSavedStatus(prevVideos, updatedSavedIds)
-      );
-      
-      // Değişikliği bildirmek için özel bir event yayınla
-      window.dispatchEvent(new Event('videoDownloaded'));
+      // Process the download without waiting for the response
+      downloadVideo(videoId, video).catch(error => {
+        console.error("Error downloading video:", error);
+        // Revert UI state if there's an error
+        setSavedVideos(getAllSavedVideos(allVideos));
+      });
       
     } catch (error) {
       console.error("Error downloading video:", error);

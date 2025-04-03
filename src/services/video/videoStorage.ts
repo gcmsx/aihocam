@@ -97,7 +97,13 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
     localStorage.setItem('savedVideos', JSON.stringify(updatedSavedIds));
     console.log("Updated downloaded videos IDs:", updatedSavedIds);
     
-    // Dispatch an event to notify all components about the change
+    // Dispatch a CUSTOM event to notify all components about the change
+    // This event will include additional data about which video was updated
+    window.dispatchEvent(new CustomEvent('videoDownloaded', { 
+      detail: { videoId, saved: !savedIds.includes(videoId) } 
+    }));
+    
+    // For backward compatibility
     window.dispatchEvent(new CustomEvent('videoSaved', { 
       detail: { videoId, saved: !savedIds.includes(videoId) } 
     }));
@@ -159,4 +165,31 @@ export const updateRecentlyViewed = (videoId: number): number[] => {
   console.log("Recently viewed videos updated:", recentlyViewed);
   
   return recentlyViewed;
+};
+
+/**
+ * Get all saved videos with full details
+ * @param allVideos All available videos to search from
+ * @returns Array of videos with saved status
+ */
+export const getAllSavedVideos = (allVideos: Video[]): Video[] => {
+  const savedIds = getSavedVideosFromStorage();
+  return allVideos.filter(video => savedIds.includes(video.id))
+    .map(video => ({...video, saved: true}));
+};
+
+/**
+ * Get all recently viewed videos with full details
+ * @param allVideos All available videos to search from
+ * @returns Array of videos with saved status
+ */
+export const getAllRecentVideos = (allVideos: Video[]): Video[] => {
+  const recentIds = getRecentVideosFromStorage();
+  const savedIds = getSavedVideosFromStorage();
+  
+  // Keep original order of recently viewed videos
+  return recentIds
+    .map(id => allVideos.find(video => video.id === id))
+    .filter((video): video is Video => !!video)
+    .map(video => ({...video, saved: savedIds.includes(video.id)}));
 };
