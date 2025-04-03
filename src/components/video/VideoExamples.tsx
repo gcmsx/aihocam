@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 
 interface Example {
   question: string;
@@ -13,6 +12,35 @@ interface VideoExamplesProps {
 }
 
 const VideoExamples = ({ examples }: VideoExamplesProps) => {
+  const [answeredQuestions, setAnsweredQuestions] = useState<{[key: number]: string | null}>({});
+
+  const handleOptionClick = (questionIndex: number, selectedOption: string) => {
+    if (!answeredQuestions[questionIndex]) {
+      setAnsweredQuestions(prev => ({
+        ...prev,
+        [questionIndex]: selectedOption
+      }));
+    }
+  };
+
+  const getOptionClassName = (questionIndex: number, option: string, correctAnswer: string | undefined) => {
+    if (!answeredQuestions[questionIndex]) {
+      return "p-2 border rounded cursor-pointer hover:bg-muted";
+    }
+
+    if (answeredQuestions[questionIndex] === option) {
+      return option === correctAnswer 
+        ? "p-2 border rounded bg-green-500 text-white"
+        : "p-2 border rounded bg-red-500 text-white";
+    }
+
+    if (option === correctAnswer && answeredQuestions[questionIndex] !== null) {
+      return "p-2 border rounded bg-green-500 text-white";
+    }
+
+    return "p-2 border rounded";
+  };
+
   return (
     <div className="space-y-6">
       {examples.map((example, index) => (
@@ -24,7 +52,8 @@ const VideoExamples = ({ examples }: VideoExamplesProps) => {
               {example.options.map((option, optionIndex) => (
                 <div 
                   key={optionIndex}
-                  className={`p-2 border rounded cursor-pointer ${option === example.answer ? 'bg-green-100 border-green-300' : 'hover:bg-muted'}`}
+                  className={getOptionClassName(index, option, example.answer)}
+                  onClick={() => handleOptionClick(index, option)}
                 >
                   {option}
                 </div>
@@ -32,10 +61,12 @@ const VideoExamples = ({ examples }: VideoExamplesProps) => {
             </div>
           )}
           
-          <div className="mt-4 bg-muted p-3 rounded">
-            <div className="font-medium text-sm">Açıklama:</div>
-            <div className="text-sm">{example.explanation}</div>
-          </div>
+          {answeredQuestions[index] && (
+            <div className="mt-4 bg-muted p-3 rounded animate-fade-in">
+              <div className="font-medium text-sm">Açıklama:</div>
+              <div className="text-sm">{example.explanation}</div>
+            </div>
+          )}
         </div>
       ))}
     </div>
