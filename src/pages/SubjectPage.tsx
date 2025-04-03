@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import NavBar from '@/components/NavBar';
 import { Video } from '@/types/video';
 import { 
@@ -18,7 +18,6 @@ import { getSubjectVideos } from '@/utils/videoUtils';
 const SubjectPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const [videos, setVideos] = useState<Video[]>([]);
-  const navigate = useNavigate();
   
   if (!subject || !subjectColors[subject]) {
     return <div className="p-4">Konu bulunamadı.</div>;
@@ -85,12 +84,9 @@ const SubjectPage = () => {
     };
   }, [subject]);
   
-  const handleVideoClick = (videoId: number) => {
+  const handleVideoClick = (title: string, videoId: number) => {
     // Add to recently viewed videos
     updateRecentlyViewed(videoId);
-    
-    // Navigate to video detail page
-    navigate(`/video/${videoId}`);
   };
   
   const handleSaveVideo = async (videoId: number) => {

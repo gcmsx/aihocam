@@ -6,12 +6,4 @@ export interface Video {
   duration: string;
   saved: boolean;
   subject?: string;
-  description?: string;
-  examples?: Array<{
-    question: string;
-    options?: string[];
-    answer?: string;
-    explanation?: string;
-  }>;
-  videoUrl?: string;
 }

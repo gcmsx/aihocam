@@ -1,4 +1,3 @@
-
 import { Video } from '@/types/video';
 import { setupDatabase } from './videoDatabase';
 
@@ -66,8 +65,6 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
         deleteRequest.onerror = reject;
         transaction.oncomplete = resolve;
       });
-      
-      console.log(`Video ${videoId} removed from IndexedDB`);
     } else {
       // If not downloaded, add it
       updatedSavedIds = [...savedIds, videoId];
@@ -77,36 +74,23 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
       const transaction = db.transaction(['videos'], 'readwrite');
       const store = transaction.objectStore('videos');
       
-      // Ensure we're saving the correct video data
-      // Use the passed video object but ensure all required fields are present
+      // Simulating video data download
       const videoData = {
-        id: videoId,
-        title: video.title || `Video ${videoId}`,
-        thumbnailUrl: video.thumbnailUrl || "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6",
-        duration: video.duration || "10:00",
-        subject: video.subject || "",
+        ...video,
+        videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
         saved: true,
         downloaded: true,
-        downloadDate: new Date().toISOString(),
-        // Include any additional fields from the original video
-        ...video
+        downloadDate: new Date().toISOString()
       };
-      
-      console.log("Saving video to IndexedDB:", videoData);
       
       const putRequest = store.put(videoData);
       
       // Wait for put to complete
       await new Promise((resolve, reject) => {
         putRequest.onsuccess = resolve;
-        putRequest.onerror = (error) => {
-          console.error("Error saving to IndexedDB:", error);
-          reject(error);
-        };
+        putRequest.onerror = reject;
         transaction.oncomplete = resolve;
       });
-      
-      console.log(`Video ${videoId} saved to IndexedDB successfully`);
     }
     
     // Make sure localStorage updates immediately and synchronously
@@ -114,6 +98,7 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
     console.log("Updated downloaded videos IDs:", updatedSavedIds);
     
     // Dispatch a CUSTOM event to notify all components about the change
+    // This event will include additional data about which video was updated
     window.dispatchEvent(new CustomEvent('videoDownloaded', { 
       detail: { videoId, saved: !savedIds.includes(videoId) } 
     }));
@@ -131,7 +116,35 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
 };
 
 /**
- * Update recently viewed videos in localStorage and ensures the video is properly saved
+ * Save a video ID to localStorage (legacy method, kept for compatibility)
+ */
+export const saveVideo = (videoId: number): number[] => {
+  // Get current saved videos from localStorage
+  const savedIds = getSavedVideosFromStorage();
+  
+  // Toggle save status
+  let updatedSavedIds: number[];
+  
+  if (savedIds.includes(videoId)) {
+    updatedSavedIds = savedIds.filter(id => id !== videoId);
+  } else {
+    updatedSavedIds = [...savedIds, videoId];
+  }
+  
+  // Update localStorage
+  localStorage.setItem('savedVideos', JSON.stringify(updatedSavedIds));
+  console.log("Updated saved IDs:", updatedSavedIds);
+  
+  // Dispatch an event to notify all components about the change
+  window.dispatchEvent(new CustomEvent('videoSaved', { 
+    detail: { videoId, saved: !savedIds.includes(videoId) } 
+  }));
+  
+  return updatedSavedIds;
+};
+
+/**
+ * Update recently viewed videos in localStorage
  */
 export const updateRecentlyViewed = (videoId: number): number[] => {
   const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
@@ -179,37 +192,4 @@ export const getAllRecentVideos = (allVideos: Video[]): Video[] => {
     .map(id => allVideos.find(video => video.id === id))
     .filter((video): video is Video => !!video)
     .map(video => ({...video, saved: savedIds.includes(video.id)}));
-};
-
-/**
- * Get a video from IndexedDB by ID
- */
-export const getVideoFromIndexedDB = async (videoId: number): Promise<Video | null> => {
-  try {
-    const db = await setupDatabase() as IDBDatabase;
-    const transaction = db.transaction(['videos'], 'readonly');
-    const store = transaction.objectStore('videos');
-    
-    return new Promise((resolve, reject) => {
-      const request = store.get(videoId);
-      
-      request.onsuccess = () => {
-        if (request.result) {
-          console.log(`Video ${videoId} found in IndexedDB:`, request.result);
-          resolve(request.result);
-        } else {
-          console.log(`Video ${videoId} not found in IndexedDB`);
-          resolve(null);
-        }
-      };
-      
-      request.onerror = (error) => {
-        console.error(`Error getting video ${videoId} from IndexedDB:`, error);
-        reject(error);
-      };
-    });
-  } catch (error) {
-    console.error(`Error accessing IndexedDB for video ${videoId}:`, error);
-    return null;
-  }
 };

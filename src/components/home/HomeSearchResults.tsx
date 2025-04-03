@@ -6,7 +6,7 @@ import { Video } from '@/types/video';
 interface HomeSearchResultsProps {
   searchQuery: string;
   filteredVideos: Video[];
-  handleVideoClick: (videoId: number) => void;
+  handleVideoClick: (title: string) => void;
   handleSaveVideo: (videoId: number) => void;
 }
 
@@ -33,7 +33,7 @@ const HomeSearchResults = ({
             duration={video.duration}
             saved={video.saved}
             onSave={() => handleSaveVideo(video.id)}
-            onClick={() => handleVideoClick(video.id)}
+            onClick={() => handleVideoClick(video.title)}
           />
         ))}
       </div>

@@ -30,10 +30,9 @@ export const setupDatabase = () => {
 };
 
 /**
- * Internal function to get a video from IndexedDB - renamed to avoid export conflict
- * This function is not exported to avoid conflicts with videoStorage.ts
+ * Get a video from IndexedDB
  */
-const _getVideoFromIndexedDB = async (videoId: number): Promise<any> => {
+export const getVideoFromIndexedDB = async (videoId: number): Promise<any> => {
   try {
     const db = await setupDatabase() as IDBDatabase;
     const transaction = db.transaction(['videos'], 'readonly');
