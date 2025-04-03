@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import SubjectGrid from '@/components/SubjectGrid';
 import SearchBar from '@/components/SearchBar';
@@ -10,12 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 const Index = () => {
   const [activeTab, setActiveTab] = useState('trend');
   
-  const handleSubjectClick = (subject: string) => {
-    toast({
-      title: subject,
-      description: `${subject} kategorisi seçildi.`,
-    });
-  };
+  // Toast bildirimi kaldırıldı
 
   const handleVideoClick = (title: string) => {
     toast({
@@ -123,7 +117,7 @@ const Index = () => {
         <SearchBar />
         
         <h2 className="text-lg font-semibold mt-6 mb-4">Konular</h2>
-        <SubjectGrid onSubjectClick={handleSubjectClick} />
+        <SubjectGrid onSubjectClick={() => {}} /> {/* Boş bir fonksiyon atandı */}
         
         <div className="mt-8">
           <div className="flex border-b mb-4">
