@@ -39,6 +39,33 @@ export const useVideoLibrary = () => {
     
   }, [allVideos]);
 
+  // Video kaydetme işlemi sonrası state'i güncelle
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (allVideos.length === 0) return;
+      
+      const savedIds = getSavedVideosFromStorage();
+      const savedVideosList = getVideosByIds(savedIds, allVideos);
+      setSavedVideos(updateVideoSavedStatus(savedVideosList, savedIds));
+      
+      // Son izlenen videoları da güncelle
+      const recentIds = getRecentVideosFromStorage();
+      const recentVideosList = getVideosByIds(recentIds, allVideos);
+      setRecentVideos(updateVideoSavedStatus(recentVideosList, savedIds));
+    };
+
+    // LocalStorage değişikliklerini dinle
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Özel bir event dinleyici oluştur
+    window.addEventListener('videoSaved', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('videoSaved', handleStorageChange);
+    };
+  }, [allVideos]);
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
@@ -84,6 +111,9 @@ export const useVideoLibrary = () => {
       setRecentVideos(prevVideos => 
         updateVideoSavedStatus(prevVideos, updatedSavedIds)
       );
+      
+      // Değişikliği bildirmek için özel bir event yayınla
+      window.dispatchEvent(new Event('videoSaved'));
       
     } catch (error) {
       console.error("Error updating saved videos:", error);

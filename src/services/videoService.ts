@@ -1,3 +1,4 @@
+
 import { Video } from '@/types/video';
 
 // Mock video verileri
@@ -172,6 +173,8 @@ export const updateRecentlyViewed = (videoId: number): number[] => {
 };
 
 export const getVideosByIds = (ids: number[], allVideos: Video[]): Video[] => {
+  if (!ids || !Array.isArray(ids) || ids.length === 0) return [];
+  
   return allVideos.filter(video => ids.includes(video.id));
 };
 
@@ -179,6 +182,9 @@ export const updateVideoSavedStatus = (
   videos: Video[], 
   savedIds: number[]
 ): Video[] => {
+  if (!videos || !Array.isArray(videos)) return [];
+  if (!savedIds || !Array.isArray(savedIds)) return videos;
+  
   return videos.map(video => ({
     ...video,
     saved: savedIds.includes(video.id)
