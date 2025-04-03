@@ -8,6 +8,7 @@ import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('trend');
+  const [searchQuery, setSearchQuery] = useState('');
   const [videos, setVideos] = useState({
     trend: [
       {
@@ -128,22 +129,31 @@ const Index = () => {
       return updatedVideos;
     });
     
-    // Show toast notification
-    toast({
-      title: "Video Kaydedildi",
-      description: "Video kütüphanenize eklendi.",
-    });
+    // Toast notification removed as requested
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
   const getActiveVideos = () => {
-    return videos[activeTab] || [];
+    const activeVideos = videos[activeTab] || [];
+    
+    if (!searchQuery) {
+      return activeVideos;
+    }
+    
+    // Filter videos based on search query
+    return activeVideos.filter(video => 
+      video.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   };
 
   return (
     <div className="pb-16">
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Hızlı Öğrenme</h1>
-        <SearchBar />
+        <SearchBar onChange={handleSearch} />
         
         <h2 className="text-lg font-semibold mt-6 mb-4">Konular</h2>
         <SubjectGrid onSubjectClick={() => {}} />
@@ -170,20 +180,26 @@ const Index = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {getActiveVideos().map(video => (
-              <VideoCard 
-                key={video.id}
-                id={video.id}
-                title={video.title}
-                thumbnailUrl={video.thumbnailUrl}
-                duration={video.duration}
-                saved={video.saved}
-                onSave={() => handleSaveVideo(video.id)}
-                onClick={() => handleVideoClick(video.title)}
-              />
-            ))}
-          </div>
+          {getActiveVideos().length === 0 ? (
+            <div className="text-center py-10 text-muted-foreground">
+              Arama sonucu bulunamadı.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {getActiveVideos().map(video => (
+                <VideoCard 
+                  key={video.id}
+                  id={video.id}
+                  title={video.title}
+                  thumbnailUrl={video.thumbnailUrl}
+                  duration={video.duration}
+                  saved={video.saved}
+                  onSave={() => handleSaveVideo(video.id)}
+                  onClick={() => handleVideoClick(video.title)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <NavBar />
