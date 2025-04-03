@@ -168,6 +168,13 @@ const UserProfile = () => {
       }
     };
     
+    const handleRecentlyViewedUpdate = (e: StorageEvent) => {
+      if (e.key === 'recentlyViewedVideos') {
+        // When recentlyViewedVideos changes, update daily video count
+        handleVideoWatched();
+      }
+    };
+    
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'achievements') {
         handleQuestionsCompleted();
@@ -179,11 +186,13 @@ const UserProfile = () => {
     window.addEventListener('questionsCompleted', handleQuestionsCompleted);
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('videoWatched', handleVideoWatched);
+    window.addEventListener('recentlyViewedUpdated', handleVideoWatched);
     
     return () => {
       window.removeEventListener('questionsCompleted', handleQuestionsCompleted);
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('videoWatched', handleVideoWatched);
+      window.removeEventListener('recentlyViewedUpdated', handleVideoWatched);
     };
   }, []);
 

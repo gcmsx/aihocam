@@ -137,6 +137,9 @@ export const updateRecentlyViewed = (videoId: number): number[] => {
   const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
   let recentlyViewed = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage) : [];
   
+  // Check if the video is already in the list
+  const isNewVideo = !recentlyViewed.includes(videoId);
+  
   // Remove the video if it's already in the recently viewed list
   recentlyViewed = recentlyViewed.filter((id: number) => id !== videoId);
   
@@ -150,6 +153,50 @@ export const updateRecentlyViewed = (videoId: number): number[] => {
   localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
   
   console.log("Recently viewed videos updated:", recentlyViewed);
+  
+  // Dispatch an event when a new video is added to recently viewed
+  if (isNewVideo) {
+    // Dispatch a custom event to update daily video count
+    window.dispatchEvent(new CustomEvent('recentlyViewedUpdated', { 
+      detail: { videoId } 
+    }));
+    
+    // Update daily progress directly
+    const today = new Date().toLocaleDateString();
+    const dailyProgressStr = localStorage.getItem(`dailyProgress_${today}`);
+    const dailyProgress = dailyProgressStr ? JSON.parse(dailyProgressStr) : { videosWatched: 0, goalReached: false };
+    
+    if (!dailyProgress.goalReached) {
+      const newVideosWatched = dailyProgress.videosWatched + 1;
+      
+      // Check if goal is reached
+      if (newVideosWatched >= 5 && !dailyProgress.goalReached) {
+        // Add 3 points for completing daily goal
+        const achievementsFromStorage = localStorage.getItem('achievements');
+        const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage) : { count: 0 };
+        achievements.count += 3;
+        localStorage.setItem('achievements', JSON.stringify(achievements));
+        
+        // Show a toast notification
+        if (typeof window !== 'undefined') {
+          const toastEvent = new CustomEvent('toast', {
+            detail: {
+              title: "Günlük Hedef Tamamlandı!",
+              description: "5 video izlediniz ve 3 puan kazandınız.",
+              variant: "default"
+            }
+          });
+          window.dispatchEvent(toastEvent);
+        }
+      }
+      
+      // Save updated progress
+      localStorage.setItem(`dailyProgress_${today}`, JSON.stringify({
+        videosWatched: newVideosWatched,
+        goalReached: newVideosWatched >= 5
+      }));
+    }
+  }
   
   return recentlyViewed;
 };
