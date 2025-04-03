@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import NavBar from '@/components/NavBar';
-import { toast } from '@/hooks/use-toast';
-import { Toaster } from '@/components/ui/toaster';
 import { Video } from '@/types/video';
 import { 
   getSavedVideosFromStorage, 
@@ -45,11 +43,6 @@ const SubjectPage = () => {
   const handleVideoClick = (title: string, videoId: number) => {
     // Add to recently viewed videos
     updateRecentlyViewed(videoId);
-    
-    toast({
-      title: "Video",
-      description: `'${title}' videosu açılıyor...`,
-    });
   };
   
   const handleSaveVideo = (videoId: number) => {
@@ -64,15 +57,6 @@ const SubjectPage = () => {
           : video
       )
     );
-    
-    // Show toast notification
-    const isNowSaved = updatedSavedIds.includes(videoId);
-    toast({
-      title: isNowSaved ? "Video kaydedildi" : "Video kaldırıldı",
-      description: isNowSaved 
-        ? "Video başarıyla kaydedildi." 
-        : "Video kaydedilenlerden kaldırıldı.",
-    });
   };
   
   return (
@@ -89,7 +73,6 @@ const SubjectPage = () => {
         <ProgressSection topics={topics} color={color} />
       </div>
       <NavBar />
-      <Toaster />
     </div>
   );
 };

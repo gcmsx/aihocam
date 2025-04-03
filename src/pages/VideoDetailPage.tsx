@@ -2,7 +2,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import NavBar from '@/components/NavBar';
-import { Toaster } from '@/components/ui/toaster';
 import VideoHeader from '@/components/video/VideoHeader';
 import VideoPlayer from '@/components/video/VideoPlayer';
 import ContentTabs from '@/components/video/ContentTabs';
@@ -34,6 +33,7 @@ const VideoDetailPage = () => {
         <VideoPlayer 
           thumbnailUrl={video.thumbnailUrl}
           title={video.title}
+          videoUrl="https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
         />
         
         <ContentTabs 
@@ -43,7 +43,6 @@ const VideoDetailPage = () => {
       </div>
       
       <NavBar />
-      <Toaster />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { Video } from '@/types/video';
 import { getSavedVideosFromStorage, saveVideo, updateRecentlyViewed } from '@/services/videoService';
 
@@ -54,7 +53,6 @@ export const useVideoDetail = (videoId: string | undefined) => {
   const [video, setVideo] = useState<VideoDetails | null>(null);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
   
   useEffect(() => {
     if (!videoId) {
@@ -81,15 +79,10 @@ export const useVideoDetail = (videoId: string | undefined) => {
       }
     } catch (error) {
       console.error("Error fetching video details:", error);
-      toast({
-        title: "Hata!",
-        description: "Video detayları yüklenirken bir hata oluştu.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
-  }, [videoId, toast]);
+  }, [videoId]);
   
   const handleSaveVideo = () => {
     if (!video) return;
@@ -98,14 +91,6 @@ export const useVideoDetail = (videoId: string | undefined) => {
     const updatedSavedIds = saveVideo(video.id);
     const newSaveStatus = updatedSavedIds.includes(video.id);
     setSaved(newSaveStatus);
-    
-    // Kullanıcıya bildirim göster
-    toast({
-      title: newSaveStatus ? "Video kaydedildi" : "Video kaldırıldı",
-      description: newSaveStatus
-        ? "Video başarıyla kaydedildi."
-        : "Video kaydedilenlerden kaldırıldı.",
-    });
   };
   
   return { video, saved, loading, handleSaveVideo };
