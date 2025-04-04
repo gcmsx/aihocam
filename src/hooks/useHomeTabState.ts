@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
+import { Video } from '@/types/video';
 
-export const useHomeTabState = (initialTab: string = '9') => {
-  const [activeTab, setActiveTab] = useState(initialTab);
-
+export const useHomeTabState = () => {
+  const [activeTab, setActiveTab] = useState('trend');
+  
   return {
     activeTab,
     setActiveTab

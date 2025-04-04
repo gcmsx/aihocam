@@ -4,7 +4,6 @@ import { useHomeTabState } from './useHomeTabState';
 import { useHomeSearch } from './useHomeSearch';
 import { useNavigate } from 'react-router-dom';
 import { Video } from '@/types/video';
-import { GradeLevel } from '@/data/gradeData';
 import { 
   getVideos, 
   searchVideos, 
@@ -16,10 +15,9 @@ import {
 export const useHomeVideos = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<{[key: string]: Video[]}>({
-    '9': [],
-    '10': [],
-    '11': [],
-    '12': []
+    trend: [],
+    recommended: [],
+    popular: []
   });
   const [allVideos, setAllVideos] = useState<Video[]>([]);
 
@@ -36,21 +34,16 @@ export const useHomeVideos = () => {
     
     setAllVideos(videosWithSavedStatus);
     
-    // Organize videos by grade
-    const gradeVideos = {
-      '9': [] as Video[],
-      '10': [] as Video[],
-      '11': [] as Video[],
-      '12': [] as Video[]
-    };
+    // Categorize videos
+    const trendVideos = videosWithSavedStatus.slice(0, 3);
+    const recommendedVideos = videosWithSavedStatus.slice(3, 6);
+    const popularVideos = videosWithSavedStatus.slice(6, 9);
     
-    videosWithSavedStatus.forEach(video => {
-      if (video.grade) {
-        gradeVideos[video.grade].push(video);
-      }
+    setVideos({
+      trend: trendVideos,
+      recommended: recommendedVideos,
+      popular: popularVideos
     });
-    
-    setVideos(gradeVideos);
   }, []);
 
   // Listen for video save/download events
