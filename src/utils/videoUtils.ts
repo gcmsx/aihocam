@@ -1,3 +1,4 @@
+
 import { mockVideos } from '@/services/video/mockData';
 import { Video } from '@/types/video';
 import { GradeLevel } from '@/data/gradeData';
@@ -29,14 +30,18 @@ export const getSubjectVideos = (subject: string): Video[] => {
     
     for (let i = 0; i < videosToAdd; i++) {
       const videoNumber = subjectVideos.length + i + 1;
-      additionalVideos.push({
+      const newVideo = {
         id: maxId + i + 1,
         title: `${subject} Dersi ${videoNumber}. Video`,
         subject: subject,
         thumbnailUrl: placeholderImages[i % placeholderImages.length], 
         duration: `${Math.floor(Math.random() * 20 + 5)} dk`,
         saved: false
-      });
+      };
+      
+      // Push to both mock videos array and our result array
+      mockVideos.push(newVideo);
+      additionalVideos.push(newVideo);
     }
 
     console.log(`Added ${additionalVideos.length} videos for ${subject}. Total: ${subjectVideos.length + additionalVideos.length}`);
@@ -46,7 +51,7 @@ export const getSubjectVideos = (subject: string): Video[] => {
   return subjectVideos;
 };
 
-// New function to get videos for a specific subject and grade
+// Function to get videos for a specific subject and grade
 export const getSubjectGradeVideos = (subject: string, grade: GradeLevel): Video[] => {
   // First try to find videos that already have the grade specified
   const existingVideos = mockVideos.filter(
@@ -78,7 +83,7 @@ export const getSubjectGradeVideos = (subject: string, grade: GradeLevel): Video
   
   for (let i = 0; i < videosToAdd; i++) {
     const videoNumber = existingVideos.length + i + 1;
-    additionalVideos.push({
+    const newVideo = {
       id: maxId + i + 1,
       title: `${subject} ${grade}. Sınıf - ${videoNumber}. Video`,
       subject: subject,
@@ -86,7 +91,11 @@ export const getSubjectGradeVideos = (subject: string, grade: GradeLevel): Video
       thumbnailUrl: placeholderImages[i % placeholderImages.length], 
       duration: `${Math.floor(Math.random() * 20 + 5)} dk`,
       saved: false
-    });
+    };
+    
+    // Push to both mock videos array and our result array
+    mockVideos.push(newVideo);
+    additionalVideos.push(newVideo);
   }
 
   console.log(`Added ${additionalVideos.length} videos for ${subject} ${grade}. sınıf. Total: ${existingVideos.length + additionalVideos.length}`);

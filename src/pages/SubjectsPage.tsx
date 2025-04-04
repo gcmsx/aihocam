@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import VideoCard from '@/components/VideoCard';
 import NavBar from '@/components/NavBar';
@@ -18,20 +18,110 @@ import {
 } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { getSubjectGradeVideos } from '@/utils/videoUtils';
+import { 
+  updateRecentlyViewed,
+  downloadVideo,
+  getSavedVideosFromStorage
+} from '@/services/video';
+import { Video } from '@/types/video';
 
 const SubjectsPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const navigate = useNavigate();
   const [selectedGrade, setSelectedGrade] = useState<GradeLevel | null>(null);
+  const [subjectVideos, setSubjectVideos] = useState<Video[]>([]);
   
   // Handle back button
   const handleBack = () => {
     navigate('/');
   };
   
+  // Effect to get videos and update saved status
+  useEffect(() => {
+    if (!subject || !selectedGrade) return;
+    
+    // Get videos for the selected grade and subject
+    const videos = getSubjectGradeVideos(subject, selectedGrade);
+    
+    // Update saved status from localStorage
+    const savedIds = getSavedVideosFromStorage();
+    const updatedVideos = videos.map(video => ({
+      ...video,
+      saved: savedIds.includes(video.id)
+    }));
+    
+    setSubjectVideos(updatedVideos);
+  }, [subject, selectedGrade]);
+  
+  // Listen for video save/download events
+  useEffect(() => {
+    const handleVideoUpdate = () => {
+      if (!subject || !selectedGrade) return;
+      
+      const savedIds = getSavedVideosFromStorage();
+      
+      setSubjectVideos(prevVideos => 
+        prevVideos.map(video => ({
+          ...video,
+          saved: savedIds.includes(video.id)
+        }))
+      );
+    };
+    
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'savedVideos') {
+        handleVideoUpdate();
+      }
+    };
+    
+    window.addEventListener('videoSaved', handleVideoUpdate);
+    window.addEventListener('videoDownloaded', handleVideoUpdate);
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('videoSaved', handleVideoUpdate);
+      window.removeEventListener('videoDownloaded', handleVideoUpdate);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [subject, selectedGrade]);
+  
   // Handle video click
   const handleVideoClick = (videoId: number) => {
+    // Add to recently viewed videos
+    updateRecentlyViewed(videoId);
+    
+    // Navigate to video detail page
     navigate(`/video/${videoId}`);
+  };
+  
+  // Handle save video
+  const handleSaveVideo = async (videoId: number) => {
+    try {
+      // Find the video
+      const video = subjectVideos.find(v => v.id === videoId);
+      if (!video) return;
+      
+      // Update local state immediately for better UI responsiveness
+      setSubjectVideos(prevVideos => 
+        prevVideos.map(v => 
+          v.id === videoId ? { ...v, saved: !v.saved } : v
+        )
+      );
+      
+      // Process the download
+      await downloadVideo(videoId, video);
+    } catch (error) {
+      console.error("Error saving video:", error);
+      // If there's an error, revert UI changes
+      const savedIds = getSavedVideosFromStorage();
+      
+      setSubjectVideos(prevVideos => 
+        prevVideos.map(v => ({
+          ...v,
+          saved: savedIds.includes(v.id)
+        }))
+      );
+    }
   };
   
   if (!subject) {
@@ -44,11 +134,6 @@ const SubjectsPage = () => {
     gradeTopics[subject][selectedGrade] : 
     subjectTopics[subject] || [];
   
-  // Get videos for the selected grade and subject
-  const subjectVideos = selectedGrade ? 
-    getSubjectGradeVideos(subject, selectedGrade) : 
-    [];
-
   // Generate chart data based on selected grade topics
   const chartData = topics.map(topic => ({
     name: topic,
@@ -95,6 +180,8 @@ const SubjectsPage = () => {
                     thumbnailUrl={video.thumbnailUrl}
                     duration={video.duration}
                     onClick={() => handleVideoClick(video.id)}
+                    saved={video.saved}
+                    onSave={() => handleSaveVideo(video.id)}
                   />
                 ))}
               </div>
