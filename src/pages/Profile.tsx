@@ -66,20 +66,41 @@ const Profile = () => {
     // Add subject field to recently viewed videos if needed
     const recentlyViewedStr = localStorage.getItem('recentlyViewedVideos');
     if (recentlyViewedStr) {
-      const recentlyViewed = JSON.parse(recentlyViewedStr);
-      let hasChanges = false;
-      
-      recentlyViewed.forEach((video: any) => {
-        if (!video.subject) {
-          // Assign a random subject for existing data
-          const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-          video.subject = subjects[Math.floor(Math.random() * subjects.length)];
-          hasChanges = true;
+      try {
+        const recentlyViewed = JSON.parse(recentlyViewedStr);
+        
+        // Check if recentlyViewed is an array of objects or just an array of numbers
+        if (Array.isArray(recentlyViewed)) {
+          let hasChanges = false;
+          let updatedRecentlyViewed = [...recentlyViewed];
+          
+          // Convert to proper format if it's just an array of numbers
+          if (recentlyViewed.length > 0 && typeof recentlyViewed[0] === 'number') {
+            const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
+            
+            updatedRecentlyViewed = recentlyViewed.map((videoId: number) => ({
+              id: videoId,
+              subject: subjects[Math.floor(Math.random() * subjects.length)]
+            }));
+            
+            hasChanges = true;
+          } else {
+            // It's already an array of objects, just add subject if missing
+            updatedRecentlyViewed.forEach((video: any) => {
+              if (!video.subject) {
+                const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
+                video.subject = subjects[Math.floor(Math.random() * subjects.length)];
+                hasChanges = true;
+              }
+            });
+          }
+          
+          if (hasChanges) {
+            localStorage.setItem('recentlyViewedVideos', JSON.stringify(updatedRecentlyViewed));
+          }
         }
-      });
-      
-      if (hasChanges) {
-        localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
+      } catch (error) {
+        console.error('Error processing recently viewed videos:', error);
       }
     }
   }, []);

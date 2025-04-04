@@ -1,4 +1,3 @@
-
 import { Video } from '@/types/video';
 import { setupDatabase } from './videoDatabase';
 
@@ -28,7 +27,14 @@ export const getRecentVideosFromStorage = (): number[] => {
   
   if (recentlyViewedFromStorage) {
     try {
-      return JSON.parse(recentlyViewedFromStorage);
+      const recentlyViewed = JSON.parse(recentlyViewedFromStorage);
+      
+      // Handle both array of objects and array of numbers
+      if (recentlyViewed.length > 0 && typeof recentlyViewed[0] === 'object') {
+        return recentlyViewed.map((video: any) => video.id);
+      }
+      
+      return recentlyViewed;
     } catch (error) {
       console.error("Error parsing recently viewed videos:", error);
       return [];
@@ -135,7 +141,23 @@ export const downloadVideo = async (videoId: number, video: Video): Promise<numb
  */
 export const updateRecentlyViewed = (videoId: number): number[] => {
   const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
-  let recentlyViewed = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage) : [];
+  let recentlyViewed = [];
+  
+  // Process existing data or initialize new array
+  if (recentlyViewedFromStorage) {
+    try {
+      const parsed = JSON.parse(recentlyViewedFromStorage);
+      
+      // Convert to IDs if it's already objects with IDs
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0].id) {
+        recentlyViewed = parsed.map(item => item.id);
+      } else if (Array.isArray(parsed)) {
+        recentlyViewed = parsed;
+      }
+    } catch (error) {
+      console.error("Error parsing recentlyViewed:", error);
+    }
+  }
   
   // Check if the video is already in the list
   const isNewVideo = !recentlyViewed.includes(videoId);
@@ -149,10 +171,17 @@ export const updateRecentlyViewed = (videoId: number): number[] => {
   // Keep only the most recent 10 videos
   recentlyViewed = recentlyViewed.slice(0, 10);
   
-  // Update localStorage with stringified array
-  localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
+  // Instead of storing just IDs, store objects with ID and subject
+  const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
+  const recentlyViewedObjects = recentlyViewed.map((id: number) => ({
+    id: id,
+    subject: subjects[Math.floor(Math.random() * subjects.length)]
+  }));
   
-  console.log("Recently viewed videos updated:", recentlyViewed);
+  // Update localStorage with stringified array of objects
+  localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewedObjects));
+  
+  console.log("Recently viewed videos updated:", recentlyViewedObjects);
   
   // Dispatch an event when a new video is added to recently viewed
   if (isNewVideo) {
@@ -218,8 +247,26 @@ export const getAllSavedVideos = (allVideos: Video[]): Video[] => {
  * @returns Array of videos with saved status
  */
 export const getAllRecentVideos = (allVideos: Video[]): Video[] => {
-  const recentIds = getRecentVideosFromStorage();
+  const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
   const savedIds = getSavedVideosFromStorage();
+  let recentIds: number[] = [];
+  
+  if (recentlyViewedFromStorage) {
+    try {
+      const parsed = JSON.parse(recentlyViewedFromStorage);
+      
+      // Handle both formats: array of objects with ID or array of numbers
+      if (Array.isArray(parsed)) {
+        if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0].id) {
+          recentIds = parsed.map(item => item.id);
+        } else {
+          recentIds = parsed;
+        }
+      }
+    } catch (error) {
+      console.error("Error parsing recently viewed videos:", error);
+    }
+  }
   
   // Keep original order of recently viewed videos
   return recentIds
