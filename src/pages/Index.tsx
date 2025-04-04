@@ -11,7 +11,7 @@ const Index = () => {
   
   // Load version from localStorage
   useEffect(() => {
-    const storedVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0345';
+    const storedVersion = localStorage.getItem('appVersion');
     setVersion(storedVersion);
     
     const handleVersionUpdate = (e: CustomEvent) => {
