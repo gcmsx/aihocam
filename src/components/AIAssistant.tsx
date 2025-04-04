@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Image, X, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: number;
@@ -290,7 +292,13 @@ const AIAssistant = () => {
                   />
                 </div>
               )}
-              <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+              {message.sender === 'ai' ? (
+                <div className="text-sm markdown-content">
+                  <ReactMarkdown>{message.text}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+              )}
             </div>
           </div>
         ))}

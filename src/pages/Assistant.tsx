@@ -2,6 +2,7 @@
 import React from 'react';
 import NavBar from '@/components/NavBar';
 import AIAssistant from '@/components/AIAssistant';
+import './assistant.css';
 
 const Assistant = () => {
   return (
