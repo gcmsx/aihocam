@@ -95,9 +95,14 @@ const SubjectPage = () => {
   
   const handleSaveVideo = async (videoId: number) => {
     try {
+      console.log("Saving video:", videoId);
+      
       // Find the video
       const video = videos.find(v => v.id === videoId);
-      if (!video) return;
+      if (!video) {
+        console.error("Video not found:", videoId);
+        return;
+      }
       
       // Update UI immediately for better responsiveness
       setVideos(prevVideos => 
@@ -110,6 +115,8 @@ const SubjectPage = () => {
       
       // Process the download
       await downloadVideo(videoId, video);
+      console.log("Video downloaded successfully:", videoId);
+      
     } catch (error) {
       console.error("Error downloading video:", error);
       // Revert UI state if there's an error
