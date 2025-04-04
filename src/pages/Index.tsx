@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
-import HomeTabs from '@/components/home/HomeTabs';
 import HomeSearchResults from '@/components/home/HomeSearchResults';
 import SubjectGrid from '@/components/SubjectGrid';
 import { useHomeVideos } from '@/hooks/useHomeVideos';
@@ -29,10 +28,7 @@ const Index = () => {
   }, []);
   
   const { 
-    activeTab,
-    setActiveTab,
     searchQuery,
-    videos,
     filteredAllVideos,
     handleSearch,
     handleVideoClick,
@@ -55,17 +51,7 @@ const Index = () => {
         />
         
         {(!searchQuery || filteredAllVideos.length === 0) && (
-          <>
-            <SubjectGrid />
-            
-            <HomeTabs 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              videos={videos}
-              handleVideoClick={handleVideoClick}
-              handleSaveVideo={handleSaveVideo}
-            />
-          </>
+          <SubjectGrid />
         )}
       </div>
       <NavBar />
