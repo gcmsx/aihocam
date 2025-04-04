@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 const Profile = () => {
   // Update the beta version when making changes to this page
   useEffect(() => {
-    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0343';
+    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0345';
     localStorage.setItem('appVersion', currentVersion);
     
     // Dispatch an event to notify index page to update version
@@ -41,6 +41,46 @@ const Profile = () => {
     // Initialize selected grade if not set
     if (!localStorage.getItem('selected_grade')) {
       localStorage.setItem('selected_grade', '9');
+    }
+    
+    // Add subject field to completed questions if needed
+    const completedQuestionsStr = localStorage.getItem('completedQuestions');
+    if (completedQuestionsStr) {
+      const completedQuestions = JSON.parse(completedQuestionsStr);
+      let hasChanges = false;
+      
+      Object.entries(completedQuestions).forEach(([videoId, data]: [string, any]) => {
+        if (!data.subject) {
+          // Assign a random subject for existing data
+          const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
+          data.subject = subjects[Math.floor(Math.random() * subjects.length)];
+          hasChanges = true;
+        }
+      });
+      
+      if (hasChanges) {
+        localStorage.setItem('completedQuestions', JSON.stringify(completedQuestions));
+      }
+    }
+    
+    // Add subject field to recently viewed videos if needed
+    const recentlyViewedStr = localStorage.getItem('recentlyViewedVideos');
+    if (recentlyViewedStr) {
+      const recentlyViewed = JSON.parse(recentlyViewedStr);
+      let hasChanges = false;
+      
+      recentlyViewed.forEach((video: any) => {
+        if (!video.subject) {
+          // Assign a random subject for existing data
+          const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
+          video.subject = subjects[Math.floor(Math.random() * subjects.length)];
+          hasChanges = true;
+        }
+      });
+      
+      if (hasChanges) {
+        localStorage.setItem('recentlyViewedVideos', JSON.stringify(recentlyViewed));
+      }
     }
   }, []);
   

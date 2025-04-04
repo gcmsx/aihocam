@@ -18,31 +18,17 @@ const GradeSelector: React.FC<GradeSelectorProps> = ({
   }));
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-      <div className="flex gap-2">
-        {grades.slice(0, 2).map(grade => (
-          <Button
-            key={grade.value}
-            variant={selectedGrade === grade.value ? "default" : "outline"}
-            size="sm"
-            onClick={() => onGradeChange(grade.value)}
-          >
-            {grade.label}
-          </Button>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        {grades.slice(2).map(grade => (
-          <Button
-            key={grade.value}
-            variant={selectedGrade === grade.value ? "default" : "outline"}
-            size="sm"
-            onClick={() => onGradeChange(grade.value)}
-          >
-            {grade.label}
-          </Button>
-        ))}
-      </div>
+    <div className="flex items-center justify-center gap-2 mb-4">
+      {grades.map(grade => (
+        <Button
+          key={grade.value}
+          variant={selectedGrade === grade.value ? "default" : "outline"}
+          size="sm"
+          onClick={() => onGradeChange(grade.value)}
+        >
+          {grade.label}
+        </Button>
+      ))}
     </div>
   );
 };
