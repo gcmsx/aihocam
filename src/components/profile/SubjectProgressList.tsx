@@ -37,39 +37,51 @@ const SubjectProgressList: React.FC<SubjectProgressProps> = ({ selectedGrade }) 
       const completedQuestionsStr = localStorage.getItem('completedQuestions');
       const completedQuestions = completedQuestionsStr ? JSON.parse(completedQuestionsStr) : {};
       
-      // Count total watched videos and completed questions by subject
-      const subjectCounts: {[subject: string]: {watched: number, completed: number}} = {};
+      // Count total watched videos and completed questions by subject and grade
+      const subjectGradeCounts: {[key: string]: {watched: number, completed: number}} = {};
       
-      // Initialize counts for all subjects
+      // Initialize counts for all subjects for the current grade
       allSubjects.forEach(subject => {
-        subjectCounts[subject] = { watched: 0, completed: 0 };
+        const key = `${subject}_${selectedGrade}`;
+        subjectGradeCounts[key] = { watched: 0, completed: 0 };
       });
       
-      // Count watched videos by subject
+      // Count watched videos by subject and grade
       recentlyViewed.forEach((video: any) => {
+        if (!video || typeof video !== 'object') return;
+        
         const subject = video.subject;
-        if (subject && allSubjects.includes(subject)) {
-          if (!subjectCounts[subject]) {
-            subjectCounts[subject] = { watched: 0, completed: 0 };
+        const grade = video.grade || selectedGrade; // Default to selected grade if not specified
+        
+        if (subject && allSubjects.includes(subject) && grade === selectedGrade) {
+          const key = `${subject}_${grade}`;
+          if (!subjectGradeCounts[key]) {
+            subjectGradeCounts[key] = { watched: 0, completed: 0 };
           }
-          subjectCounts[subject].watched += 1;
+          subjectGradeCounts[key].watched += 1;
         }
       });
       
-      // Count completed question sets by subject
+      // Count completed question sets by subject and grade
       Object.values(completedQuestions).forEach((data: any) => {
+        if (!data || typeof data !== 'object') return;
+        
         const subject = data.subject;
-        if (subject && allSubjects.includes(subject)) {
-          if (!subjectCounts[subject]) {
-            subjectCounts[subject] = { watched: 0, completed: 0 };
+        const grade = data.grade || selectedGrade; // Default to selected grade if not specified
+        
+        if (subject && allSubjects.includes(subject) && grade === selectedGrade) {
+          const key = `${subject}_${grade}`;
+          if (!subjectGradeCounts[key]) {
+            subjectGradeCounts[key] = { watched: 0, completed: 0 };
           }
-          subjectCounts[subject].completed += 1;
+          subjectGradeCounts[key].completed += 1;
         }
       });
       
-      // Calculate progress percentage for each subject
+      // Calculate progress percentage for each subject in the current grade
       allSubjects.forEach(subject => {
-        const counts = subjectCounts[subject];
+        const key = `${subject}_${selectedGrade}`;
+        const counts = subjectGradeCounts[key];
         const watchedPoints = counts.watched * 5; // Each watched video is worth 5 points
         const completedPoints = counts.completed * 10; // Each completed question set is worth 10 points
         const totalPoints = watchedPoints + completedPoints;
@@ -82,14 +94,17 @@ const SubjectProgressList: React.FC<SubjectProgressProps> = ({ selectedGrade }) 
           const progressPercentage = Math.min(Math.round(totalPoints / 2), 100);
           newProgressData[subject] = progressPercentage;
         } else {
-          // Retrieve stored progress or use default random value
+          // Retrieve stored progress for this specific grade level and subject, or generate a new random one
           const key = `progress_${subject}_${selectedGrade}`;
           const storedProgress = localStorage.getItem(key);
           
           if (storedProgress) {
             newProgressData[subject] = parseInt(storedProgress);
           } else {
-            const randomProgress = Math.floor(Math.random() * 100);
+            // Generate a random progress for this grade/subject combination
+            // Make it more realistic - different for each grade/subject
+            const seed = selectedGrade * 13 + subject.length * 7; // Create a deterministic seed based on grade and subject
+            const randomProgress = Math.floor((Math.sin(seed) + 1) / 2 * 80) + 10; // 10-90% range
             localStorage.setItem(key, randomProgress.toString());
             newProgressData[subject] = randomProgress;
           }
@@ -114,7 +129,7 @@ const SubjectProgressList: React.FC<SubjectProgressProps> = ({ selectedGrade }) 
       window.removeEventListener('questionsCompleted', handleQuestionsCompleted);
       window.removeEventListener('recentlyViewedUpdated', handleVideoWatched);
     };
-  }, [selectedGrade]);
+  }, [selectedGrade]); // Re-calculate when grade changes
 
   return (
     <div>

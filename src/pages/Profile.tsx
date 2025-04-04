@@ -43,17 +43,27 @@ const Profile = () => {
       localStorage.setItem('selected_grade', '9');
     }
     
-    // Add subject field to completed questions if needed
+    // Add subject and grade fields to completed questions if needed
     const completedQuestionsStr = localStorage.getItem('completedQuestions');
     if (completedQuestionsStr) {
       const completedQuestions = JSON.parse(completedQuestionsStr);
       let hasChanges = false;
       
       Object.entries(completedQuestions).forEach(([videoId, data]: [string, any]) => {
+        // Add subject if missing
         if (!data.subject) {
           // Assign a random subject for existing data
           const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
           data.subject = subjects[Math.floor(Math.random() * subjects.length)];
+          hasChanges = true;
+        }
+        
+        // Add grade if missing
+        if (!data.grade) {
+          // Assign a grade based on videoId to ensure consistent assignment
+          const videoIdNum = parseInt(videoId);
+          const grades = [9, 10, 11, 12];
+          data.grade = grades[videoIdNum % 4];
           hasChanges = true;
         }
       });
@@ -63,33 +73,43 @@ const Profile = () => {
       }
     }
     
-    // Add subject field to recently viewed videos if needed
+    // Add subject and grade fields to recently viewed videos if needed
     const recentlyViewedStr = localStorage.getItem('recentlyViewedVideos');
     if (recentlyViewedStr) {
       try {
         const recentlyViewed = JSON.parse(recentlyViewedStr);
         
-        // Check if recentlyViewed is an array of objects or just an array of numbers
+        // Check if recentlyViewed is an array
         if (Array.isArray(recentlyViewed)) {
           let hasChanges = false;
           let updatedRecentlyViewed = [...recentlyViewed];
           
           // Convert to proper format if it's just an array of numbers
-          if (recentlyViewed.length > 0 && typeof recentlyViewed[0] === 'number') {
+          if (recentlyViewed.length > 0 && typeof recentlyViewed[0] !== 'object') {
             const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
+            const grades = [9, 10, 11, 12];
             
             updatedRecentlyViewed = recentlyViewed.map((videoId: number) => ({
               id: videoId,
-              subject: subjects[Math.floor(Math.random() * subjects.length)]
+              subject: subjects[videoId % subjects.length],
+              grade: grades[videoId % grades.length]
             }));
             
             hasChanges = true;
           } else {
-            // It's already an array of objects, just add subject if missing
+            // It's already an array of objects, add subject and grade if missing
             updatedRecentlyViewed.forEach((video: any) => {
+              if (!video) return;
+              
               if (!video.subject) {
                 const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-                video.subject = subjects[Math.floor(Math.random() * subjects.length)];
+                video.subject = subjects[video.id % subjects.length];
+                hasChanges = true;
+              }
+              
+              if (!video.grade) {
+                const grades = [9, 10, 11, 12];
+                video.grade = grades[video.id % grades.length];
                 hasChanges = true;
               }
             });

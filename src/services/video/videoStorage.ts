@@ -1,3 +1,4 @@
+
 import { Video } from '@/types/video';
 import { setupDatabase } from './videoDatabase';
 
@@ -171,11 +172,14 @@ export const updateRecentlyViewed = (videoId: number): number[] => {
   // Keep only the most recent 10 videos
   recentlyViewed = recentlyViewed.slice(0, 10);
   
-  // Instead of storing just IDs, store objects with ID and subject
+  // Instead of storing just IDs, store objects with ID, subject and grade
   const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
+  const grades = [9, 10, 11, 12];
+  
   const recentlyViewedObjects = recentlyViewed.map((id: number) => ({
     id: id,
-    subject: subjects[Math.floor(Math.random() * subjects.length)]
+    subject: subjects[id % subjects.length],
+    grade: grades[id % grades.length]
   }));
   
   // Update localStorage with stringified array of objects
@@ -232,8 +236,6 @@ export const updateRecentlyViewed = (videoId: number): number[] => {
 
 /**
  * Get all saved videos with full details
- * @param allVideos All available videos to search from
- * @returns Array of videos with saved status
  */
 export const getAllSavedVideos = (allVideos: Video[]): Video[] => {
   const savedIds = getSavedVideosFromStorage();
@@ -243,8 +245,6 @@ export const getAllSavedVideos = (allVideos: Video[]): Video[] => {
 
 /**
  * Get all recently viewed videos with full details
- * @param allVideos All available videos to search from
- * @returns Array of videos with saved status
  */
 export const getAllRecentVideos = (allVideos: Video[]): Video[] => {
   const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
