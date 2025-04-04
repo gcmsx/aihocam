@@ -3,6 +3,29 @@ import { mockVideos } from '@/services/video/mockData';
 import { Video } from '@/types/video';
 import { GradeLevel } from '@/data/gradeData';
 
+// Filter out videos with specific topic names like "Cumhuriyetin İlanı" or "Periyodik Tablo"
+const unwantedTopics = ["Cumhuriyetin İlanı", "Periyodik Tablo", "Osmanlı İmparatorluğu", "İnteraktif Deney"];
+
+// Helper function to clean unwanted videos from mockVideos array
+const cleanMockVideos = () => {
+  const indexesToRemove: number[] = [];
+  
+  // Find videos with unwanted topics
+  mockVideos.forEach((video, index) => {
+    if (unwantedTopics.some(topic => video.title.includes(topic))) {
+      indexesToRemove.push(index);
+    }
+  });
+  
+  // Remove videos from highest index to lowest to avoid index shifting issues
+  for (let i = indexesToRemove.length - 1; i >= 0; i--) {
+    mockVideos.splice(indexesToRemove[i], 1);
+  }
+};
+
+// Clean up mockVideos array on module initialization
+cleanMockVideos();
+
 export const getSubjectVideos = (subject: string): Video[] => {
   // Get all videos for the specific subject
   const subjectVideos = mockVideos.filter(
