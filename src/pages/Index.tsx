@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
@@ -8,11 +7,11 @@ import SubjectGrid from '@/components/SubjectGrid';
 import { useHomeVideos } from '@/hooks/useHomeVideos';
 
 const Index = () => {
-  const [version, setVersion] = useState('0.341');
+  const [version, setVersion] = useState('0.345');
   
   // Load version from localStorage
   useEffect(() => {
-    const storedVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0341';
+    const storedVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0345';
     setVersion(storedVersion);
     
     const handleVersionUpdate = (e: CustomEvent) => {
