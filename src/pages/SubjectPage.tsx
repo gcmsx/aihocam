@@ -8,7 +8,7 @@ import {
   downloadVideo, 
   updateRecentlyViewed,
   getAllSavedVideos
-} from '@/services/videoService';
+} from '@/services/video';
 import SubjectHeader from '@/components/subject/SubjectHeader';
 import VideoSection from '@/components/subject/VideoSection';
 import ProgressSection from '@/components/subject/ProgressSection';
@@ -109,19 +109,17 @@ const SubjectPage = () => {
       );
       
       // Process the download
-      downloadVideo(videoId, video).catch(error => {
-        console.error("Error downloading video:", error);
-        // Revert UI state if there's an error
-        const savedIds = getSavedVideosFromStorage();
-        setVideos(prevVideos => 
-          prevVideos.map(video => ({
-            ...video,
-            saved: savedIds.includes(video.id)
-          }))
-        );
-      });
+      await downloadVideo(videoId, video);
     } catch (error) {
       console.error("Error downloading video:", error);
+      // Revert UI state if there's an error
+      const savedIds = getSavedVideosFromStorage();
+      setVideos(prevVideos => 
+        prevVideos.map(video => ({
+          ...video,
+          saved: savedIds.includes(video.id)
+        }))
+      );
     }
   };
   

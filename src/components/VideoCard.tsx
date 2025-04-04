@@ -63,6 +63,7 @@ const VideoCard = ({
             className="p-1.5 bg-black/40 rounded-full text-white hover:bg-black/60 transition"
             onClick={handleSave}
             aria-label={saved ? "İndirildi" : "İndir"}
+            type="button"
           >
             {saved ? (
               <CheckCircle size={16} className="text-white" />
@@ -71,7 +72,7 @@ const VideoCard = ({
             )}
           </button>
         </div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 hover:opacity-100 transition-opacity">
           <div className="bg-primary/80 p-3 rounded-full">
             <Play size={24} className="text-white" fill="white" />
           </div>
