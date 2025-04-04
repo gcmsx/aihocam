@@ -4,19 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import { mockVideos } from '@/services/video/mockData';
 import { Button } from './ui/button';
 import { subjectIcons } from '@/data/subjectIcons';
+import { subjectColors } from '@/data/subjectData';
 
-// Get unique subjects from mock data
-const getUniqueSubjects = (): string[] => {
-  const subjects = mockVideos
-    .map(video => video.subject)
-    .filter((subject): subject is string => subject !== undefined);
-  
-  return [...new Set(subjects)];
-};
+// Define all subjects that should be shown
+const allSubjects = [
+  'Tarih',
+  'Coğrafya',
+  'Felsefe',
+  'Matematik',
+  'Fizik',
+  'Kimya',
+  'Biyoloji',
+  'İngilizce',
+  'Edebiyat'
+];
 
 const SubjectGrid = () => {
   const navigate = useNavigate();
-  const subjects = getUniqueSubjects();
 
   const handleSubjectClick = (subject: string) => {
     navigate(`/subject/${subject}`);
@@ -28,7 +32,7 @@ const SubjectGrid = () => {
       
       {/* Subject Buttons Grid */}
       <div className="grid grid-cols-3 gap-3 mb-5">
-        {subjects.map((subject) => (
+        {allSubjects.map((subject) => (
           <Button
             key={subject}
             variant="outline"

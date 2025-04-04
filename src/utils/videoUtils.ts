@@ -37,6 +37,19 @@ const cleanMockVideos = () => {
 // Clean up mockVideos array on module initialization
 cleanMockVideos();
 
+// Ensure all subjects have videos
+const allSubjects = [
+  'Tarih',
+  'Coğrafya',
+  'Felsefe',
+  'Matematik',
+  'Fizik',
+  'Kimya',
+  'Biyoloji',
+  'İngilizce',
+  'Edebiyat'
+];
+
 export const getSubjectVideos = (subject: string): Video[] => {
   // Get all videos for the specific subject
   const subjectVideos = mockVideos.filter(
@@ -135,3 +148,14 @@ export const getSubjectGradeVideos = (subject: string, grade: GradeLevel): Video
   console.log(`Added ${additionalVideos.length} videos for ${subject} ${grade}. sınıf. Total: ${existingVideos.length + additionalVideos.length}`);
   return [...existingVideos, ...additionalVideos];
 };
+
+// Making sure all subjects have some videos in the mock data
+const ensureAllSubjectsHaveVideos = () => {
+  allSubjects.forEach(subject => {
+    // This will generate mock videos if needed
+    getSubjectVideos(subject);
+  });
+};
+
+// Initialize by ensuring all subjects have videos
+ensureAllSubjectsHaveVideos();
