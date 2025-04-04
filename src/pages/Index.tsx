@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
@@ -11,8 +12,8 @@ const Index = () => {
   
   // Load version from localStorage
   useEffect(() => {
-    const storedVersion = localStorage.getItem('appVersion');
-    setVersion(storedVersion);
+    // Set the version in localStorage instead of reading from it
+    localStorage.setItem('appVersion', '0.345');
     
     const handleVersionUpdate = (e: CustomEvent) => {
       if (e.detail && e.detail.version) {

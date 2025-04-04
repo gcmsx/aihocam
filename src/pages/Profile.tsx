@@ -7,12 +7,12 @@ import { toast } from '@/hooks/use-toast';
 const Profile = () => {
   // Update the beta version when making changes to this page
   useEffect(() => {
-    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0345';
-    localStorage.setItem('appVersion', currentVersion);
+    // Set the version to 0.345
+    localStorage.setItem('appVersion', '0.345');
     
     // Dispatch an event to notify index page to update version
     window.dispatchEvent(new CustomEvent('versionUpdated', {
-      detail: { version: currentVersion }
+      detail: { version: '0.345' }
     }));
     
     // Check if this is the first time visiting the profile page today
