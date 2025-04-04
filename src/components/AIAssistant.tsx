@@ -23,7 +23,7 @@ const AIAssistant = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const OPENAI_API_KEY = "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";
+  const OPENAI_API_KEY = "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";
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
