@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Image, X, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ const AIAssistant = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const OPENAI_API_KEY = "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";
+  const OPENAI_API_KEY = "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";
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
