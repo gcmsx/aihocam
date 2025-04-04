@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Play } from 'lucide-react';
+import { Play, Bookmark } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface VideoCardProps {
@@ -9,6 +9,8 @@ interface VideoCardProps {
   duration: string;
   id: number;
   onClick?: () => void;
+  saved?: boolean;
+  onSave?: () => void;
 }
 
 const VideoCard = ({ 
@@ -16,7 +18,9 @@ const VideoCard = ({
   thumbnailUrl, 
   duration, 
   onClick,
-  id
+  id,
+  saved = false,
+  onSave
 }: VideoCardProps) => {
   const navigate = useNavigate();
   
@@ -26,6 +30,13 @@ const VideoCard = ({
     } else {
       // Navigate to the video detail page with the correct ID
       navigate(`/video/${id}`);
+    }
+  };
+  
+  const handleSaveClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card click
+    if (onSave) {
+      onSave();
     }
   };
   
@@ -51,6 +62,16 @@ const VideoCard = ({
             <Play size={24} className="text-white" fill="white" />
           </div>
         </div>
+        
+        {onSave && (
+          <button 
+            onClick={handleSaveClick}
+            className={`absolute top-2 right-2 p-1.5 rounded-full ${saved ? 'bg-primary text-white' : 'bg-black/50 text-white hover:bg-black/70'}`}
+            aria-label={saved ? "Remove from saved" : "Save video"}
+          >
+            <Bookmark size={16} fill={saved ? "currentColor" : "none"} />
+          </button>
+        )}
       </div>
     </div>
   );
