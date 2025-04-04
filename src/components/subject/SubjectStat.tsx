@@ -12,7 +12,7 @@ const SubjectStat = ({ topic, progress, color }: SubjectStatProps) => {
   return (
     <div className="mb-3">
       <div className="flex justify-between mb-1">
-        <span className="text-sm font-medium">{topic}</span>
+        <span className="text-sm font-medium truncate max-w-[70%]">{topic}</span>
         <span className="text-sm text-muted-foreground">{progress}%</span>
       </div>
       <Progress value={progress} className="h-2">

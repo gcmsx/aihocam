@@ -14,7 +14,7 @@ import {
   ChartLegend, 
   ChartLegendContent,
 } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { getSubjectVideos } from '@/utils/videoUtils';
 
 const SubjectsPage = () => {
@@ -98,7 +98,7 @@ const SubjectsPage = () => {
             {topics.map((topic, index) => (
               <div key={index} className="mb-3">
                 <div className="flex justify-between mb-1">
-                  <span className="text-sm font-medium">{topic}</span>
+                  <span className="text-sm font-medium truncate max-w-[70%]">{topic}</span>
                   <span className="text-sm text-muted-foreground">{Math.floor(Math.random() * 100)}%</span>
                 </div>
                 <Progress value={Math.floor(Math.random() * 100)} className="h-2">
@@ -114,7 +114,7 @@ const SubjectsPage = () => {
 
         <div className="mb-8">
           <h2 className="text-lg font-semibold mb-4">İstatistikler</h2>
-          <Card className="p-4">
+          <Card className="p-4 overflow-hidden">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <p className="text-sm">Tamamlanan Video</p>
@@ -130,19 +130,21 @@ const SubjectsPage = () => {
               </div>
             </div>
 
-            <div className="h-60 mt-4">
+            <div className="mt-4">
               <h3 className="text-md font-medium mb-2">Konu Bazlı Performans</h3>
-              <ChartContainer config={{}} className="h-full">
-                <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]} />
-                  <Tooltip 
-                    formatter={(value) => `${value}%`}
-                    contentStyle={{ background: 'white', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '8px' }}
-                  />
-                </BarChart>
-              </ChartContainer>
+              <div className="w-full h-60">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 12 }} />
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]} />
+                    <Tooltip 
+                      formatter={(value) => `${value}%`}
+                      contentStyle={{ background: 'white', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '8px' }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </Card>
         </div>

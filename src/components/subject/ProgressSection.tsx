@@ -11,7 +11,7 @@ const ProgressSection = ({ topics, color }: ProgressSectionProps) => {
   return (
     <div className="mt-8">
       <h2 className="text-lg font-semibold mb-4">İlerleme Durumu</h2>
-      <div className="card p-4">
+      <div className="card p-4 overflow-hidden">
         {topics.map((topic, index) => (
           <SubjectStat 
             key={index}
