@@ -9,7 +9,8 @@ import {
 import SubjectHeader from '@/components/subject/SubjectHeader';
 import VideoSection from '@/components/subject/VideoSection';
 import ProgressSection from '@/components/subject/ProgressSection';
-import { subjectColors, subjectTopics } from '@/data/subjectData';
+import { subjectColors } from '@/data/subjectData';
+import { gradeTopics } from '@/data/gradeData';
 import { getSubjectVideos } from '@/utils/videoUtils';
 
 const SubjectPage = () => {
@@ -33,7 +34,9 @@ const SubjectPage = () => {
     };
   }, [subject]);
   
-  const topics = subjectTopics[subject] || [];
+  // Use 9th grade topics as default (since we don't have grade selection on this page)
+  const defaultGrade = 9;
+  const topics = gradeTopics[subject]?.[defaultGrade] || [];
   const color = subjectColors[subject];
   
   useEffect(() => {

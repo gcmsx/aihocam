@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import VideoCard from '@/components/VideoCard';
@@ -6,7 +5,7 @@ import NavBar from '@/components/NavBar';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { subjectIcons } from '@/data/subjectIcons';
-import { subjectTopics, subjectColors } from '@/data/subjectData';
+import { subjectColors } from '@/data/subjectData';
 import { gradeTopics, GradeLevel } from '@/data/gradeData';
 import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
@@ -132,7 +131,7 @@ const SubjectsPage = () => {
   const color = subjectColors[subject] || '#1A1B41';
   const topics = selectedGrade && gradeTopics[subject] ? 
     gradeTopics[subject][selectedGrade] : 
-    subjectTopics[subject] || [];
+    [];
   
   // Generate chart data based on selected grade topics
   const chartData = topics.map(topic => ({
