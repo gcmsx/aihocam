@@ -1,13 +1,13 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import NavBar from '@/components/NavBar';
 import UserProfile from '@/components/UserProfile';
 import { toast } from '@/hooks/use-toast';
 
 const Profile = () => {
   // Update the beta version when making changes to this page
-  React.useEffect(() => {
-    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0341';
+  useEffect(() => {
+    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0342';
     localStorage.setItem('appVersion', currentVersion);
     
     // Dispatch an event to notify index page to update version

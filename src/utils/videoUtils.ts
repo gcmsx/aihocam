@@ -4,7 +4,18 @@ import { Video } from '@/types/video';
 import { GradeLevel } from '@/data/gradeData';
 
 // Filter out videos with specific topic names like "Cumhuriyetin İlanı" or "Periyodik Tablo"
-const unwantedTopics = ["Cumhuriyetin İlanı", "Periyodik Tablo", "Osmanlı İmparatorluğu", "İnteraktif Deney"];
+const unwantedTopics = [
+  "Cumhuriyetin İlanı", 
+  "Periyodik Tablo", 
+  "Osmanlı İmparatorluğu", 
+  "İnteraktif Deney",
+  "Hareket Kanunları",
+  "Kıtalar ve Okyanuslar",
+  "Kurtuluş Savaşı",
+  "Asitler ve Bazlar",
+  "Kimyasal Bağlar",
+  "Destan ve Efsaneler"
+];
 
 // Helper function to clean unwanted videos from mockVideos array
 const cleanMockVideos = () => {

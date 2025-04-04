@@ -31,8 +31,6 @@ const ProgressItem = ({ subject, progress, color }: ProgressItemProps) => {
 };
 
 const UserProfile = () => {
-  const [username, setUsername] = useState('Kullanıcı Adı');
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [stats, setStats] = useState([
     { title: 'Videolar', value: '0', icon: <BarChart3 size={20} className="text-primary" /> },
@@ -41,6 +39,15 @@ const UserProfile = () => {
   ]);
   const [dailyVideosWatched, setDailyVideosWatched] = useState(0);
   const [dailyGoalReached, setDailyGoalReached] = useState(false);
+  
+  // Load profile data from localStorage or use defaults
+  const [username, setUsername] = useState(() => {
+    return localStorage.getItem('profile_username') || 'Kullanıcı Adı';
+  });
+  
+  const [profileImage, setProfileImage] = useState<string | null>(() => {
+    return localStorage.getItem('profile_image');
+  });
   
   const subjects = [
     { subject: 'Tarih', progress: 65, color: '#1A1B41' },
@@ -209,6 +216,14 @@ const UserProfile = () => {
     setUsername(newUsername);
     setProfileImage(newImageUrl);
     setIsEditing(false);
+    
+    // Save to localStorage for persistence
+    localStorage.setItem('profile_username', newUsername);
+    if (newImageUrl) {
+      localStorage.setItem('profile_image', newImageUrl);
+    } else {
+      localStorage.removeItem('profile_image');
+    }
   };
 
   const initials = getInitials(username);
