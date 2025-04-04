@@ -23,13 +23,6 @@ const AIAssistant = () => {
   
   const OPENAI_API_KEY = "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";
   
-  const quickQuestions = [
-    "Nasıl daha etkili çalışabilirim?",
-    "Son izlediğim videoyu özetle",
-    "Tarih konularında zorlanıyorum",
-    "Fizik formüllerini ezberlemek için ipuçları"
-  ];
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -219,10 +212,6 @@ const AIAssistant = () => {
     }
   };
 
-  const handleQuickQuestion = (question: string) => {
-    setInput(question);
-  };
-
   const handleImageUpload = () => {
     fileInputRef.current?.click();
   };
@@ -336,18 +325,6 @@ const AIAssistant = () => {
             </button>
           </div>
         )}
-        
-        <div className="flex flex-wrap gap-2 mb-4">
-          {quickQuestions.map((question, index) => (
-            <button
-              key={index}
-              className="bg-muted text-xs py-1.5 px-3 rounded-full hover:bg-primary/10 transition-colors"
-              onClick={() => handleQuickQuestion(question)}
-            >
-              {question}
-            </button>
-          ))}
-        </div>
         
         <div className="flex gap-2">
           <Button 
