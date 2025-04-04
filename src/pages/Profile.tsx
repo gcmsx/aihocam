@@ -7,7 +7,7 @@ import { toast } from '@/hooks/use-toast';
 const Profile = () => {
   // Update the beta version when making changes to this page
   useEffect(() => {
-    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0342';
+    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0343';
     localStorage.setItem('appVersion', currentVersion);
     
     // Dispatch an event to notify index page to update version
@@ -36,6 +36,11 @@ const Profile = () => {
           variant: "default",
         });
       }
+    }
+    
+    // Initialize selected grade if not set
+    if (!localStorage.getItem('selected_grade')) {
+      localStorage.setItem('selected_grade', '9');
     }
   }, []);
   

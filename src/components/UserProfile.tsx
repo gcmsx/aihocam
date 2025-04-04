@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Calendar, Award, Target, BarChart3, Share2, Edit } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
@@ -6,32 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ProfileEditor from './ProfileEditor';
 import { toast } from '@/hooks/use-toast';
-
-interface ProgressItemProps {
-  subject: string;
-  progress: number;
-  color: string;
-}
-
-const ProgressItem = ({ subject, progress, color }: ProgressItemProps) => {
-  return (
-    <div className="mb-4">
-      <div className="flex justify-between mb-1">
-        <span className="text-sm font-medium">{subject}</span>
-        <span className="text-sm text-muted-foreground">{progress}%</span>
-      </div>
-      <Progress value={progress} className="h-2" style={{ backgroundColor: '#e2e8f0' }}>
-        <div 
-          className="h-full rounded-full" 
-          style={{ width: `${progress}%`, backgroundColor: color }} 
-        />
-      </Progress>
-    </div>
-  );
-};
+import GradeSelector from './profile/GradeSelector';
+import SubjectProgressList from './profile/SubjectProgressList';
+import { GradeLevel } from '@/data/gradeData';
 
 const UserProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState<GradeLevel>(9);
   const [stats, setStats] = useState([
     { title: 'Videolar', value: '0', icon: <BarChart3 size={20} className="text-primary" /> },
     { title: 'Puan', value: '0', icon: <Award size={20} className="text-primary" /> },
@@ -48,15 +28,21 @@ const UserProfile = () => {
   const [profileImage, setProfileImage] = useState<string | null>(() => {
     return localStorage.getItem('profile_image');
   });
-  
-  const subjects = [
-    { subject: 'Tarih', progress: 65, color: '#1A1B41' },
-    { subject: 'Coğrafya', progress: 40, color: '#3E1F47' },
-    { subject: 'Felsefe', progress: 25, color: '#6A3FB2' },
-    { subject: 'Matematik', progress: 70, color: '#00B8D4' },
-    { subject: 'Fizik', progress: 50, color: '#3E1F47' },
-  ];
 
+  // Load selected grade from localStorage
+  useEffect(() => {
+    const storedGrade = localStorage.getItem('selected_grade');
+    if (storedGrade) {
+      setSelectedGrade(parseInt(storedGrade) as GradeLevel);
+    }
+  }, []);
+
+  // Handle grade change
+  const handleGradeChange = (grade: GradeLevel) => {
+    setSelectedGrade(grade);
+    localStorage.setItem('selected_grade', grade.toString());
+  };
+  
   // Load daily goal progress from localStorage
   useEffect(() => {
     const today = new Date().toLocaleDateString();
@@ -291,14 +277,8 @@ const UserProfile = () => {
 
       <h3 className="font-semibold mb-4">Konu İlerlemesi</h3>
       <div className="card p-4">
-        {subjects.map((subject, index) => (
-          <ProgressItem 
-            key={index}
-            subject={subject.subject}
-            progress={subject.progress}
-            color={subject.color}
-          />
-        ))}
+        <GradeSelector selectedGrade={selectedGrade} onGradeChange={handleGradeChange} />
+        <SubjectProgressList selectedGrade={selectedGrade} />
       </div>
 
       <div className="mt-6 flex justify-center">
