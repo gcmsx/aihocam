@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useHomeTabState } from './useHomeTabState';
 import { useHomeSearch } from './useHomeSearch';
 import { useNavigate } from 'react-router-dom';
 import { Video } from '@/types/video';
@@ -13,6 +14,11 @@ import {
 
 export const useHomeVideos = () => {
   const navigate = useNavigate();
+  const [videos, setVideos] = useState<{[key: string]: Video[]}>({
+    trend: [],
+    recommended: [],
+    popular: []
+  });
   const [allVideos, setAllVideos] = useState<Video[]>([]);
 
   // Load all videos
@@ -27,6 +33,17 @@ export const useHomeVideos = () => {
     }));
     
     setAllVideos(videosWithSavedStatus);
+    
+    // Categorize videos
+    const trendVideos = videosWithSavedStatus.slice(0, 3);
+    const recommendedVideos = videosWithSavedStatus.slice(3, 6);
+    const popularVideos = videosWithSavedStatus.slice(6, 9);
+    
+    setVideos({
+      trend: trendVideos,
+      recommended: recommendedVideos,
+      popular: popularVideos
+    });
   }, []);
 
   // Listen for video save/download events
@@ -41,6 +58,20 @@ export const useHomeVideos = () => {
           saved: savedIds.includes(video.id)
         }))
       );
+      
+      // Update videos object with saved status
+      setVideos(prevVideos => {
+        const updatedVideos = { ...prevVideos };
+        
+        for (const category in updatedVideos) {
+          updatedVideos[category] = updatedVideos[category].map(video => ({
+            ...video,
+            saved: savedIds.includes(video.id)
+          }));
+        }
+        
+        return updatedVideos;
+      });
     };
     
     const handleStorageChange = (e: StorageEvent) => {
@@ -60,7 +91,8 @@ export const useHomeVideos = () => {
     };
   }, []);
 
-  // Use our refactored search hook
+  // Use our refactored hooks
+  const { activeTab, setActiveTab } = useHomeTabState();
   const { searchQuery, handleSearch, filteredAllVideos } = useHomeSearch(allVideos);
 
   const handleVideoClick = (videoId: number) => {
@@ -84,6 +116,18 @@ export const useHomeVideos = () => {
         )
       );
       
+      setVideos(prevVideos => {
+        const updatedVideos = { ...prevVideos };
+        
+        for (const category in updatedVideos) {
+          updatedVideos[category] = updatedVideos[category].map(v => 
+            v.id === videoId ? { ...v, saved: !v.saved } : v
+          );
+        }
+        
+        return updatedVideos;
+      });
+      
       // Process the download
       await downloadVideo(videoId, video);
     } catch (error) {
@@ -97,11 +141,27 @@ export const useHomeVideos = () => {
           saved: savedIds.includes(v.id)
         }))
       );
+      
+      setVideos(prevVideos => {
+        const updatedVideos = { ...prevVideos };
+        
+        for (const category in updatedVideos) {
+          updatedVideos[category] = updatedVideos[category].map(v => ({
+            ...v,
+            saved: savedIds.includes(v.id)
+          }));
+        }
+        
+        return updatedVideos;
+      });
     }
   };
 
   return {
+    activeTab,
+    setActiveTab,
     searchQuery,
+    videos,
     allVideos,
     filteredAllVideos,
     handleSearch,
