@@ -31,17 +31,14 @@ const AIAssistant = () => {
   ];
 
   useEffect(() => {
-    // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSend = async () => {
     if (!input.trim() && !selectedImage) return;
     
-    // Prepare user message text
-    const userText = input.trim() || (selectedImage ? "Bu görsel hakkında bilgi verir misiniz?" : "");
+    const userText = input.trim() || "";
     
-    // Add user message with optional image
     const newUserMessage: Message = { 
       id: messages.length + 1, 
       text: userText, 
@@ -53,11 +50,9 @@ const AIAssistant = () => {
     setInput('');
     setSelectedImage(null);
     
-    // Show AI is typing
     setIsTyping(true);
     
     try {
-      // Prepare messages for the API call
       const apiMessages = [
         {
           role: 'system',
@@ -74,12 +69,11 @@ const AIAssistant = () => {
         }))
       ];
 
-      // Add the new user message
       if (selectedImage) {
         apiMessages.push({
           role: 'user',
           content: [
-            { type: 'text', text: userText },
+            { type: 'text', text: userText || "Bu görsel hakkında bilgi verir misiniz?" },
             { type: 'image_url', image_url: { url: selectedImage } }
           ]
         });
@@ -90,7 +84,6 @@ const AIAssistant = () => {
         });
       }
 
-      // Make a real OpenAI API call
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -114,7 +107,6 @@ const AIAssistant = () => {
       const data = await response.json();
       const aiMessage = data.choices[0].message.content;
       
-      // Add AI response to messages
       const aiResponseObj = { 
         id: messages.length + 2, 
         text: aiMessage, 
@@ -125,11 +117,9 @@ const AIAssistant = () => {
     } catch (error) {
       console.error('OpenAI API Error:', error);
       
-      // Fallback to offline mode in case of API error
       let aiResponse = "";
       const userInput = input.toLowerCase();
       
-      // Fallback logic with hardcoded responses
       if (userInput.includes("etkili çalış") || userInput.includes("verimli çalış")) {
         aiResponse = "Etkili çalışmak için bazı öneriler:\n\n" +
           "1. Pomodoro tekniğini deneyin: 25 dakika çalışıp 5 dakika ara verin\n" +
@@ -210,7 +200,6 @@ const AIAssistant = () => {
         variant: "destructive",
       });
       
-      // Add fallback AI response
       const errorResponse = { 
         id: messages.length + 2, 
         text: aiResponse, 
@@ -262,7 +251,6 @@ const AIAssistant = () => {
     
     setIsUploading(true);
     try {
-      // Convert file to base64
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
@@ -282,7 +270,6 @@ const AIAssistant = () => {
       setIsUploading(false);
     }
     
-    // Clear the input to allow selecting the same file again
     e.target.value = '';
   };
 
