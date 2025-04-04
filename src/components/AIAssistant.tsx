@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Image, X } from 'lucide-react';
+import { Send, Image, X, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
@@ -8,6 +7,7 @@ interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
+  imageUrl?: string;
 }
 
 const AIAssistant = () => {
@@ -17,7 +17,9 @@ const AIAssistant = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const OPENAI_API_KEY = "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";
   
@@ -34,17 +36,60 @@ const AIAssistant = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() && !selectedImage) return;
     
-    // Add user message
-    const newUserMessage = { id: messages.length + 1, text: input, sender: 'user' as const };
+    // Prepare user message text
+    const userText = input.trim() || (selectedImage ? "Bu görsel hakkında bilgi verir misiniz?" : "");
+    
+    // Add user message with optional image
+    const newUserMessage: Message = { 
+      id: messages.length + 1, 
+      text: userText, 
+      sender: 'user',
+      imageUrl: selectedImage || undefined
+    };
+    
     setMessages([...messages, newUserMessage]);
     setInput('');
+    setSelectedImage(null);
     
     // Show AI is typing
     setIsTyping(true);
     
     try {
+      // Prepare messages for the API call
+      const apiMessages = [
+        {
+          role: 'system',
+          content: 'Sen bir eğitim asistanısın. Öğrencilere ders çalışma, motivasyon, eğitim içerikleri hakkında Türkçe yardım ediyorsun. Eğitimle ilgili olmayan sorulara "Üzgünüm, ben bir eğitim asistanıyım ve sadece eğitimle ilgili konularda yardımcı olabilirim." diye yanıt ver.'
+        },
+        ...messages.map(msg => ({
+          role: msg.sender === 'user' ? 'user' : 'assistant',
+          content: msg.imageUrl 
+            ? [
+                { type: 'text', text: msg.text },
+                { type: 'image_url', image_url: { url: msg.imageUrl } }
+              ] 
+            : msg.text
+        }))
+      ];
+
+      // Add the new user message
+      if (selectedImage) {
+        apiMessages.push({
+          role: 'user',
+          content: [
+            { type: 'text', text: userText },
+            { type: 'image_url', image_url: { url: selectedImage } }
+          ]
+        });
+      } else {
+        apiMessages.push({
+          role: 'user',
+          content: userText
+        });
+      }
+
       // Make a real OpenAI API call
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -54,20 +99,7 @@ const AIAssistant = () => {
         },
         body: JSON.stringify({
           model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Sen bir eğitim asistanısın. Öğrencilere ders çalışma, motivasyon, eğitim içerikleri hakkında Türkçe yardım ediyorsun. Eğitimle ilgili olmayan sorulara "Üzgünüm, ben bir eğitim asistanıyım ve sadece eğitimle ilgili konularda yardımcı olabilirim." diye yanıt ver.'
-            },
-            ...messages.map(msg => ({
-              role: msg.sender === 'user' ? 'user' : 'assistant',
-              content: msg.text
-            })),
-            {
-              role: 'user',
-              content: input
-            }
-          ],
+          messages: apiMessages,
           temperature: 0.7,
           max_tokens: 500
         })
@@ -165,6 +197,9 @@ const AIAssistant = () => {
           "4. Renkli kalemler ve işaretleyiciler kullanın\n" +
           "5. Dijital not alma araçlarını deneyin (Notion, Evernote vb.)";
       }
+      else if (selectedImage) {
+        aiResponse = "Görselinizi inceledim ancak şu anda API bağlantısı olmadığı için detaylı analiz yapamıyorum. Görsel içeriği ile ilgili belirli bir sorunuz varsa, lütfen tekrar sorunuzu belirtin.";
+      }
       else {
         aiResponse = "Üzgünüm, şu anda API ile bağlantı kuramıyorum. Daha sonra tekrar deneyebilir misiniz? Alternatif olarak, eğitim teknikleri, çalışma yöntemleri veya belirli dersler hakkında sorular sorabilirsiniz.";
       }
@@ -200,11 +235,59 @@ const AIAssistant = () => {
   };
 
   const handleImageUpload = () => {
-    toast({
-      title: "Görsel yükleme",
-      description: "Görsel yükleme özelliği hazırlanıyor...",
-    });
-    // This would be implemented with OpenAI's vision capabilities in a future update
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Hata",
+        description: "Lütfen geçerli bir görsel dosyası seçin (JPEG, PNG, vb.)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({
+        title: "Hata",
+        description: "Görsel boyutu 5MB'den küçük olmalıdır.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsUploading(true);
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        setSelectedImage(base64String);
+        setIsUploading(false);
+      };
+      reader.onerror = () => {
+        throw new Error("Görsel yüklenirken bir hata oluştu.");
+      };
+    } catch (error: any) {
+      toast({
+        title: "Görsel Yükleme Hatası",
+        description: error.message,
+        variant: "destructive",
+      });
+      setIsUploading(false);
+    }
+    
+    // Clear the input to allow selecting the same file again
+    e.target.value = '';
+  };
+
+  const removeSelectedImage = () => {
+    setSelectedImage(null);
   };
 
   return (
@@ -222,6 +305,15 @@ const AIAssistant = () => {
                   : 'bg-muted text-foreground'
               }`}
             >
+              {message.imageUrl && (
+                <div className="mb-2">
+                  <img 
+                    src={message.imageUrl} 
+                    alt="User uploaded" 
+                    className="rounded-lg max-h-[200px] max-w-full object-contain"
+                  />
+                </div>
+              )}
               <p className="text-sm whitespace-pre-wrap">{message.text}</p>
             </div>
           </div>
@@ -242,6 +334,22 @@ const AIAssistant = () => {
       </div>
       
       <div className="p-4 bg-background border-t border-border">
+        {selectedImage && (
+          <div className="mb-2 relative inline-block">
+            <img 
+              src={selectedImage} 
+              alt="Selected" 
+              className="h-20 rounded-lg object-cover"
+            />
+            <button
+              onClick={removeSelectedImage}
+              className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-1"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+        
         <div className="flex flex-wrap gap-2 mb-4">
           {quickQuestions.map((question, index) => (
             <button
@@ -262,8 +370,20 @@ const AIAssistant = () => {
             onClick={handleImageUpload}
             disabled={isTyping || isUploading}
           >
-            <Image size={20} />
+            {isUploading ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : (
+              <Image size={20} />
+            )}
           </Button>
+          
+          <input 
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
           
           <div className="relative flex-1">
             <textarea
@@ -290,7 +410,7 @@ const AIAssistant = () => {
             size="icon" 
             className="shrink-0 rounded-full"
             onClick={handleSend}
-            disabled={isTyping || !input.trim()}
+            disabled={isTyping || (!input.trim() && !selectedImage)}
           >
             <Send size={20} />
           </Button>
@@ -301,4 +421,3 @@ const AIAssistant = () => {
 };
 
 export default AIAssistant;
-
