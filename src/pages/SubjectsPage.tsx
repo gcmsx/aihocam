@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import VideoCard from '@/components/VideoCard';
@@ -28,6 +29,7 @@ const SubjectsPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const navigate = useNavigate();
   const [selectedGrade, setSelectedGrade] = useState<GradeLevel>(9); // Set default grade to 9th
+  const [subjectVideos, setSubjectVideos] = useState<Video[]>([]);
   
   const handleBack = () => {
     navigate('/');
