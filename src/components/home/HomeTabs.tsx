@@ -60,8 +60,6 @@ const HomeTabs = ({ activeTab, setActiveTab, videos, handleVideoClick, handleSav
               title={video.title}
               thumbnailUrl={video.thumbnailUrl}
               duration={video.duration}
-              saved={video.saved}
-              onSave={() => handleSaveVideo(video.id)}
               onClick={() => handleVideoClick(video.id)}
             />
           ))}

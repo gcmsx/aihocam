@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import VideoCard from '@/components/VideoCard';
@@ -79,7 +78,6 @@ const SubjectsPage = () => {
                 title={video.title}
                 thumbnailUrl={video.thumbnailUrl}
                 duration={video.duration}
-                saved={video.saved}
                 onClick={() => handleVideoClick(video.id)}
               />
             ))}

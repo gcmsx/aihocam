@@ -31,8 +31,6 @@ const HomeSearchResults = ({
             title={video.title}
             thumbnailUrl={video.thumbnailUrl}
             duration={video.duration}
-            saved={video.saved}
-            onSave={() => handleSaveVideo(video.id)}
             onClick={() => handleVideoClick(video.id)}
           />
         ))}

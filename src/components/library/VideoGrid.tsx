@@ -32,8 +32,6 @@ const VideoGrid = ({ videos, onVideoClick, onSaveVideo, emptyMessage }: VideoGri
           title={video.title}
           thumbnailUrl={video.thumbnailUrl}
           duration={video.duration}
-          saved={video.saved}
-          onSave={() => onSaveVideo(video.id)}
           onClick={() => onVideoClick(video.id)}
         />
       ))}
