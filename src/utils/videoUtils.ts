@@ -1,17 +1,10 @@
+
 import { mockVideos } from '@/services/video/mockData';
 import { Video } from '@/types/video';
 import { GradeLevel } from '@/data/gradeData';
 
-// Filter out videos with specific topic names
-const unwantedTopics = [
-  "Cumhuriyetin İlanı", 
-  "Periyodik Tablo", 
-  "Osmanlı İmparatorluğu", 
-  "İnteraktif Deney",
-  "Kurtuluş Savaşı", 
-  "Kıtalar ve Okyanuslar", 
-  "Türkiye'nin İklimi"
-];
+// Filter out videos with specific topic names like "Cumhuriyetin İlanı" or "Periyodik Tablo"
+const unwantedTopics = ["Cumhuriyetin İlanı", "Periyodik Tablo", "Osmanlı İmparatorluğu", "İnteraktif Deney"];
 
 // Helper function to clean unwanted videos from mockVideos array
 const cleanMockVideos = () => {
@@ -81,6 +74,7 @@ export const getSubjectVideos = (subject: string): Video[] => {
   return subjectVideos;
 };
 
+// Function to get videos for a specific subject and grade
 export const getSubjectGradeVideos = (subject: string, grade: GradeLevel): Video[] => {
   // First try to find videos that already have the grade specified
   const existingVideos = mockVideos.filter(
