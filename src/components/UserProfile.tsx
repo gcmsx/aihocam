@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Award, Target, BarChart3, Share2, Edit } from 'lucide-react';
+import { Calendar, Award, Target, BarChart3, Edit } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -20,7 +20,6 @@ const UserProfile = () => {
   const [dailyVideosWatched, setDailyVideosWatched] = useState(0);
   const [dailyGoalReached, setDailyGoalReached] = useState(false);
   
-  // Load profile data from localStorage or use defaults
   const [username, setUsername] = useState(() => {
     return localStorage.getItem('profile_username') || 'Kullanıcı Adı';
   });
@@ -29,7 +28,6 @@ const UserProfile = () => {
     return localStorage.getItem('profile_image');
   });
 
-  // Load selected grade from localStorage
   useEffect(() => {
     const storedGrade = localStorage.getItem('selected_grade');
     if (storedGrade) {
@@ -37,13 +35,11 @@ const UserProfile = () => {
     }
   }, []);
 
-  // Handle grade change
   const handleGradeChange = (grade: GradeLevel) => {
     setSelectedGrade(grade);
     localStorage.setItem('selected_grade', grade.toString());
   };
   
-  // Load daily goal progress from localStorage
   useEffect(() => {
     const today = new Date().toLocaleDateString();
     const dailyProgress = localStorage.getItem(`dailyProgress_${today}`);
@@ -52,7 +48,6 @@ const UserProfile = () => {
       setDailyVideosWatched(videosWatched);
       setDailyGoalReached(goalReached);
     } else {
-      // Reset daily progress for a new day
       setDailyVideosWatched(0);
       setDailyGoalReached(false);
       localStorage.setItem(`dailyProgress_${today}`, JSON.stringify({
@@ -62,20 +57,15 @@ const UserProfile = () => {
     }
   }, []);
 
-  // Load user stats from localStorage
   useEffect(() => {
-    // Get watched videos count
     const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
     const watchedVideos = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage).length : 0;
     
-    // Get achievements/points count
     const achievementsFromStorage = localStorage.getItem('achievements');
     const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage).count : 0;
     
-    // Get active days (for now, we'll just set it to a fixed value)
     const activeDays = 14;
     
-    // Update stats
     setStats([
       { title: 'Videolar', value: watchedVideos.toString(), icon: <BarChart3 size={20} className="text-primary" /> },
       { title: 'Puan', value: achievements.toString(), icon: <Award size={20} className="text-primary" /> },
@@ -83,10 +73,8 @@ const UserProfile = () => {
     ]);
   }, []);
 
-  // Listen for updates to watched videos and achievements
   useEffect(() => {
     const handleQuestionsCompleted = () => {
-      // Update achievements count
       const achievementsFromStorage = localStorage.getItem('achievements');
       const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage).count : 0;
       
@@ -101,11 +89,9 @@ const UserProfile = () => {
     };
     
     const handleVideoWatched = () => {
-      // Update watched videos count
       const recentlyViewedFromStorage = localStorage.getItem('recentlyViewedVideos');
       const watchedVideos = recentlyViewedFromStorage ? JSON.parse(recentlyViewedFromStorage).length : 0;
       
-      // Update videos stat
       setStats(prev => {
         const newStats = [...prev];
         const videoStat = newStats.find(s => s.title === 'Videolar');
@@ -115,7 +101,6 @@ const UserProfile = () => {
         return newStats;
       });
       
-      // Update daily progress
       const today = new Date().toLocaleDateString();
       const dailyProgressStr = localStorage.getItem(`dailyProgress_${today}`);
       const dailyProgress = dailyProgressStr ? JSON.parse(dailyProgressStr) : { videosWatched: 0, goalReached: false };
@@ -124,18 +109,14 @@ const UserProfile = () => {
         const newVideosWatched = dailyProgress.videosWatched + 1;
         setDailyVideosWatched(newVideosWatched);
         
-        // Check if goal is reached
         if (newVideosWatched >= 5 && !dailyProgress.goalReached) {
-          // Add 3 points for completing daily goal
           const achievementsFromStorage = localStorage.getItem('achievements');
           const achievements = achievementsFromStorage ? JSON.parse(achievementsFromStorage) : { count: 0 };
           achievements.count += 3;
           localStorage.setItem('achievements', JSON.stringify(achievements));
           
-          // Mark goal as reached
           setDailyGoalReached(true);
           
-          // Update point stat
           setStats(prev => {
             const newStats = [...prev];
             const pointStat = newStats.find(s => s.title === 'Puan');
@@ -145,7 +126,6 @@ const UserProfile = () => {
             return newStats;
           });
           
-          // Show a toast notification
           toast({
             title: "Günlük Hedef Tamamlandı!",
             description: "5 video izlediniz ve 3 puan kazandınız.",
@@ -153,7 +133,6 @@ const UserProfile = () => {
           });
         }
         
-        // Save updated progress
         localStorage.setItem(`dailyProgress_${today}`, JSON.stringify({
           videosWatched: newVideosWatched,
           goalReached: newVideosWatched >= 5
@@ -163,7 +142,6 @@ const UserProfile = () => {
     
     const handleRecentlyViewedUpdate = (e: StorageEvent) => {
       if (e.key === 'recentlyViewedVideos') {
-        // When recentlyViewedVideos changes, update daily video count
         handleVideoWatched();
       }
     };
@@ -203,7 +181,6 @@ const UserProfile = () => {
     setProfileImage(newImageUrl);
     setIsEditing(false);
     
-    // Save to localStorage for persistence
     localStorage.setItem('profile_username', newUsername);
     if (newImageUrl) {
       localStorage.setItem('profile_image', newImageUrl);
@@ -279,13 +256,6 @@ const UserProfile = () => {
       <div className="card p-4">
         <GradeSelector selectedGrade={selectedGrade} onGradeChange={handleGradeChange} />
         <SubjectProgressList selectedGrade={selectedGrade} />
-      </div>
-
-      <div className="mt-6 flex justify-center">
-        <button className="flex items-center gap-2 bg-muted px-4 py-2 rounded-full text-sm">
-          <Share2 size={16} />
-          İlerlemeni Paylaş
-        </button>
       </div>
 
       <ProfileEditor 
