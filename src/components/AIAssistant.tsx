@@ -270,7 +270,7 @@ const AIAssistant = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Bir soru sorun veya fotoğraf gönderin..."
+              placeholder="AI Asistanım"
               className="w-full rounded-full px-4 pr-12 py-2 resize-none bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
               rows={1}
               style={{ minHeight: '40px', maxHeight: '120px' }}
@@ -301,3 +301,4 @@ const AIAssistant = () => {
 };
 
 export default AIAssistant;
+
