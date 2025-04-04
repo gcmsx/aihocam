@@ -1,24 +1,20 @@
 
 import React from 'react';
-import { Play, Clock, Download, CheckCircle } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface VideoCardProps {
   title: string;
   thumbnailUrl: string;
   duration: string;
-  saved?: boolean;
-  onSave?: () => void;
-  onClick?: () => void;
   id: number;
+  onClick?: () => void;
 }
 
 const VideoCard = ({ 
   title, 
   thumbnailUrl, 
   duration, 
-  saved = false,
-  onSave,
   onClick,
   id
 }: VideoCardProps) => {
@@ -30,16 +26,6 @@ const VideoCard = ({
     } else {
       // Navigate to the video detail page with the correct ID
       navigate(`/video/${id}`);
-    }
-  };
-  
-  const handleSave = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the click from bubbling to parent
-    console.log("Save button clicked for video:", id);
-    if (onSave) {
-      onSave();
-    } else {
-      console.warn("No onSave handler provided for video:", id);
     }
   };
   
@@ -58,22 +44,7 @@ const VideoCard = ({
           <h3 className="text-white font-medium text-sm line-clamp-2 truncate">{title}</h3>
         </div>
         <div className="video-duration flex items-center gap-1 absolute bottom-2 right-2 bg-black/60 text-white px-1.5 py-0.5 rounded text-xs truncate">
-          <Clock size={12} />
           <span>{duration}</span>
-        </div>
-        <div className="absolute top-2 left-2">
-          <button 
-            className="p-1.5 bg-black/40 rounded-full text-white hover:bg-black/60 transition"
-            onClick={handleSave}
-            aria-label={saved ? "İndirildi" : "İndir"}
-            type="button"
-          >
-            {saved ? (
-              <CheckCircle size={16} className="text-white" />
-            ) : (
-              <Download size={16} />
-            )}
-          </button>
         </div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="bg-primary/80 p-3 rounded-full">
