@@ -89,11 +89,16 @@ const Profile = () => {
             const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
             const grades = [9, 10, 11, 12];
             
-            updatedRecentlyViewed = recentlyViewed.map((videoId: number) => ({
-              id: videoId,
-              subject: subjects[videoId % subjects.length],
-              grade: grades[videoId % grades.length]
-            }));
+            updatedRecentlyViewed = recentlyViewed.map((videoId: any) => {
+              // Ensure the videoId is treated correctly whether it's a number or an object
+              if (typeof videoId === 'object' && videoId !== null) return videoId;
+              
+              return {
+                id: Number(videoId),
+                subject: subjects[Number(videoId) % subjects.length],
+                grade: grades[Number(videoId) % grades.length]
+              };
+            });
             
             hasChanges = true;
           } else {

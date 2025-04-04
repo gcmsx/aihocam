@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -36,6 +36,14 @@ const ProfileEditor = ({
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
+  // Reset the form when the dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setUsername(currentUsername);
+      setImageUrl(currentImageUrl || '');
+    }
+  }, [isOpen, currentUsername, currentImageUrl]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -48,7 +56,9 @@ const ProfileEditor = ({
     setTimeout(() => {
       const reader = new FileReader();
       reader.onload = () => {
-        setImageUrl(reader.result as string);
+        // Store the image in localStorage to persist it
+        const imageDataUrl = reader.result as string;
+        setImageUrl(imageDataUrl);
         setIsUploading(false);
       };
       reader.readAsDataURL(file);
