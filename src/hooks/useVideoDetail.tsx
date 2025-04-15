@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { Video } from '@/types/video';
 import { getSavedVideosFromStorage, updateRecentlyViewed, downloadVideo } from '@/services/videoService';
-import { getSubjectExamples, getSubjectDescription } from '@/services/video/videoUtils';
+import { getSubjectExamples, getSubjectDescription } from '@/services/video';
 
 export interface Example {
   question: string;
