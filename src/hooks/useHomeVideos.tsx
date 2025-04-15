@@ -34,10 +34,14 @@ export const useHomeVideos = () => {
     
     setAllVideos(videosWithSavedStatus);
     
-    // Categorize videos
-    const trendVideos = videosWithSavedStatus.slice(0, 3);
-    const recommendedVideos = videosWithSavedStatus.slice(3, 6);
-    const popularVideos = videosWithSavedStatus.slice(6, 9);
+    // Categorize videos - distribute evenly across categories
+    const shuffledVideos = [...videosWithSavedStatus].sort(() => Math.random() - 0.5);
+    
+    // Take different slices for different categories
+    // This ensures we have a good mix of videos in each category
+    const trendVideos = shuffledVideos.slice(0, 6);
+    const recommendedVideos = shuffledVideos.slice(6, 12);
+    const popularVideos = shuffledVideos.slice(12, 18);
     
     setVideos({
       trend: trendVideos,
@@ -146,32 +150,42 @@ export const useHomeVideos = () => {
       });
       
       // Process the download
-      await downloadVideo(videoId, video);
-    } catch (error) {
-      console.error("Error saving video:", error);
-      // If there's an error, revert UI changes by re-fetching the saved IDs
-      const savedIds = getSavedVideosFromStorage();
-      
-      setAllVideos(prevVideos => 
-        prevVideos.map(v => ({
-          ...v,
-          saved: savedIds.includes(v.id)
-        }))
-      );
-      
-      setVideos(prevVideos => {
-        const updatedVideos = { ...prevVideos };
-        
-        for (const category in updatedVideos) {
-          updatedVideos[category] = updatedVideos[category].map(v => ({
-            ...v,
-            saved: savedIds.includes(v.id)
-          }));
-        }
-        
-        return updatedVideos;
+      await downloadVideo(videoId, video).catch(error => {
+        console.error("Error saving video:", error);
+        // Revert UI state if there's an error
+        updateVideoSavedStatus();
       });
+      
+    } catch (error) {
+      console.error("Error handling save video:", error);
+      // Make sure to revert the UI state on error
+      updateVideoSavedStatus();
     }
+  };
+
+  // Helper to update the saved status of all videos
+  const updateVideoSavedStatus = () => {
+    const savedIds = getSavedVideosFromStorage();
+    
+    setAllVideos(prevVideos => 
+      prevVideos.map(video => ({
+        ...video,
+        saved: savedIds.includes(video.id)
+      }))
+    );
+    
+    setVideos(prevVideos => {
+      const updatedVideos = { ...prevVideos };
+      
+      for (const category in updatedVideos) {
+        updatedVideos[category] = updatedVideos[category].map(video => ({
+          ...video,
+          saved: savedIds.includes(video.id)
+        }));
+      }
+      
+      return updatedVideos;
+    });
   };
 
   return {

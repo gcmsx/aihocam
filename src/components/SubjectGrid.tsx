@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockVideos } from '@/services/video/mockData';
 import { Button } from './ui/button';
 import { subjectIcons } from '@/data/subjectIcons';
 import { subjectColors } from '@/data/subjectData';

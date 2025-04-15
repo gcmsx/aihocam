@@ -14,9 +14,8 @@ import {
   getVideoFromIndexedDB 
 } from './videoStorage';
 import { 
-  getSubjectExamples, 
   getSubjectDescription 
-} from './videoUtils';
+} from '@/utils/videoUtils';
 
 // Export the imported functions
 export {
@@ -29,7 +28,6 @@ export {
   getAllSavedVideos,
   getAllRecentVideos,
   getVideoFromIndexedDB,
-  getSubjectExamples,
   getSubjectDescription
 };
 

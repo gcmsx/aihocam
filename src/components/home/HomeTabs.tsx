@@ -52,7 +52,7 @@ const HomeTabs = ({ activeTab, setActiveTab, videos, handleVideoClick, handleSav
           Arama sonucu bulunamadı.
         </div>
       ) : (
-        <div className="flex flex-col space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {getActiveVideos().map(video => (
             <VideoCard 
               key={video.id}
@@ -61,6 +61,8 @@ const HomeTabs = ({ activeTab, setActiveTab, videos, handleVideoClick, handleSav
               thumbnailUrl={video.thumbnailUrl}
               duration={video.duration}
               onClick={() => handleVideoClick(video.id)}
+              saved={video.saved}
+              onSave={() => handleSaveVideo(video.id)}
             />
           ))}
         </div>
