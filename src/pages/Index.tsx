@@ -36,8 +36,6 @@ const Index = () => {
   }, []);
   
   const { 
-    activeTab,
-    setActiveTab,
     searchQuery,
     videos,
     filteredAllVideos,
@@ -80,8 +78,6 @@ const Index = () => {
             <SubjectGrid />
             
             <HomeTabs 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
               videos={videos}
               handleVideoClick={handleVideoClick}
               handleSaveVideo={handleSaveVideo}

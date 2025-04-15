@@ -16,7 +16,9 @@ import {
 
 import { 
   getSubjectDescription,
-  getSubjectExamples
+  getSubjectExamples,
+  getSubjectVideos,
+  getSubjectGradeVideos
 } from '@/utils/videoUtils';
 
 // Export the imported functions
@@ -31,7 +33,9 @@ export {
   getAllRecentVideos,
   getVideoFromIndexedDB,
   getSubjectDescription,
-  getSubjectExamples
+  getSubjectExamples,
+  getSubjectVideos,
+  getSubjectGradeVideos
 };
 
 // Provide a centralized API for getting videos

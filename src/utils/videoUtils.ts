@@ -1,8 +1,4 @@
 
-import { mockVideos } from '@/services/video/mockData';
-import { Video } from '@/types/video';
-import { GradeLevel } from '@/data/gradeData';
-
 // Get subject-specific video description
 export const getSubjectDescription = (subject: string) => {
   const descriptions = {
@@ -20,6 +16,11 @@ export const getSubjectDescription = (subject: string) => {
   return descriptions[subject] || "Bu derste konu anlatımı ve örnekler bulacaksınız.";
 };
 
+import { mockVideos } from '@/services/video/mockData';
+import { Video } from '@/types/video';
+import { GradeLevel } from '@/data/gradeData';
+import { gradeTopics } from '@/data/gradeData';
+
 // Initialize mock videos with course data
 const initializeMockVideos = () => {
   // Clear any existing videos
@@ -31,23 +32,32 @@ const initializeMockVideos = () => {
     'Fizik', 'Kimya', 'Biyoloji', 'İngilizce', 'Edebiyat'
   ];
   
-  // Create 6 videos for each subject
+  // Available grade levels
+  const grades: GradeLevel[] = [9, 10, 11, 12];
+  
+  // Create videos for each subject and grade
   let videoId = 1;
   subjects.forEach(subject => {
-    for (let i = 1; i <= 6; i++) {
-      const video: Video = {
-        id: videoId++,
-        title: `${subject} Dersi ${i}: ${getVideoTitle(subject, i)}`,
-        thumbnailUrl: `/placeholder.svg`,
-        duration: `${Math.floor(Math.random() * 10) + 10}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
-        saved: false,
-        subject: subject,
-        grade: 9, // Default to 9th grade
-        description: getSubjectDescription(subject),
-      };
+    grades.forEach(grade => {
+      // Get topics for this subject and grade
+      const topics = gradeTopics[subject][grade] || [];
       
-      mockVideos.push(video);
-    }
+      // Create videos for each topic
+      topics.forEach((topic, index) => {
+        const video: Video = {
+          id: videoId++,
+          title: `${subject} ${grade}. Sınıf: ${topic}`,
+          thumbnailUrl: `/placeholder.svg`,
+          duration: `${Math.floor(Math.random() * 10) + 10}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+          saved: false,
+          subject: subject,
+          grade: grade,
+          description: getSubjectDescription(subject),
+        };
+        
+        mockVideos.push(video);
+      });
+    });
   });
 };
 

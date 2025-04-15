@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useHomeTabState } from './useHomeTabState';
 import { useHomeSearch } from './useHomeSearch';
 import { useNavigate } from 'react-router-dom';
 import { Video } from '@/types/video';
@@ -14,11 +13,7 @@ import {
 
 export const useHomeVideos = () => {
   const navigate = useNavigate();
-  const [videos, setVideos] = useState<{[key: string]: Video[]}>({
-    trend: [],
-    recommended: [],
-    popular: []
-  });
+  const [videos, setVideos] = useState<Video[]>([]);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
 
   // Load all videos
@@ -34,30 +29,14 @@ export const useHomeVideos = () => {
     
     setAllVideos(videosWithSavedStatus);
     
-    // Categorize videos - distribute evenly across categories
-    const shuffledVideos = [...videosWithSavedStatus].sort(() => Math.random() - 0.5);
-    
-    // Take different slices for different categories
-    // This ensures we have a good mix of videos in each category
-    const trendVideos = shuffledVideos.slice(0, 6);
-    const recommendedVideos = shuffledVideos.slice(6, 12);
-    const popularVideos = shuffledVideos.slice(12, 18);
-    
-    setVideos({
-      trend: trendVideos,
-      recommended: recommendedVideos,
-      popular: popularVideos
-    });
+    // Select a subset of videos to display
+    const displayVideos = videosWithSavedStatus.slice(0, 12);
+    setVideos(displayVideos);
   }, []);
 
   // Function to clear all home videos
   const clearHomeVideos = useCallback(() => {
-    setVideos({
-      trend: [],
-      recommended: [],
-      popular: []
-    });
-    
+    setVideos([]);
     setAllVideos([]);
   }, []);
 
@@ -74,19 +53,13 @@ export const useHomeVideos = () => {
         }))
       );
       
-      // Update videos object with saved status
-      setVideos(prevVideos => {
-        const updatedVideos = { ...prevVideos };
-        
-        for (const category in updatedVideos) {
-          updatedVideos[category] = updatedVideos[category].map(video => ({
-            ...video,
-            saved: savedIds.includes(video.id)
-          }));
-        }
-        
-        return updatedVideos;
-      });
+      // Update videos with saved status
+      setVideos(prevVideos => 
+        prevVideos.map(video => ({
+          ...video,
+          saved: savedIds.includes(video.id)
+        }))
+      );
     };
     
     const handleStorageChange = (e: StorageEvent) => {
@@ -112,8 +85,6 @@ export const useHomeVideos = () => {
     };
   }, [clearHomeVideos]);
 
-  // Use our refactored hooks
-  const { activeTab, setActiveTab } = useHomeTabState();
   const { searchQuery, handleSearch, filteredAllVideos } = useHomeSearch(allVideos);
 
   const handleVideoClick = (videoId: number) => {
@@ -137,17 +108,11 @@ export const useHomeVideos = () => {
         )
       );
       
-      setVideos(prevVideos => {
-        const updatedVideos = { ...prevVideos };
-        
-        for (const category in updatedVideos) {
-          updatedVideos[category] = updatedVideos[category].map(v => 
-            v.id === videoId ? { ...v, saved: !v.saved } : v
-          );
-        }
-        
-        return updatedVideos;
-      });
+      setVideos(prevVideos => 
+        prevVideos.map(v => 
+          v.id === videoId ? { ...v, saved: !v.saved } : v
+        )
+      );
       
       // Process the download
       await downloadVideo(videoId, video).catch(error => {
@@ -174,26 +139,18 @@ export const useHomeVideos = () => {
       }))
     );
     
-    setVideos(prevVideos => {
-      const updatedVideos = { ...prevVideos };
-      
-      for (const category in updatedVideos) {
-        updatedVideos[category] = updatedVideos[category].map(video => ({
-          ...video,
-          saved: savedIds.includes(video.id)
-        }));
-      }
-      
-      return updatedVideos;
-    });
+    setVideos(prevVideos => 
+      prevVideos.map(video => ({
+        ...video,
+        saved: savedIds.includes(video.id)
+      }))
+    );
   };
 
   return {
-    activeTab,
-    setActiveTab,
-    searchQuery,
     videos,
     allVideos,
+    searchQuery,
     filteredAllVideos,
     handleSearch,
     handleVideoClick,

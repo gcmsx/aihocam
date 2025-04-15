@@ -7,12 +7,13 @@ interface VideoSectionProps {
   videos: Video[];
   onVideoClick: (videoId: number) => void;
   onSaveVideo?: (videoId: number) => void;
+  title?: string;
 }
 
-const VideoSection = ({ videos, onVideoClick, onSaveVideo }: VideoSectionProps) => {
+const VideoSection = ({ videos, onVideoClick, onSaveVideo, title = "Önerilen Dersler" }: VideoSectionProps) => {
   return (
     <div className="mb-6">
-      <h2 className="text-lg font-semibold mb-4">Önerilen Dersler</h2>
+      <h2 className="text-lg font-semibold mb-4">{title}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {videos.map(video => (
           <VideoCard 
