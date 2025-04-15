@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useHomeTabState } from './useHomeTabState';
 import { useHomeSearch } from './useHomeSearch';
 import { useNavigate } from 'react-router-dom';
@@ -46,6 +46,17 @@ export const useHomeVideos = () => {
     });
   }, []);
 
+  // Function to clear all home videos
+  const clearHomeVideos = useCallback(() => {
+    setVideos({
+      trend: [],
+      recommended: [],
+      popular: []
+    });
+    
+    setAllVideos([]);
+  }, []);
+
   // Listen for video save/download events
   useEffect(() => {
     const handleVideoUpdate = () => {
@@ -80,16 +91,22 @@ export const useHomeVideos = () => {
       }
     };
     
+    const handleLessonDataCleared = () => {
+      clearHomeVideos();
+    };
+    
     window.addEventListener('videoSaved', handleVideoUpdate);
     window.addEventListener('videoDownloaded', handleVideoUpdate);
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('lessonDataCleared', handleLessonDataCleared);
     
     return () => {
       window.removeEventListener('videoSaved', handleVideoUpdate);
       window.removeEventListener('videoDownloaded', handleVideoUpdate);
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('lessonDataCleared', handleLessonDataCleared);
     };
-  }, []);
+  }, [clearHomeVideos]);
 
   // Use our refactored hooks
   const { activeTab, setActiveTab } = useHomeTabState();
@@ -166,6 +183,7 @@ export const useHomeVideos = () => {
     filteredAllVideos,
     handleSearch,
     handleVideoClick,
-    handleSaveVideo
+    handleSaveVideo,
+    clearHomeVideos
   };
 };

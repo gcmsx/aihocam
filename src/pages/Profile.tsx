@@ -26,46 +26,15 @@ const Profile = () => {
   
   // Function to clear all lesson data from the application
   const clearAllLessonData = () => {
-    // Keys to remove from localStorage
-    const keysToRemove = [
-      'recentlyViewedVideos',       // Recently viewed videos
-      'savedVideos',                // Saved/downloaded videos
-      'completedQuestions',         // All completed questions
-      'achievements',               // User achievements
-      'lastProfileVisit'            // Last profile visit timestamp
-    ];
+    // Clear all localStorage data
+    localStorage.clear();
     
-    // Remove all answeredQuestions entries
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('answeredQuestions_')) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    // Remove all dailyProgress entries
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('dailyProgress_')) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    // Remove all progress entries
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('progress_')) {
-        keysToRemove.push(key);
-      }
-    }
-    
-    // Remove all keys
-    keysToRemove.forEach(key => {
-      localStorage.removeItem(key);
-    });
+    // Reset critical app settings
+    localStorage.setItem('appVersion', '0.345');
+    localStorage.setItem('selected_grade', '9');
     
     // Clear IndexedDB database for videos
-    clearVideosDatabase();
+    clearAllDatabases();
     
     // Show toast notification
     toast({
@@ -76,22 +45,72 @@ const Profile = () => {
     
     // Notify all components about data reset
     window.dispatchEvent(new CustomEvent('lessonDataCleared'));
+    window.dispatchEvent(new CustomEvent('allContentCleared'));
+    
+    // Reset trending, recommended and popular videos
+    window.dispatchEvent(new CustomEvent('resetHomeContent'));
   };
   
-  // Function to clear the IndexedDB database for videos
-  const clearVideosDatabase = () => {
+  // Function to clear all IndexedDB databases
+  const clearAllDatabases = () => {
     try {
-      const request = indexedDB.deleteDatabase('VideoDatabase');
+      // Get all database names
+      const databases = indexedDB.databases ? indexedDB.databases() : Promise.resolve([]);
       
-      request.onsuccess = () => {
-        console.log('Video database successfully deleted');
-      };
-      
-      request.onerror = () => {
-        console.error('Error deleting video database');
-      };
+      databases.then((dbs) => {
+        dbs.forEach(db => {
+          if (db.name) {
+            try {
+              console.log(`Deleting database: ${db.name}`);
+              const request = indexedDB.deleteDatabase(db.name);
+              
+              request.onsuccess = () => {
+                console.log(`Database ${db.name} successfully deleted`);
+              };
+              
+              request.onerror = (error) => {
+                console.error(`Error deleting database ${db.name}:`, error);
+              };
+            } catch (error) {
+              console.error(`Error accessing database ${db.name}:`, error);
+            }
+          }
+        });
+      }).catch(error => {
+        console.error('Error listing databases:', error);
+        
+        // Fallback: try to delete VideoDatabase directly
+        try {
+          const request = indexedDB.deleteDatabase('VideoDatabase');
+          
+          request.onsuccess = () => {
+            console.log('Video database successfully deleted');
+          };
+          
+          request.onerror = (error) => {
+            console.error('Error deleting video database:', error);
+          };
+        } catch (error) {
+          console.error('Error accessing IndexedDB:', error);
+        }
+      });
     } catch (error) {
       console.error('Error accessing IndexedDB:', error);
+      
+      // Fallback: try to delete VideoDatabase directly
+      try {
+        const request = indexedDB.deleteDatabase('VideoDatabase');
+        
+        request.onsuccess = () => {
+          console.log('Video database successfully deleted');
+        };
+        
+        request.onerror = (error) => {
+          console.error('Error deleting video database:', error);
+        };
+      } catch (error) {
+        console.error('Error accessing IndexedDB:', error);
+      }
     }
   };
   

@@ -21,10 +21,17 @@ const Index = () => {
       }
     };
     
+    const handleContentCleared = () => {
+      // Force refresh the page to clear all in-memory data
+      window.location.reload();
+    };
+    
     window.addEventListener('versionUpdated', handleVersionUpdate as EventListener);
+    window.addEventListener('allContentCleared', handleContentCleared as EventListener);
     
     return () => {
       window.removeEventListener('versionUpdated', handleVersionUpdate as EventListener);
+      window.removeEventListener('allContentCleared', handleContentCleared as EventListener);
     };
   }, []);
   
@@ -36,8 +43,22 @@ const Index = () => {
     filteredAllVideos,
     handleSearch,
     handleVideoClick,
-    handleSaveVideo
+    handleSaveVideo,
+    clearHomeVideos
   } = useHomeVideos();
+  
+  // Listen for reset home content event
+  useEffect(() => {
+    const handleResetHomeContent = () => {
+      clearHomeVideos();
+    };
+    
+    window.addEventListener('resetHomeContent', handleResetHomeContent as EventListener);
+    
+    return () => {
+      window.removeEventListener('resetHomeContent', handleResetHomeContent as EventListener);
+    };
+  }, [clearHomeVideos]);
 
   return (
     <div className="pb-16">
