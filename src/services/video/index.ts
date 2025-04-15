@@ -17,7 +17,7 @@ import {
 import { 
   getSubjectDescription,
   getSubjectExamples
-} from '@/services/video/videoUtils';
+} from '@/utils/videoUtils';
 
 // Export the imported functions
 export {
