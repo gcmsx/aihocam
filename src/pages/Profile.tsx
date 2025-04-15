@@ -15,120 +15,85 @@ const Profile = () => {
       detail: { version: '0.345' }
     }));
     
-    // Check if this is the first time visiting the profile page today
-    const today = new Date().toLocaleDateString();
-    const lastVisit = localStorage.getItem('lastProfileVisit');
-    
-    if (lastVisit !== today) {
-      localStorage.setItem('lastProfileVisit', today);
-      
-      // Reset daily progress for a new day if needed
-      const dailyProgressKey = `dailyProgress_${today}`;
-      if (!localStorage.getItem(dailyProgressKey)) {
-        localStorage.setItem(dailyProgressKey, JSON.stringify({
-          videosWatched: 0,
-          goalReached: false
-        }));
-        
-        toast({
-          title: "Yeni Gün!",
-          description: "Bugün için yeni bir hedefin var: 5 video izle.",
-          variant: "default",
-        });
-      }
-    }
+    // Clear all lesson data
+    clearAllLessonData();
     
     // Initialize selected grade if not set
     if (!localStorage.getItem('selected_grade')) {
       localStorage.setItem('selected_grade', '9');
     }
-    
-    // Add subject and grade fields to completed questions if needed
-    const completedQuestionsStr = localStorage.getItem('completedQuestions');
-    if (completedQuestionsStr) {
-      const completedQuestions = JSON.parse(completedQuestionsStr);
-      let hasChanges = false;
-      
-      Object.entries(completedQuestions).forEach(([videoId, data]: [string, any]) => {
-        // Add subject if missing
-        if (!data.subject) {
-          // Assign a random subject for existing data
-          const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-          data.subject = subjects[Math.floor(Math.random() * subjects.length)];
-          hasChanges = true;
-        }
-        
-        // Add grade if missing
-        if (!data.grade) {
-          // Assign a grade based on videoId to ensure consistent assignment
-          const videoIdNum = parseInt(videoId);
-          const grades = [9, 10, 11, 12];
-          data.grade = grades[videoIdNum % 4];
-          hasChanges = true;
-        }
-      });
-      
-      if (hasChanges) {
-        localStorage.setItem('completedQuestions', JSON.stringify(completedQuestions));
-      }
-    }
-    
-    // Add subject and grade fields to recently viewed videos if needed
-    const recentlyViewedStr = localStorage.getItem('recentlyViewedVideos');
-    if (recentlyViewedStr) {
-      try {
-        const recentlyViewed = JSON.parse(recentlyViewedStr);
-        
-        // Check if recentlyViewed is an array
-        if (Array.isArray(recentlyViewed)) {
-          let hasChanges = false;
-          let updatedRecentlyViewed = [...recentlyViewed];
-          
-          // Convert to proper format if it's just an array of numbers
-          if (recentlyViewed.length > 0 && typeof recentlyViewed[0] !== 'object') {
-            const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-            const grades = [9, 10, 11, 12];
-            
-            updatedRecentlyViewed = recentlyViewed.map((videoId: any) => {
-              // Ensure the videoId is treated correctly whether it's a number or an object
-              if (typeof videoId === 'object' && videoId !== null) return videoId;
-              
-              return {
-                id: Number(videoId),
-                subject: subjects[Number(videoId) % subjects.length],
-                grade: grades[Number(videoId) % grades.length]
-              };
-            });
-            
-            hasChanges = true;
-          } else {
-            // It's already an array of objects, add subject and grade if missing
-            updatedRecentlyViewed.forEach((video: any) => {
-              if (!video) return;
-              
-              if (!video.subject) {
-                const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-                video.subject = subjects[video.id % subjects.length];
-                hasChanges = true;
-              }
-              
-              if (!video.grade) {
-                const grades = [9, 10, 11, 12];
-                video.grade = grades[video.id % grades.length];
-                hasChanges = true;
-              }
-            });
-          }
-          
-          if (hasChanges) {
-            localStorage.setItem('recentlyViewedVideos', JSON.stringify(updatedRecentlyViewed));
-          }
-        }
-      } catch (error) {
-        console.error('Error processing recently viewed videos:', error);
-      }
-    }
   }, []);
+  
+  // Function to clear all lesson data from the application
+  const clearAllLessonData = () => {
+    // Keys to remove from localStorage
+    const keysToRemove = [
+      'recentlyViewedVideos',       // Recently viewed videos
+      'savedVideos',                // Saved/downloaded videos
+      'completedQuestions',         // All completed questions
+      'achievements',               // User achievements
+      'lastProfileVisit'            // Last profile visit timestamp
+    ];
+    
+    // Remove all answeredQuestions entries
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('answeredQuestions_')) {
+        keysToRemove.push(key);
+      }
+    }
+    
+    // Remove all dailyProgress entries
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('dailyProgress_')) {
+        keysToRemove.push(key);
+      }
+    }
+    
+    // Remove all progress entries
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('progress_')) {
+        keysToRemove.push(key);
+      }
+    }
+    
+    // Remove all keys
+    keysToRemove.forEach(key => {
+      localStorage.removeItem(key);
+    });
+    
+    // Clear IndexedDB database for videos
+    clearVideosDatabase();
+    
+    // Show toast notification
+    toast({
+      title: "Tüm ders verileri silindi",
+      description: "İzlenen videolar, tamamlanan sorular ve ilerleme durumu başarıyla temizlendi.",
+      variant: "default",
+    });
+    
+    // Notify all components about data reset
+    window.dispatchEvent(new CustomEvent('lessonDataCleared'));
+  };
+  
+  // Function to clear the IndexedDB database for videos
+  const clearVideosDatabase = () => {
+    try {
+      const request = indexedDB.deleteDatabase('VideoDatabase');
+      
+      request.onsuccess = () => {
+        console.log('Video database successfully deleted');
+      };
+      
+      request.onerror = () => {
+        console.error('Error deleting video database');
+      };
+    } catch (error) {
+      console.error('Error accessing IndexedDB:', error);
+    }
+  };
   
   return (
     <div className="pb-16">
