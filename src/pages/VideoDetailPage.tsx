@@ -181,7 +181,7 @@ const VideoDetailPage = () => {
         <VideoPlayer 
           thumbnailUrl={video.thumbnailUrl}
           title={video.title}
-          videoUrl={video.videoUrl || "https://www.youtube.com/watch?v=CqJIdHsNpc0"}
+          videoUrl={video.videoUrl || "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"}
         />
         
         <ContentTabs 
