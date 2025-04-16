@@ -181,7 +181,7 @@ const VideoDetailPage = () => {
         <VideoPlayer 
           thumbnailUrl={video.thumbnailUrl}
           title={video.title}
-          videoUrl={video.videoUrl || "https://www.youtube.com/embed/CqJIdHsNpc0?si=LIaYp4kMKzMTqQCh"}
+          videoUrl={video.videoUrl || "https://www.youtube.com/watch?v=CqJIdHsNpc0"}
         />
         
         <ContentTabs 
