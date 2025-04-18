@@ -27,14 +27,16 @@ const Index = () => {
   const { searchQuery, handleSearch } = useHomeSearch([]);
 
   return (
-    <div className="pb-16">
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">
+    <div className="flex flex-col min-h-screen">
+      <div className="p-4 flex-1">
+        <h1 className="text-2xl font-bold mb-4 text-center">
           AI Hocam <span className="text-sm text-muted-foreground">(Kapalı Beta GEN-1 final v.{version})</span>
         </h1>
         <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         
-        <SubjectGrid />
+        <div className="flex justify-center items-center flex-1">
+          <SubjectGrid />
+        </div>
       </div>
       <NavBar />
     </div>

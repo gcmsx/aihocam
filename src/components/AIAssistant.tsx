@@ -11,6 +11,8 @@ interface Message {
   imageUrl?: string;
 }
 
+const CHAT_STORAGE_KEY = 'ai_assistant_chat';
+
 const AIAssistant = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
@@ -23,6 +25,26 @@ const AIAssistant = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const OPENAI_API_KEY = "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";
+  
+  useEffect(() => {
+    const savedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages);
+        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+          setMessages(parsedMessages);
+        }
+      } catch (error) {
+        console.error('Error parsing saved chat:', error);
+      }
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+    }
+  }, [messages]);
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -26,10 +26,10 @@ const SubjectGrid = () => {
   };
 
   return (
-    <div className="mt-6 mb-8 flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center min-h-[70vh]">
       <h2 className="text-xl font-semibold mb-4">Dersler</h2>
       
-      {/* Subject Buttons Grid - Centered with max-width */}
+      {/* Subject Buttons Grid - Perfectly centered with max-width */}
       <div className="grid grid-cols-3 gap-3 mb-5 max-w-md mx-auto w-full">
         {allSubjects.map((subject) => (
           <Button
