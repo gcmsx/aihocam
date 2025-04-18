@@ -1,3 +1,4 @@
+
 // Get subject-specific video description
 export const getSubjectDescription = (subject: string) => {
   const descriptions = {
@@ -160,36 +161,36 @@ export const getGradeTopics = (subject: string, grade: number) => {
   const topicsByGrade = {
     'Coğrafya': {
       9: [
-        'Doğal Sistemler ve Oluşum Süreçleri',
-        'İklim Sistemleri ve İklim Değişikliği',
+        'Fiziki Coğrafya Temelleri',
+        'İklim Bilgisi ve İklim Değişikliği',
         'Ekosistemler ve Biyoçeşitlilik',
-        'Yerleşim Sistemleri ve Şehirleşme',
+        'Yerleşme Coğrafyası',
         'Doğal Kaynaklar ve Sürdürülebilirlik',
-        'Afetler ve Risk Yönetimi'
+        'Afetler ve Yönetimi'
       ],
       10: [
         'Dünya\'nın Tektonik Yapısı',
-        'Küresel İklim Sistemleri',
-        'Nüfus Politikaları ve Göç',
-        'Ekonomik Faaliyetler ve Küreselleşme',
-        'Enerji Kaynakları ve Politikalar',
+        'İklim Sistemleri ve Değişim',
+        'Nüfus ve Göç Politikaları',
+        'Küresel Ekonomi Dinamikleri',
+        'Enerji Kaynakları ve Dağılımı',
         'Çevre Sorunları ve Çözümleri'
       ],
       11: [
-        'Bölgesel Kalkınma ve Planlama',
-        'Uluslararası Ulaşım Sistemleri',
-        'Küresel Ticaret ve Ekonomi',
-        'Doğal Kaynak Yönetimi',
-        'Sürdürülebilir Şehirler',
-        'Küresel Çevre Sorunları'
+        'Bölgesel Kalkınma Stratejileri',
+        'Ulaşım Sistemleri ve Ağları',
+        'Uluslararası Ticaret ve Ekonomi',
+        'Doğal Kaynak Yönetim Politikaları',
+        'Kent Ekolojisi ve Sürdürülebilir Şehirler',
+        'Küresel Çevre Sorunlarının Analizi'
       ],
       12: [
-        'Türkiye\'nin Fiziki Coğrafyası',
-        'Türkiye\'nin İklim Özellikleri',
-        'Türkiye\'nin Nüfus Yapısı',
-        'Türkiye\'nin Ekonomik Coğrafyası',
-        'Türkiye\'de Turizm',
-        'Türkiye\'nin Çevre Politikaları'
+        'Türkiye\'nin Jeomorfolojik Özellikleri',
+        'Türkiye\'nin İklim Bölgeleri',
+        'Türkiye\'nin Demografik Yapısı',
+        'Türkiye Ekonomi Coğrafyası',
+        'Türkiye\'nin Turizm Potansiyeli',
+        'Türkiye\'nin Çevre Politikaları ve Uygulamaları'
       ]
     },
     'Tarih': {
@@ -490,6 +491,24 @@ export const getSubjectExamples = (subject: string) => {
         options: ["Yükselti", "Yağış azlığı", "Toprak yapısı", "Rüzgar"],
         answer: "Yağış azlığı",
         explanation: "İç Anadolu'da yıllık yağış miktarının az olması (300-400 mm) ve yağışın mevsimlere dağılışındaki düzensizlik, step bitki örtüsünün oluşmasına neden olur."
+      },
+      {
+        question: "Türkiye'nin en yüksek dağı hangisidir?",
+        options: ["Erciyes", "Ağrı Dağı", "Uludağ", "Kaçkar Dağı"],
+        answer: "Ağrı Dağı",
+        explanation: "Türkiye'nin en yüksek dağı 5137 metre ile Ağrı Dağı'dır. Volkanik bir dağ olan Ağrı Dağı, Doğu Anadolu Bölgesi'nde yer alır."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bir akarsu aşındırma şekli değildir?",
+        options: ["Kanyon", "Delta", "Menderes", "Çağlayan"],
+        answer: "Delta",
+        explanation: "Delta, akarsuların taşıdığı alüvyonları deniz veya göl kıyısında biriktirmesiyle oluşan bir birikim şeklidir. Kanyon, menderes ve çağlayan aşındırma şekilleridir."
+      },
+      {
+        question: "Türkiye'nin en büyük gölü hangisidir?",
+        options: ["Beyşehir Gölü", "Tuz Gölü", "İznik Gölü", "Van Gölü"],
+        answer: "Van Gölü",
+        explanation: "Türkiye'nin en büyük gölü, 3713 km² yüzölçümüyle Van Gölü'dür. Sodalı bir göl olan Van Gölü tektonik kökenlidir ve Doğu Anadolu Bölgesi'nde yer alır."
       }
     ],
     'Fizik': [
@@ -510,6 +529,24 @@ export const getSubjectExamples = (subject: string) => {
         options: ["1 s", "2 s", "3 s", "4 s"],
         answer: "2 s",
         explanation: "h = (1/2)gt² formülünü kullanarak: 20 m = (1/2) × 10 m/s² × t², t² = 4, t = 2 s"
+      },
+      {
+        question: "1 kilowatt-saat kaç joule enerjiye eşittir?",
+        options: ["3600 J", "36000 J", "360000 J", "3600000 J"],
+        answer: "3600000 J",
+        explanation: "1 kWh = 1000 W × 3600 s = 3600000 J"
+      },
+      {
+        question: "Paralel bağlı dirençlerin eşdeğer direnci için aşağıdakilerden hangisi doğrudur?",
+        options: ["Her zaman en büyük dirençten küçüktür", "Her zaman en küçük dirençten büyüktür", "Dirençlerin toplamından büyüktür", "Dirençlerin çarpımına eşittir"],
+        answer: "Her zaman en küçük dirençten küçüktür",
+        explanation: "Paralel bağlı dirençlerde eşdeğer direnç her zaman devredeki en küçük dirençten daha küçüktür. 1/Req = 1/R1 + 1/R2 + ... + 1/Rn formülüne göre hesaplanır."
+      },
+      {
+        question: "Elektromanyetik dalgalar için aşağıdakilerden hangisi doğru değildir?",
+        options: ["Boşlukta ışık hızıyla yayılırlar", "Enerjileri frekansları ile doğru orantılıdır", "Yayılmak için maddesel ortama ihtiyaç duyarlar", "Hem elektrik hem manyetik alan içerirler"],
+        answer: "Yayılmak için maddesel ortama ihtiyaç duyarlar",
+        explanation: "Elektromanyetik dalgalar boşlukta yayılabilirler, maddesel ortama ihtiyaç duymazlar. Bu yüzden güneşten gelen ışık, boşlukta yayılarak dünyaya ulaşabilir."
       }
     ],
     'Matematik': [
@@ -530,6 +567,24 @@ export const getSubjectExamples = (subject: string) => {
         options: ["2", "3", "4", "8"],
         answer: "3",
         explanation: "log₂(8) = log₂(2³) = 3"
+      },
+      {
+        question: "f(x) = 3x² - 12x + 5 fonksiyonunun türevi nedir?",
+        options: ["f'(x) = 6x - 12", "f'(x) = 3x - 12", "f'(x) = 6x² - 12", "f'(x) = 3x² - 12"],
+        answer: "f'(x) = 6x - 12",
+        explanation: "f(x) = 3x² - 12x + 5 fonksiyonunun türevi f'(x) = 6x - 12 olur. x² teriminin türevi 2x, sabit terimin türevi ise 0'dır."
+      },
+      {
+        question: "∫(2x + 3)dx ifadesinin belirsiz integrali nedir?",
+        options: ["x² + 3x + C", "x² + 3x", "2x² + 3x + C", "x² + 3 + C"],
+        answer: "x² + 3x + C",
+        explanation: "∫(2x + 3)dx = ∫2xdx + ∫3dx = 2∫xdx + 3∫dx = 2(x²/2) + 3x + C = x² + 3x + C"
+      },
+      {
+        question: "Bir ürünün fiyatı %20 zamlandıktan sonra %10 indirim yapılıyor. Bu ürünün fiyatında net değişim yüzdesi nedir?",
+        options: ["%10 artış", "%10 azalış", "%8 artış", "%12 azalış"],
+        answer: "%8 artış",
+        explanation: "Başlangıç fiyatını 100 birim kabul edelim. %20 zam sonrası 120 birim olur. %10 indirim sonrası 120 × 0,9 = 108 birim olur. Net değişim: (108-100)/100 = 0,08 = %8 artış"
       }
     ],
     'Kimya': [
@@ -550,14 +605,216 @@ export const getSubjectExamples = (subject: string) => {
         options: ["NaCl + AgNO₃ → AgCl + NaNO₃", "HCl + NaOH → NaCl + H₂O", "Zn + CuSO₄ → ZnSO₄ + Cu", "CaCO₃ → CaO + CO₂"],
         answer: "Zn + CuSO₄ → ZnSO₄ + Cu",
         explanation: "Bu tepkimede Zn elektronu Cu'ya vererek yükseltgeniyor (Zn⁰ → Zn²⁺ + 2e⁻), Cu ise elektron alarak indirgeniyor (Cu²⁺ + 2e⁻ → Cu⁰)."
+      },
+      {
+        question: "Aşağıdaki elementlerden hangisi bir metaldir?",
+        options: ["Cl", "S", "P", "Na"],
+        answer: "Na",
+        explanation: "Na (Sodyum) bir alkali metaldir. Cl (Klor), S (Kükürt) ve P (Fosfor) ametaller grubunda yer alır."
+      },
+      {
+        question: "pH değeri 3 olan bir çözeltinin H⁺ iyon derişimi nedir?",
+        options: ["3 M", "0.3 M", "0.001 M", "0.03 M"],
+        answer: "0.001 M",
+        explanation: "pH = -log[H⁺], pH = 3 ise [H⁺] = 10^(-3) M = 0.001 M olur."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bir izotop örneğidir?",
+        options: ["C-O", "H-Cl", "C-12 ve C-14", "O-N"],
+        answer: "C-12 ve C-14",
+        explanation: "İzotoplar, aynı elementin farklı nötron sayısına sahip atomlarıdır. C-12 ve C-14, karbon elementinin farklı izotoplarıdır."
       }
     ],
-    'Biyoloji': [],
-    'Tarih': [],
-    'Coğrafya': [],
-    'Felsefe': [],
-    'İngilizce': [],
-    'Edebiyat': []
+    'Biyoloji': [
+      {
+        question: "Hücre zarının yapısını açıklayan model hangisidir?",
+        options: ["Akışkan Mozaik Model", "Elektron Transpor Zinciri", "Endosimbiyont Teori", "Santral Dogma"],
+        answer: "Akışkan Mozaik Model",
+        explanation: "Akışkan Mozaik Model, Singer ve Nicolson tarafından önerilen ve hücre zarının yapısını açıklayan modeldir. Fosfolipid çift tabaka içerisinde protein moleküllerinin hareket halinde olduğunu belirtir."
+      },
+      {
+        question: "Mitokondri organelinin esas görevi nedir?",
+        options: ["Protein sentezi", "Hücre sindirim", "ATP üretimi", "DNA replikasyonu"],
+        answer: "ATP üretimi",
+        explanation: "Mitokondriler, oksijenli solunum yoluyla hücre için enerji (ATP) üreten organellerdir. Bu nedenle hücrenin enerji santrali olarak bilinirler."
+      },
+      {
+        question: "DNA'nın ana bileşenleri nelerdir?",
+        options: ["Amino asitler ve proteinler", "Şeker, fosfat grubu ve bazlar", "Nükleotidler ve yağ asitleri", "RNA ve ribozomlar"],
+        answer: "Şeker, fosfat grubu ve bazlar",
+        explanation: "DNA molekülü, deoksiriboz şekeri, fosfat grupları ve azotlu organik bazlardan (adenin, guanin, sitozin, timin) oluşur."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bitkilerle hayvanlarda ortak olarak bulunan hücre organeli değildir?",
+        options: ["Mitokondri", "Ribozom", "Kloroplast", "Endoplazmik retikulum"],
+        answer: "Kloroplast",
+        explanation: "Kloroplast sadece bitki ve bazı alg hücrelerinde bulunan, fotosentez yapan organelidir. Hayvan hücrelerinde kloroplast bulunmaz."
+      },
+      {
+        question: "Mendel'in kalıtım kanunlarından biri olan 'Ayrılma Kanunu' neyi ifade eder?",
+        options: ["Genlerin protein sentezi", "Homolog kromozomların ayrılması", "DNA'nın replikasyonu", "RNA'nın transkripsiyonu"],
+        answer: "Homolog kromozomların ayrılması",
+        explanation: "Ayrılma Kanunu, homolog kromozomlarda bulunan alel genlerin gamet oluşumu sırasında birbirinden ayrılarak farklı gametlere geçtiğini ifade eder."
+      },
+      {
+        question: "İnsanda hangi kromozomlar cinsiyeti belirler?",
+        options: ["X ve Y kromozomları", "1. kromozom çifti", "21. kromozom çifti", "X ve Z kromozomları"],
+        answer: "X ve Y kromozomları",
+        explanation: "İnsanda cinsiyet kromozomları X ve Y'dir. XX dişi, XY erkek bireyler oluşturur. Cinsiyeti babadan gelen kromozom belirler."
+      }
+    ],
+    'Tarih': [
+      {
+        question: "Aşağıdakilerden hangisi Türk tarihinde kurulan ilk Müslüman Türk devletidir?",
+        options: ["Karahanlılar", "Gazneliler", "Selçuklular", "Osmanlılar"],
+        answer: "Karahanlılar",
+        explanation: "Karahanlılar (840-1212), tarihte kurulan ilk Müslüman Türk devletidir. 10. yüzyılda Satuk Buğra Han döneminde İslamiyet'i kabul etmişlerdir."
+      },
+      {
+        question: "Osmanlı Devleti'nin kuruluş tarihi aşağıdakilerden hangisidir?",
+        options: ["1071", "1299", "1453", "1517"],
+        answer: "1299",
+        explanation: "Osmanlı Devleti'nin kuruluş tarihi olarak Osman Bey'in Söğüt'te bağımsızlığını ilan ettiği 1299 yılı kabul edilir."
+      },
+      {
+        question: "İstanbul'un fethi hangi padişah döneminde gerçekleşmiştir?",
+        options: ["Yıldırım Bayezid", "Fatih Sultan Mehmet", "Kanuni Sultan Süleyman", "Yavuz Sultan Selim"],
+        answer: "Fatih Sultan Mehmet",
+        explanation: "İstanbul 29 Mayıs 1453'te Fatih Sultan Mehmet tarafından fethedilmiştir. Bu fetihle Orta Çağ kapanıp Yeni Çağ başlamıştır."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Kurtuluş Savaşı'nda yapılan ilk anlaşmadır?",
+        options: ["Sevr", "Lozan", "Ankara", "Mudanya"],
+        answer: "Ankara",
+        explanation: "Kurtuluş Savaşı'nda yapılan ilk anlaşma, 20 Ekim 1921'de Fransa ile imzalanan Ankara Antlaşması'dır. Bu anlaşmayla Fransa, Misakı Millî'yi tanıyan ilk İtilaf Devleti olmuştur."
+      },
+      {
+        question: "Türkiye Cumhuriyeti'nin ilânı hangi tarihte gerçekleşmiştir?",
+        options: ["23 Nisan 1920", "30 Ağustos 1922", "29 Ekim 1923", "5 Aralık 1934"],
+        answer: "29 Ekim 1923",
+        explanation: "Türkiye Cumhuriyeti, TBMM'de kabul edilen anayasa değişikliği ile 29 Ekim 1923 tarihinde ilan edilmiştir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Atatürk döneminde gerçekleştirilen inkılâplardan biri değildir?",
+        options: ["Soyadı Kanunu", "Şapka İnkılabı", "Çok Partili Hayata Geçiş", "Harf İnkılabı"],
+        answer: "Çok Partili Hayata Geçiş",
+        explanation: "Çok partili hayata kalıcı olarak geçiş, Atatürk'ün vefatından sonra 1946'da gerçekleşmiştir. Diğer seçenekler Atatürk döneminde yapılan inkılâplardır."
+      }
+    ],
+    'Felsefe': [
+      {
+        question: "Aşağıdakilerden hangisi Antik Yunan felsefesinin önemli filozoflarından biridir?",
+        options: ["Descartes", "Socrates", "Kant", "Sartre"],
+        answer: "Socrates",
+        explanation: "Sokrates (Socrates), MÖ 469-399 yılları arasında yaşamış ve Platon ile Aristoteles'i etkilemiş önemli bir Antik Yunan filozofudur."
+      },
+      {
+        question: "'Cogito ergo sum' (Düşünüyorum, öyleyse varım) sözü hangi filozofa aittir?",
+        options: ["Aristoteles", "Platon", "Descartes", "Nietzsche"],
+        answer: "Descartes",
+        explanation: "'Cogito ergo sum', 17. yüzyıl Fransız filozof René Descartes'a ait meşhur bir sözdür ve modern felsefenin başlangıç noktası olarak kabul edilir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bir ahlak felsefesi görüşü değildir?",
+        options: ["Hedonizm", "Faydacılık", "Determinizm", "Deontoloji"],
+        answer: "Determinizm",
+        explanation: "Determinizm, evrendeki tüm olayların sebep-sonuç ilişkisine bağlı olduğunu savunan metafizik bir görüştür. Diğerleri ahlak felsefesi (etik) görüşleridir."
+      },
+      {
+        question: "'Kategorik İmperatif' kavramı hangi filozofa aittir?",
+        options: ["Hegel", "Kant", "Locke", "Hume"],
+        answer: "Kant",
+        explanation: "Kategorik İmperatif (Kesin Buyruk), Immanuel Kant'ın ahlak felsefesinin temel kavramıdır. Kant'a göre, eylemlerimizin evrensel bir yasa olabilecek şekilde olmalıdır."
+      },
+      {
+        question: "Varoluşçuluk (Egzistansiyalizm) akımının öncülerinden biri aşağıdakilerden hangisidir?",
+        options: ["Auguste Comte", "Karl Marx", "Jean-Paul Sartre", "John Locke"],
+        answer: "Jean-Paul Sartre",
+        explanation: "Jean-Paul Sartre, 20. yüzyılın en önemli varoluşçu filozoflarındandır. 'Varoluş özden önce gelir' sözü ona aittir."
+      },
+      {
+        question: "'İdea'lar teorisi hangi filozofun öğretisinde merkez kavramdır?",
+        options: ["Platon", "Aristoteles", "Herakleitos", "Thales"],
+        answer: "Platon",
+        explanation: "İdealar teorisi, Platon'un felsefesinin merkezidir. Platon'a göre gerçek dünya, duyularla algıladığımız dünya değil, idealar dünyasıdır."
+      }
+    ],
+    'İngilizce': [
+      {
+        question: "Choose the correct sentence.",
+        options: ["She don't like coffee.", "She doesn't likes coffee.", "She doesn't like coffee.", "She not like coffee."],
+        answer: "She doesn't like coffee.",
+        explanation: "Simple present tense with third person singular subject requires 'doesn't' + base form of the verb."
+      },
+      {
+        question: "If I _____ rich, I would buy a big house.",
+        options: ["am", "were", "will be", "would be"],
+        answer: "were",
+        explanation: "This is a type 2 conditional sentence (unreal present). The correct form in the if-clause is 'were' for all subjects."
+      },
+      {
+        question: "She has been studying English _____ five years.",
+        options: ["since", "for", "during", "while"],
+        answer: "for",
+        explanation: "'For' is used with periods of time (five years), while 'since' is used with specific points in time."
+      },
+      {
+        question: "The passive form of 'They are building a new bridge' is:",
+        options: ["A new bridge is being build.", "A new bridge is build.", "A new bridge is being built.", "A new bridge was built."],
+        answer: "A new bridge is being built.",
+        explanation: "To form the present continuous passive, use 'is/are being + past participle'. The past participle of 'build' is 'built'."
+      },
+      {
+        question: "Which sentence contains a phrasal verb?",
+        options: ["I want to speak English fluently.", "She looks beautiful in that dress.", "We need to look after our environment.", "They always arrive on time."],
+        answer: "We need to look after our environment.",
+        explanation: "'Look after' is a phrasal verb meaning 'to take care of'. Phrasal verbs consist of a verb + adverb/preposition."
+      },
+      {
+        question: "Choose the sentence with correct word order:",
+        options: ["Always she goes to bed early.", "She goes always to bed early.", "She always goes to bed early.", "She goes to bed always early."],
+        answer: "She always goes to bed early.",
+        explanation: "In English, adverbs of frequency (always, never, sometimes, etc.) usually come before the main verb but after auxiliary verbs."
+      }
+    ],
+    'Edebiyat': [
+      {
+        question: "Aşağıdakilerden hangisi Divan edebiyatının özelliklerinden değildir?",
+        options: ["Aruz ölçüsü kullanılır.", "Halk dilinden uzaktır.", "Sade bir dil kullanılır.", "Mazmunlar önemlidir."],
+        answer: "Sade bir dil kullanılır.",
+        explanation: "Divan edebiyatında Arapça ve Farsça kelimeler çok kullanıldığından dil ağır ve süslüdür. Sade dil, halk edebiyatı ve Tanzimat sonrası edebiyatın özelliğidir."
+      },
+      {
+        question: "Aşağıdaki eserlerden hangisi Tanzimat dönemine aittir?",
+        options: ["Çalıkuşu", "İntibah", "Sinekli Bakkal", "Yaban"],
+        answer: "İntibah",
+        explanation: "İntibah, Namık Kemal'in 1876'da yazdığı, Tanzimat döneminin önemli romanlarından biridir. Batılı anlamda yazılmış ilk edebi Türk romanı olarak kabul edilir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Servet-i Fünun edebiyatının temsilcilerinden biridir?",
+        options: ["Namık Kemal", "Tevfik Fikret", "Mehmet Akif Ersoy", "Ahmet Hamdi Tanpınar"],
+        answer: "Tevfik Fikret",
+        explanation: "Tevfik Fikret, Servet-i Fünun dergisinin başyazarı ve Servet-i Fünun edebiyatının en önemli temsilcilerindendir. 'Rubab-ı Şikeste' önemli eseridir."
+      },
+      {
+        question: "'Safahat' adlı eser hangi şairimize aittir?",
+        options: ["Yahya Kemal Beyatlı", "Mehmet Akif Ersoy", "Tevfik Fikret", "Necip Fazıl Kısakürek"],
+        answer: "Mehmet Akif Ersoy",
+        explanation: "Safahat, İstiklal Marşı'nın yazarı Mehmet Akif Ersoy'un yedi kitaptan oluşan şiir külliyatıdır."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Ömer Seyfettin'in bir hikayesi değildir?",
+        options: ["Yalnız Efe", "Pembe İncili Kaftan", "Çalıkuşu", "Kaşağı"],
+        answer: "Çalıkuşu",
+        explanation: "Çalıkuşu, Reşat Nuri Güntekin'in romanıdır. Diğerleri Ömer Seyfettin'in hikayeleridir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi edebi bir tür değildir?",
+        options: ["Makale", "Roman", "Hikaye", "Gazel"],
+        answer: "Makale",
+        explanation: "Makale, düşünce yazısı türüdür ve edebi bir tür değildir. Roman, hikaye ve gazel edebi türlerdir."
+      }
+    ]
   };
   
   return examplesBySubject[subject] || [];
@@ -565,15 +822,3 @@ export const getSubjectExamples = (subject: string) => {
 
 // Initialize mock videos on module load
 initializeMockVideos();
-
-// Get all videos for a specific subject
-export const getSubjectVideos = (subject: string): Video[] => {
-  return mockVideos.filter(video => video.subject === subject);
-};
-
-// Get subject videos for a specific grade
-export const getSubjectGradeVideos = (subject: string, grade: GradeLevel): Video[] => {
-  return mockVideos.filter(
-    video => video.subject === subject && video.grade === grade
-  );
-};
