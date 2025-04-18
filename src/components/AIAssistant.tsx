@@ -145,7 +145,7 @@ const AIAssistant = () => {
           "5. Aktif öğrenme teknikleri kullanın: notlar alın, özetler çıkarın";
       }
       else if (userInput.includes("video") || userInput.includes("özetle")) {
-        aiResponse = "Son izlediğiniz video hakkında bilgim yok, ancak ana noktaları hatırlamak için ana noktaları hatırlamak için video izlerken not almayı deneyebilirsiniz. Videoyu izledikten sonra kendi cümlelerinizle özetlemeye çalışın.";
+        aiResponse = "Son izlediğiniz video hakkında bilgim yok, ancak ana noktaları hatırlamak için video izlerken not almayı deneyebilirsiniz. Videoyu izledikten sonra kendi cümlelerinizle özetlemeye çalışın.";
       }
       else if (userInput.includes("tarih")) {
         aiResponse = "Tarih konularında zorlanıyorsanız şunları deneyebilirsiniz:\n\n" +
@@ -292,55 +292,53 @@ const AIAssistant = () => {
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       <div className="flex-1 p-4 overflow-y-auto">
-        <div className="glass-panel min-h-full p-4">
-          {messages.map((message) => (
+        {messages.map((message) => (
+          <div 
+            key={message.id} 
+            className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
             <div 
-              key={message.id} 
-              className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`max-w-[80%] rounded-2xl p-3 ${
+                message.sender === 'user' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted text-foreground'
+              }`}
             >
-              <div 
-                className={`max-w-[80%] rounded-2xl p-3 ${
-                  message.sender === 'user' 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-white/60 backdrop-blur-sm text-foreground'
-                }`}
-              >
-                {message.imageUrl && (
-                  <div className="mb-2">
-                    <img 
-                      src={message.imageUrl} 
-                      alt="User uploaded" 
-                      className="rounded-lg max-h-[200px] max-w-full object-contain"
-                    />
-                  </div>
-                )}
-                {message.sender === 'ai' ? (
-                  <div className="text-sm markdown-content">
-                    <ReactMarkdown>{message.text}</ReactMarkdown>
-                  </div>
-                ) : (
-                  <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-                )}
-              </div>
-            </div>
-          ))}
-          
-          {isTyping && (
-            <div className="flex justify-start mb-4">
-              <div className="bg-muted text-foreground max-w-[80%] rounded-2xl p-3">
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse-light"></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse-light" style={{animationDelay: '0.2s'}}></div>
-                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse-light" style={{animationDelay: '0.4s'}}></div>
+              {message.imageUrl && (
+                <div className="mb-2">
+                  <img 
+                    src={message.imageUrl} 
+                    alt="User uploaded" 
+                    className="rounded-lg max-h-[200px] max-w-full object-contain"
+                  />
                 </div>
+              )}
+              {message.sender === 'ai' ? (
+                <div className="text-sm markdown-content">
+                  <ReactMarkdown>{message.text}</ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+              )}
+            </div>
+          </div>
+        ))}
+        
+        {isTyping && (
+          <div className="flex justify-start mb-4">
+            <div className="bg-muted text-foreground max-w-[80%] rounded-2xl p-3">
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse-light"></div>
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse-light" style={{animationDelay: '0.2s'}}></div>
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse-light" style={{animationDelay: '0.4s'}}></div>
               </div>
             </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
       </div>
       
-      <div className="p-4 glass-panel border-t">
+      <div className="p-4 bg-background border-t border-border">
         {selectedImage && (
           <div className="mb-2 relative inline-block">
             <img 
@@ -361,7 +359,7 @@ const AIAssistant = () => {
           <Button 
             variant="outline" 
             size="icon" 
-            className="shrink-0 bg-white/50"
+            className="shrink-0"
             onClick={handleImageUpload}
             disabled={isTyping || isUploading}
           >
@@ -386,7 +384,7 @@ const AIAssistant = () => {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="AI Asistanım"
-              className="w-full rounded-full px-4 pr-12 py-2 resize-none bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-full px-4 pr-12 py-2 resize-none bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
               rows={1}
               style={{ minHeight: '40px', maxHeight: '120px' }}
               disabled={isTyping}
