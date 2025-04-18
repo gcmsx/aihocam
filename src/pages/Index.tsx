@@ -6,10 +6,10 @@ import SubjectGrid from '@/components/SubjectGrid';
 import { useHomeSearch } from '@/hooks/useHomeSearch';
 
 const Index = () => {
-  const [version, setVersion] = useState('0.345');
+  const [version, setVersion] = useState('0.345.1');
   
   useEffect(() => {
-    localStorage.setItem('appVersion', '0.345');
+    localStorage.setItem('appVersion', '0.345.1');
     
     const handleVersionUpdate = (e: CustomEvent) => {
       if (e.detail && e.detail.version) {
