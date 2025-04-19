@@ -9,6 +9,7 @@ export interface Video {
   saved: boolean;
   subject?: string;
   grade?: GradeLevel;
+  topic?: string;
   description?: string;
   examples?: Array<{
     question: string;
@@ -18,3 +19,4 @@ export interface Video {
   }>;
   videoUrl?: string;
 }
+
