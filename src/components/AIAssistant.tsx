@@ -1,17 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Image, X, Loader2 } from 'lucide-react';
+import { Send, Image, X, Loader2, FolderOpen } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import ReactMarkdown from 'react-markdown';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { detectMessageSubject, saveChatMessages, getChatMessages } from '@/utils/chatUtils';
 
 interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
   imageUrl?: string;
+  subject?: string;
 }
 
-const CHAT_STORAGE_KEY = 'ai_assistant_chat';
+const allSubjects = [
+  'Tarih',
+  'Coğrafya',
+  'Felsefe',
+  'Matematik',
+  'Fizik',
+  'Kimya',
+  'Biyoloji',
+  'İngilizce',
+  'Edebiyat'
+];
 
 const AIAssistant = () => {
   const [input, setInput] = useState('');
@@ -23,29 +42,23 @@ const AIAssistant = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const [selectedSubject, setSelectedSubject] = useState<string | undefined>(undefined);
+
   const OPENAI_API_KEY = "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";
-  
+
   useEffect(() => {
-    const savedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
-    if (savedMessages) {
-      try {
-        const parsedMessages = JSON.parse(savedMessages);
-        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
-          setMessages(parsedMessages);
-        }
-      } catch (error) {
-        console.error('Error parsing saved chat:', error);
-      }
+    const savedMessages = getChatMessages();
+    if (savedMessages.length > 0) {
+      setMessages(savedMessages);
     }
   }, []);
-  
+
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+      saveChatMessages(messages);
     }
   }, [messages]);
-  
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -54,15 +67,19 @@ const AIAssistant = () => {
     if (!input.trim() && !selectedImage) return;
     
     const userText = input.trim() || "";
+    const detectedSubject = detectMessageSubject(userText) || selectedSubject;
     
     const newUserMessage: Message = { 
       id: messages.length + 1, 
       text: userText, 
       sender: 'user',
-      imageUrl: selectedImage || undefined
+      imageUrl: selectedImage || undefined,
+      subject: detectedSubject
     };
     
-    setMessages([...messages, newUserMessage]);
+    const updatedMessages = [...messages, newUserMessage];
+    setMessages(updatedMessages);
+    saveChatMessages(updatedMessages);
     setInput('');
     setSelectedImage(null);
     
@@ -124,12 +141,15 @@ const AIAssistant = () => {
       const aiMessage = data.choices[0].message.content;
       
       const aiResponseObj = { 
-        id: messages.length + 2, 
+        id: updatedMessages.length + 1, 
         text: aiMessage, 
-        sender: 'ai' as const 
+        sender: 'ai' as const,
+        subject: detectedSubject
       };
       
-      setMessages(prev => [...prev, aiResponseObj]);
+      const finalMessages = [...updatedMessages, aiResponseObj];
+      setMessages(finalMessages);
+      saveChatMessages(finalMessages);
     } catch (error) {
       console.error('OpenAI API Error:', error);
       
@@ -217,12 +237,15 @@ const AIAssistant = () => {
       });
       
       const errorResponse = { 
-        id: messages.length + 2, 
+        id: updatedMessages.length + 1, 
         text: aiResponse, 
-        sender: 'ai' as const 
+        sender: 'ai' as const,
+        subject: detectedSubject
       };
       
-      setMessages(prev => [...prev, errorResponse]);
+      const finalMessages = [...updatedMessages, errorResponse];
+      setMessages(finalMessages);
+      saveChatMessages(finalMessages);
     } finally {
       setIsTyping(false);
     }
@@ -291,8 +314,27 @@ const AIAssistant = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h2 className="text-lg font-semibold">AI Asistan</h2>
+        <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Tüm dersler" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Tüm dersler</SelectItem>
+            {allSubjects.map((subject) => (
+              <SelectItem key={subject} value={subject}>
+                {subject}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="flex-1 p-4 overflow-y-auto">
-        {messages.map((message) => (
+        {messages
+          .filter(msg => !selectedSubject || msg.subject === selectedSubject)
+          .map((message) => (
           <div 
             key={message.id} 
             className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -304,6 +346,12 @@ const AIAssistant = () => {
                   : 'bg-muted text-foreground'
               }`}
             >
+              {message.subject && (
+                <div className="text-xs opacity-75 mb-1 flex items-center gap-1">
+                  <FolderOpen size={12} />
+                  {message.subject}
+                </div>
+              )}
               {message.imageUrl && (
                 <div className="mb-2">
                   <img 
