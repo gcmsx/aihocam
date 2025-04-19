@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -73,7 +74,7 @@
 
   body {
     @apply bg-background text-foreground font-sans text-[15px];
-    background-image: url('/background-pattern.png');
+    background-image: url('/lovable-uploads/f15656dd-ec6b-42f2-9cde-9ec7195165f3.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
