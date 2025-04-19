@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Image, X, Loader2, FolderOpen } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -321,7 +322,8 @@ const AIAssistant = () => {
             <SelectValue placeholder="Tüm dersler" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tüm dersler</SelectItem>
+            {/* Fix: Change the value prop from empty string to "all" */}
+            <SelectItem value="all">Tüm dersler</SelectItem>
             {allSubjects.map((subject) => (
               <SelectItem key={subject} value={subject}>
                 {subject}
@@ -333,7 +335,7 @@ const AIAssistant = () => {
 
       <div className="flex-1 p-4 overflow-y-auto">
         {messages
-          .filter(msg => !selectedSubject || msg.subject === selectedSubject)
+          .filter(msg => !selectedSubject || selectedSubject === "all" || msg.subject === selectedSubject)
           .map((message) => (
           <div 
             key={message.id} 
