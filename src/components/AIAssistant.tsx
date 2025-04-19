@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Image, X, Loader2, FolderOpen } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,7 @@ const AIAssistant = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedSubject, setSelectedSubject] = useState<string | undefined>(undefined);
 
-  const OPENAI_API_KEY = "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";
+  const OPENAI_API_KEY = "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";
 
   useEffect(() => {
     const savedMessages = getChatMessages();
@@ -322,7 +321,6 @@ const AIAssistant = () => {
             <SelectValue placeholder="Tüm dersler" />
           </SelectTrigger>
           <SelectContent>
-            {/* Fix: Change the value prop from empty string to "all" */}
             <SelectItem value="all">Tüm dersler</SelectItem>
             {allSubjects.map((subject) => (
               <SelectItem key={subject} value={subject}>
