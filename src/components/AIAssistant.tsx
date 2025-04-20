@@ -1,36 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Image, X, Loader2, FolderOpen } from 'lucide-react';
+import { Send, Image, X, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import ReactMarkdown from 'react-markdown';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { detectMessageSubject, saveChatMessages, getChatMessages } from '@/utils/chatUtils';
 
 interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
   imageUrl?: string;
-  subject?: string;
 }
 
-const allSubjects = [
-  'Tarih',
-  'Coğrafya',
-  'Felsefe',
-  'Matematik',
-  'Fizik',
-  'Kimya',
-  'Biyoloji',
-  'İngilizce',
-  'Edebiyat'
-];
+const CHAT_STORAGE_KEY = 'ai_assistant_chat';
 
 const AIAssistant = () => {
   const [input, setInput] = useState('');
@@ -42,23 +23,29 @@ const AIAssistant = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedSubject, setSelectedSubject] = useState<string | undefined>(undefined);
-
-  const OPENAI_API_KEY = "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";
-
+  
+  const OPENAI_API_KEY = "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";
+  
   useEffect(() => {
-    const savedMessages = getChatMessages();
-    if (savedMessages.length > 0) {
-      setMessages(savedMessages);
+    const savedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
+    if (savedMessages) {
+      try {
+        const parsedMessages = JSON.parse(savedMessages);
+        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+          setMessages(parsedMessages);
+        }
+      } catch (error) {
+        console.error('Error parsing saved chat:', error);
+      }
     }
   }, []);
-
+  
   useEffect(() => {
     if (messages.length > 0) {
-      saveChatMessages(messages);
+      localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
     }
   }, [messages]);
-
+  
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -67,19 +54,15 @@ const AIAssistant = () => {
     if (!input.trim() && !selectedImage) return;
     
     const userText = input.trim() || "";
-    const detectedSubject = detectMessageSubject(userText) || selectedSubject;
     
     const newUserMessage: Message = { 
       id: messages.length + 1, 
       text: userText, 
       sender: 'user',
-      imageUrl: selectedImage || undefined,
-      subject: detectedSubject
+      imageUrl: selectedImage || undefined
     };
     
-    const updatedMessages = [...messages, newUserMessage];
-    setMessages(updatedMessages);
-    saveChatMessages(updatedMessages);
+    setMessages([...messages, newUserMessage]);
     setInput('');
     setSelectedImage(null);
     
@@ -141,15 +124,12 @@ const AIAssistant = () => {
       const aiMessage = data.choices[0].message.content;
       
       const aiResponseObj = { 
-        id: updatedMessages.length + 1, 
+        id: messages.length + 2, 
         text: aiMessage, 
-        sender: 'ai' as const,
-        subject: detectedSubject
+        sender: 'ai' as const 
       };
       
-      const finalMessages = [...updatedMessages, aiResponseObj];
-      setMessages(finalMessages);
-      saveChatMessages(finalMessages);
+      setMessages(prev => [...prev, aiResponseObj]);
     } catch (error) {
       console.error('OpenAI API Error:', error);
       
@@ -237,15 +217,12 @@ const AIAssistant = () => {
       });
       
       const errorResponse = { 
-        id: updatedMessages.length + 1, 
+        id: messages.length + 2, 
         text: aiResponse, 
-        sender: 'ai' as const,
-        subject: detectedSubject
+        sender: 'ai' as const 
       };
       
-      const finalMessages = [...updatedMessages, errorResponse];
-      setMessages(finalMessages);
-      saveChatMessages(finalMessages);
+      setMessages(prev => [...prev, errorResponse]);
     } finally {
       setIsTyping(false);
     }
@@ -314,27 +291,8 @@ const AIAssistant = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-lg font-semibold">AI Asistan</h2>
-        <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Tüm dersler" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tüm dersler</SelectItem>
-            {allSubjects.map((subject) => (
-              <SelectItem key={subject} value={subject}>
-                {subject}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="flex-1 p-4 overflow-y-auto">
-        {messages
-          .filter(msg => !selectedSubject || selectedSubject === "all" || msg.subject === selectedSubject)
-          .map((message) => (
+        {messages.map((message) => (
           <div 
             key={message.id} 
             className={`mb-4 flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -346,12 +304,6 @@ const AIAssistant = () => {
                   : 'bg-muted text-foreground'
               }`}
             >
-              {message.subject && (
-                <div className="text-xs opacity-75 mb-1 flex items-center gap-1">
-                  <FolderOpen size={12} />
-                  {message.subject}
-                </div>
-              )}
               {message.imageUrl && (
                 <div className="mb-2">
                   <img 
