@@ -9,7 +9,7 @@ export interface Video {
   saved: boolean;
   subject?: string;
   grade?: GradeLevel;
-  topic?: string; // YENİ: Konu Alanı
+  topic?: string;
   description?: string;
   examples?: Array<{
     question: string;
