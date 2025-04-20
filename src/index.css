@@ -74,7 +74,8 @@
 
   body {
     @apply bg-background text-foreground font-sans text-[15px];
-    background-image: url('/lovable-uploads/f15656dd-ec6b-42f2-9cde-9ec7195165f3.png');
+    /* Update: Use the new background image */
+    background-image: url('https://i.pinimg.com/736x/58/ee/57/58ee57c4f963bb6fed6ff82f8399f913.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
