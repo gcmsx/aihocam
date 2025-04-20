@@ -17,19 +17,26 @@ import {
   ChartLegendContent,
 } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { getSubjectGradeVideos } from '@/utils/videoUtils';
+import { 
+  getSubjectGradeVideos, 
+  getSubjectGradeTopicVideos,
+  ensureTopicVideos
+} from '@/utils/videoUtils';
 import { 
   updateRecentlyViewed,
   downloadVideo,
   getSavedVideosFromStorage
 } from '@/services/video';
 import { Video } from '@/types/video';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import VideoSection from '@/components/subject/VideoSection';
 
 const SubjectsPage = () => {
   const { subject } = useParams<{ subject: string }>();
   const navigate = useNavigate();
   const [selectedGrade, setSelectedGrade] = useState<GradeLevel>(9); // Set default grade to 9th
   const [subjectVideos, setSubjectVideos] = useState<Video[]>([]);
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   
   const handleBack = () => {
     navigate('/');
@@ -125,6 +132,10 @@ const SubjectsPage = () => {
     fill: color
   }));
 
+  const handleTopicSelect = (topic: string) => {
+    setSelectedTopic(topic);
+  };
+
   return (
     <div className="pb-16">
       <div className="p-4">
@@ -151,53 +162,81 @@ const SubjectsPage = () => {
           color={subjectColors[subject || "default"]}
         />
         
-        <>
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Videolar</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {subjectVideos.map((video) => (
-                <VideoCard
-                  key={video.id}
-                  id={video.id}
-                  title={video.title}
-                  thumbnailUrl={video.thumbnailUrl}
-                  duration={video.duration}
-                  onClick={() => handleVideoClick(video.id)}
-                  saved={video.saved}
-                  onSave={() => handleSaveVideo(video.id)}
-                />
-              ))}
+        <Tabs defaultValue="videos" className="w-full mt-4">
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="videos">Tüm Videolar</TabsTrigger>
+            <TabsTrigger value="topics">Konular</TabsTrigger>
+            <TabsTrigger value="stats">İstatistikler</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="videos" className="mt-4">
+            <div className="mb-8">
+              <h2 className="text-lg font-semibold mb-4">Videolar</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {subjectVideos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    id={video.id}
+                    title={video.title}
+                    thumbnailUrl={video.thumbnailUrl}
+                    duration={video.duration}
+                    onClick={() => handleVideoClick(video.id)}
+                    saved={video.saved}
+                    onSave={() => handleSaveVideo(video.id)}
+                  />
+                ))}
+              </div>
+              
+              {subjectVideos.length === 0 && (
+                <div className="text-center p-8">
+                  <p className="text-muted-foreground">Bu sınıf ve konu için video bulunamadı.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="topics" className="mt-4">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold mb-4">Konu Başlıkları</h2>
+              <div className="card p-4 border rounded-lg bg-card">
+                {topics.map((topic, index) => (
+                  <div key={index} className="mb-4">
+                    <div className="flex justify-between mb-1">
+                      <span 
+                        className="text-sm font-medium truncate hover:text-primary cursor-pointer"
+                        onClick={() => handleTopicSelect(topic)}
+                      >
+                        {topic}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {Math.floor(Math.random() * 100)}%
+                      </span>
+                    </div>
+                    <Progress value={Math.floor(Math.random() * 100)} className="h-2">
+                      <div 
+                        className="h-full rounded-full" 
+                        style={{ backgroundColor: color, width: `${Math.floor(Math.random() * 100)}%` }} 
+                      />
+                    </Progress>
+                  </div>
+                ))}
+              </div>
             </div>
             
-            {subjectVideos.length === 0 && (
-              <div className="text-center p-8">
-                <p className="text-muted-foreground">Bu sınıf ve konu için video bulunamadı.</p>
-              </div>
+            {selectedTopic && (
+              <VideoSection
+                videos={[]} // Boş array geçiyoruz çünkü VideoSection içinde kendi oluşturacak
+                subject={subject}
+                grade={selectedGrade}
+                topic={selectedTopic}
+                onVideoClick={handleVideoClick}
+                onSaveVideo={handleSaveVideo}
+                title={`${selectedTopic} Videoları`}
+              />
             )}
-          </div>
-
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Konu Başlıkları</h2>
-            <div className="card p-4 border rounded-lg bg-card">
-              {topics.map((topic, index) => (
-                <div key={index} className="mb-3">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium truncate max-w-[70%]">{topic}</span>
-                    <span className="text-sm text-muted-foreground">{Math.floor(Math.random() * 100)}%</span>
-                  </div>
-                  <Progress value={Math.floor(Math.random() * 100)} className="h-2">
-                    <div 
-                      className="h-full rounded-full" 
-                      style={{ backgroundColor: color, width: `${Math.floor(Math.random() * 100)}%` }} 
-                    />
-                  </Progress>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">İstatistikler</h2>
+          </TabsContent>
+          
+          <TabsContent value="stats" className="mt-4">
             <Card className="p-4 overflow-hidden">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -231,8 +270,8 @@ const SubjectsPage = () => {
                 </div>
               </div>
             </Card>
-          </div>
-        </>
+          </TabsContent>
+        </Tabs>
       </div>
       <NavBar />
     </div>

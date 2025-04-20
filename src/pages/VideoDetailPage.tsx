@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import NavBar from '@/components/NavBar';
@@ -8,10 +9,14 @@ import { Video } from '@/types/video';
 import { 
   getFullVideoDetails, 
   downloadVideo, 
-  getVideoFromIndexedDB,
-  getSubjectDescription,
-  getSubjectExamples
+  getVideoFromIndexedDB
 } from '@/services/video';
+import { 
+  getSubjectDescription, 
+  getSubjectExamples,
+  getTopicDescription,
+  getTopicExamples
+} from '@/utils/videoUtils';
 import { toast } from '@/hooks/use-toast';
 
 const VideoDetailPage = () => {
@@ -163,9 +168,12 @@ const VideoDetailPage = () => {
     );
   }
   
-  // Get subject-specific content
-  const description = video.description || getSubjectDescription(video.subject || '');
-  const examples = video.examples || getSubjectExamples(video.subject || '');
+  // Get specific content based on topic if available, otherwise fall back to subject
+  const description = video.description || 
+    (video.topic ? getTopicDescription(video.subject || '', video.topic) : getSubjectDescription(video.subject || ''));
+  
+  const examples = video.examples || 
+    (video.topic ? getTopicExamples(video.subject || '', video.topic) : getSubjectExamples(video.subject || ''));
   
   return (
     <div className="pb-16">
