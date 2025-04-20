@@ -3,6 +3,7 @@ import React from 'react';
 import VideoCard from '@/components/VideoCard';
 import { Video } from '@/types/video';
 import { getSubjectGradeTopicVideos } from '@/utils/videoUtils';
+import { GradeLevel } from '@/data/gradeData';
 
 interface VideoSectionProps {
   videos: Video[];
@@ -11,7 +12,7 @@ interface VideoSectionProps {
   title?: string;
   topic?: string;
   subject?: string;
-  grade?: number;
+  grade?: GradeLevel; // Explicitly use GradeLevel type here
 }
 
 const VideoSection = ({ 
