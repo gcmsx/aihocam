@@ -6,10 +6,10 @@ import SubjectGrid from '@/components/SubjectGrid';
 import { useHomeSearch } from '@/hooks/useHomeSearch';
 
 const Index = () => {
-  const [version, setVersion] = useState('0.345.1');
+  const [version, setVersion] = useState('0.345');
   
   useEffect(() => {
-    localStorage.setItem('appVersion', '0.345.1');
+    localStorage.setItem('appVersion', '0.345');
     
     const handleVersionUpdate = (e: CustomEvent) => {
       if (e.detail && e.detail.version) {
@@ -31,7 +31,7 @@ const Index = () => {
       <div className="p-4 flex-1 relative z-10">
         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10" />
         <h1 className="text-2xl font-bold mb-4 text-center">
-          AI Hocam <span className="text-sm text-muted-foreground">(Kapalı Beta GEN-2 v.{version})</span>
+          AI Hocam <span className="text-sm text-muted-foreground">(Kapalı Beta GEN-1 final v.{version})</span>
         </h1>
         <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         

@@ -1,223 +1,516 @@
-import { Video } from "@/types/video";
-import { GradeLevel } from "@/data/gradeData";
-import { mockVideos } from "@/services/video/mockData";
 
-// Belirli bir subject ve topic için videoları filtrele
-export function getVideosBySubjectAndTopic(
-  subject: string,
-  topic: string,
-  allVideos: Video[]
-): Video[] {
-  return allVideos.filter(
-    (video) =>
-      video.subject === subject &&
-      video.topic === topic
-  );
-}
-
-/**
- * Belirli bir ders için tüm videoları getir
- */
-export function getSubjectVideos(subject: string, allVideos: Video[] = mockVideos): Video[] {
-  return allVideos.filter(video => video.subject === subject);
-}
-
-/**
- * Belirli bir ders ve sınıf seviyesine göre videoları getir
- */
-export function getSubjectGradeVideos(
-  subject: string, 
-  grade: GradeLevel, 
-  allVideos: Video[] = mockVideos
-): Video[] {
-  return allVideos.filter(video => 
-    video.subject === subject && 
-    video.grade === grade
-  );
-}
-
-/**
- * Search videos based on query string
- */
-export const searchVideos = (query: string, videos: Video[]): Video[] => {
-  if (!query) return [];
-  
-  return videos.filter(video => 
-    video.title.toLowerCase().includes(query.toLowerCase())
-  );
-};
-
-/**
- * Get videos by their IDs
- */
-export const getVideosByIds = (ids: number[], allVideos: Video[]): Video[] => {
-  if (!ids || !Array.isArray(ids) || ids.length === 0) return [];
-  
-  return allVideos.filter(video => ids.includes(video.id));
-};
-
-/**
- * Update video saved status based on saved IDs
- */
-export const updateVideoSavedStatus = (
-  videos: Video[], 
-  savedIds: number[]
-): Video[] => {
-  if (!videos || !Array.isArray(videos)) return [];
-  if (!savedIds || !Array.isArray(savedIds)) return videos;
-  
-  return videos.map(video => ({
-    ...video,
-    saved: savedIds.includes(video.id)
-  }));
-};
-
-/**
- * Get subject-specific video description
- */
-export const getSubjectDescription = (subject: string): string => {
+// Get subject-specific video description
+export const getSubjectDescription = (subject: string) => {
   const descriptions = {
-    'Fizik': "Bu videoda, fiziğin temel prensiplerini ve günlük hayatta nasıl uygulandığını öğreneceksiniz. Newton'un hareket kanunları, enerji korunumu ve momentum gibi temel kavramlar ele alınacaktır. Ayrıca, pratik örneklerle teorik bilgilerin nasıl uygulanacağı gösterilecektir.",
-    'Matematik': "Bu matematik dersinde, türev kavramı, türev alma kuralları ve türevin günlük hayattaki uygulamalarını öğreneceksiniz. Anlık değişim hızı, maksimum-minimum problemleri ve optimizasyon örnekleri üzerinde durulacaktır.",
-    'Kimya': "Bu kimya dersinde, periyodik tablo ve elementlerin özellikleri detaylı olarak incelenecektir. Elementlerin periyodik tablodaki yerleşimi, elektron dizilimleri ve kimyasal bağ oluşumları ele alınacaktır.",
-    'Biyoloji': "Bu biyoloji dersinde, hücre yapısı, organeller ve hücresel fonksiyonlar hakkında kapsamlı bilgi edineceksiniz. Hücre zarı, çekirdek, mitokondri gibi yapıların görevleri ve hücre bölünmesi süreçleri anlatılacaktır.",
-    'Tarih': "Bu tarih dersinde, modern Türkiye'nin kuruluş süreci ve Cumhuriyet'in ilanına giden olaylar zincirini öğreneceksiniz. Kurtuluş Savaşı'nın aşamaları, Lozan Antlaşması ve Cumhuriyet'in ilanının önemi detaylı olarak incelenecektir.",
-    'Coğrafya': "Bu coğrafya dersinde, Türkiye'nin fiziki özellikleri, iklimi, bitki örtüsü ve su kaynakları hakkında detaylı bilgi edineceksiniz. Türkiye'nin jeopolitik önemi ve bölgesel farklılıklar üzerinde durulacaktır.",
-    'Felsefe': "Bu felsefe dersinde, varoluşçuluk akımının tarihsel gelişimi, temel kavramları ve önemli temsilcileri incelenecektir. Sartre, Camus ve Kierkegaard gibi filozofların görüşleri ve eserleri ele alınacaktır.",
-    'İngilizce': "Bu İngilizce dersinde, günlük konuşma kalıpları, sık kullanılan ifadeler ve pratik yapma teknikleri öğreneceksiniz. Gerçek yaşam durumlarında kullanabileceğiniz diyalog örnekleri ve telaffuz çalışmaları yapılacaktır.",
-    'Edebiyat': "Bu edebiyat dersinde, şiir analizi teknikleri ve Türk edebiyatındaki önemli şiir akımları incelenecektir. Vezin, kafiye, edebi sanatlar gibi teknik konuların yanı sıra şiirlerin tarihsel ve toplumsal bağlamda yorumlanması ele alınacaktır."
+    'Fizik': "Bu videoda, fiziğin temel prensiplerini ve günlük hayatta nasıl uygulandığını detaylı olarak inceleyeceğiz. Newton'un hareket kanunları, enerji korunumu, momentum ve elektromanyetizma gibi temel kavramları örnekler ve deneylerle açıklayacağız. Konunun daha iyi anlaşılması için günlük hayattan örnekler ve problem çözme teknikleri sunulacaktır.",
+    'Matematik': "Bu matematik dersinde, konuyu temel kavramlardan başlayarak adım adım ilerleyeceğiz. Teorik bilgilerin yanı sıra, pratik uygulamalar ve soru çözüm teknikleri üzerinde duracağız. Konu ile ilgili özel formüller ve çözüm stratejileri detaylı olarak açıklanacak, sık yapılan hatalar ve bunlardan kaçınma yöntemleri üzerinde durulacaktır.",
+    'Kimya': "Bu kimya dersinde, konuyu moleküler düzeyden başlayarak makroskopik ölçeğe kadar inceleyeceğiz. Teorik bilgilerin yanında, laboratuvar uygulamaları ve deneysel süreçler hakkında bilgi verilecek. Günlük hayatta karşılaştığımız kimyasal olaylar üzerinden örneklerle konu pekiştirilecektir.",
+    'Biyoloji': "Bu biyoloji dersinde, canlı sistemleri moleküler, hücresel ve organizma düzeyinde inceleyeceğiz. Görsel materyaller ve animasyonlarla desteklenen derste, teorik bilgilerin yanı sıra pratik uygulamalar ve güncel biyolojik araştırmalardan örnekler paylaşılacaktır.",
+    'Tarih': "Bu tarih dersinde, olayları kronolojik sırayla ve neden-sonuç ilişkileri içinde ele alacağız. Dönemin sosyal, ekonomik ve kültürel yapısını analiz ederek, tarihsel olayların günümüze olan etkilerini inceleyeceğiz. Önemli tarihsel belgeler ve kaynaklar üzerinden konu detaylandırılacaktır.",
+    'Coğrafya': "Bu coğrafya dersinde, fiziki ve beşeri coğrafya konularını güncel veriler ve haritalar eşliğinde inceleyeceğiz. Küresel ve yerel ölçekte coğrafi olayları analiz ederek, insan-çevre etkileşimini ve güncel çevre sorunlarını ele alacağız.",
+    'Felsefe': "Bu felsefe dersinde, düşünce tarihinin önemli akımlarını ve filozofların görüşlerini karşılaştırmalı olarak inceleyeceğiz. Felsefi problemlere yaklaşım yöntemlerini tartışarak, eleştirel düşünme becerilerini geliştirmeye odaklanacağız.",
+    'İngilizce': "Bu İngilizce dersinde, dil becerilerini geliştirmeye yönelik pratik uygulamalar yapacağız. Günlük konuşma kalıpları, akademik dil kullanımı ve iş İngilizcesi örnekleriyle desteklenen derste, telaffuz ve dilbilgisi konularına da değineceğiz.",
+    'Edebiyat': "Bu edebiyat dersinde, edebi metinleri dönemin sosyal ve kültürel bağlamı içinde inceleyeceğiz. Metin analizi teknikleri, edebi sanatlar ve yazım teknikleri üzerinde durarak, öğrencilerin eleştirel okuma ve yazma becerilerini geliştirmeye odaklanacağız."
   };
   
-  return descriptions[subject as keyof typeof descriptions] || "Bu derste konu anlatımı ve örnekler bulacaksınız.";
+  return descriptions[subject] || "Bu derste konu anlatımı ve örnekler bulacaksınız.";
 };
 
-/**
- * Get topic-specific descriptions based on subject and topic
- */
-export const getTopicDescription = (subject: string, topic: string): string => {
-  const topicDescriptions: {[key: string]: {[key: string]: string}} = {
-    'Matematik': {
-      'Fonksiyonlar': "Bu videoda fonksiyonlar konusunu ele alıyoruz. Fonksiyonların tanımı, çeşitleri, grafikleri ve özellikleri detaylı olarak anlatılmaktadır. Bire bir, örten, içine fonksiyonlar ve bunların uygulamaları örneklerle açıklanmaktadır.",
-      'Trigonometri': "Bu videoda trigonometri konusunu ele alıyoruz. Açı ölçüleri, trigonometrik oranlar, sinüs, kosinüs ve tanjant fonksiyonları ve trigonometrik denklemler detaylı olarak incelenmektedir.",
-      'Logaritma': "Bu videoda logaritma konusunu ele alıyoruz. Logaritma tanımı, özellikleri, logaritmik denklemler ve gerçek hayat uygulamaları örneklerle açıklanmaktadır.",
-      'Limit': "Bu videoda limit konusunu ele alıyoruz. Limit kavramı, limit hesaplama yöntemleri, süreklilik ve türev ile bağlantısı detaylı olarak anlatılmaktadır.",
-      'Türev': "Bu videoda türev konusunu ele alıyoruz. Türevin tanımı, geometrik yorumu, türev alma kuralları ve uygulamaları örneklerle açıklanmaktadır.",
-      'İntegral': "Bu videoda integral konusunu ele alıyoruz. Belirsiz ve belirli integraller, integral alma teknikleri ve alan hesaplama uygulamaları detaylı olarak incelenmektedir.",
-      'Olasılık': "Bu videoda olasılık konusunu ele alıyoruz. Olasılık kavramı, bağımlı ve bağımsız olaylar, permütasyon ve kombinasyon uygulamaları örneklerle açıklanmaktadır.",
-      'Polinomlar': "Bu videoda polinomlar konusunu ele alıyoruz. Polinomların tanımı, çarpanlara ayırma, faktöriyel formülleri ve çözüm yöntemleri detaylı olarak anlatılmaktadır.",
-      'Karmaşık Sayılar': "Bu videoda karmaşık sayılar konusunu ele alıyoruz. Karmaşık sayıların tanımı, cebirsel ve trigonometrik formda gösterimi, geometrik yorumu ile ilgili detaylı bilgiler aktarılmaktadır.",
-      'Matrisler': "Bu videoda matrisler konusunu ele alıyoruz. Matrislerin tanımı, türleri, matris işlemleri, determinant hesaplamaları ve lineer denklem sistemlerinde kullanımları detaylı olarak incelenmektedir."
-    },
-    'Fizik': {
-      'Mekanik': "Bu videoda mekanik konusunu ele alıyoruz. Newton'un hareket kanunları, momentum, enerji korunumu ve çarpışmalar detaylı olarak anlatılmaktadır.",
-      'Elektrik': "Bu videoda elektrik konusunu ele alıyoruz. Elektrik yükü, elektrik alan, potansiyel, akım ve direnç kavramları ve devrelerin çalışması detaylı olarak incelenmektedir.",
-      'Manyetizma': "Bu videoda manyetizma konusunu ele alıyoruz. Manyetik alan, manyetik kuvvet ve elektromanyetik indüksiyon olayları örneklerle açıklanmaktadır.",
-      'Optik': "Bu videoda optik konusunu ele alıyoruz. Işığın doğası, yansıma, kırılma, mercekler ve optik araçların çalışma prensipleri detaylı olarak anlatılmaktadır.",
-      'Modern Fizik': "Bu videoda modern fizik konusunu ele alıyoruz. Kuantum mekaniği, görelilik teorisi ve atom fiziğinin temel prensipleri örneklerle açıklanmaktadır.",
-      'Termodinamik': "Bu videoda termodinamik konusunu ele alıyoruz. Isı, sıcaklık, entalpi, entropi kavramları ve termodinamiğin ana yasaları detaylı olarak incelenmektedir.",
-      'Dalgalar': "Bu videoda dalgalar konusunu ele alıyoruz. Dalga çeşitleri, dalga özellikleri, ses dalgaları, elektromanyetik dalgalar ve bunların günlük hayattaki uygulamaları ayrıntılı şekilde anlatılmaktadır.",
-      'Kütle ve Ağırlık': "Bu videoda kütle ve ağırlık konusunu ele alıyoruz. Kütle ve ağırlık arasındaki farklar, yer çekimi, ağırlık merkezi kavramları ve ölçüm yöntemleri detaylı olarak incelenmektedir.",
-      'Basınç ve Kaldırma Kuvveti': "Bu videoda basınç ve kaldırma kuvveti konusunu ele alıyoruz. Pascal prensibi, Arşimet prensibi, basınç ölçümü ve sıvıların kaldırma kuvveti detaylı olarak anlatılmaktadır.",
-      'İş, Güç ve Enerji': "Bu videoda iş, güç ve enerji konularını ele alıyoruz. İş kavramı, güç hesaplamaları, kinetik ve potansiyel enerji, enerji dönüşümleri ve korunumu detaylı olarak incelenmektedir."
-    },
-    'Kimya': {
-      'Atom Yapısı': "Bu videoda atom yapısı konusunu ele alıyoruz. Atomun parçacıkları, elektron dizilimi ve periyodik tablonun yerleşim düzeni detaylı olarak anlatılmaktadır.",
-      'Kimyasal Bağlar': "Bu videoda kimyasal bağlar konusunu ele alıyoruz. İyonik, kovalent ve metalik bağların oluşumu ve özellikleri örneklerle açıklanmaktadır.",
-      'Asitler ve Bazlar': "Bu videoda asitler ve bazlar konusunu ele alıyoruz. Asit-baz tanımları, pH kavramı, nötrleşme tepkimeleri detaylı olarak incelenmektedir.",
-      'Organik Kimya': "Bu videoda organik kimya konusunu ele alıyoruz. Karbon bileşikleri, fonksiyonel gruplar ve organik tepkimeler örneklerle açıklanmaktadır.",
-      'Periyodik Tablo': "Bu videoda periyodik tablo konusunu ele alıyoruz. Periyodik tablonun tarihsel gelişimi, elementlerin gruplanması, periyodik özellikler ve element türleri detaylı olarak anlatılmaktadır.",
-      'Kimyasal Tepkimeler': "Bu videoda kimyasal tepkimeler konusunu ele alıyoruz. Tepkime türleri, denklem denkleştirme, tepkime hızı ve kimyasal denge detaylı olarak incelenmektedir.",
-      'Gazlar': "Bu videoda gazlar konusunu ele alıyoruz. İdeal gaz yasaları, kinetik teori, gaz basıncı, sıcaklık ve hacim ilişkileri detaylı olarak açıklanmaktadır.",
-      'Çözeltiler': "Bu videoda çözeltiler konusunu ele alıyoruz. Çözünürlük, derişim birimleri, koligatif özellikler ve uygulama alanları detaylı olarak incelenmektedir.",
-      'Termokimya': "Bu videoda termokimya konusunu ele alıyoruz. Endotermik ve ekzotermik tepkimeler, enerji değişimleri, entalpi ve Hess Yasası detaylı olarak anlatılmaktadır.",
-      'Elektrokimya': "Bu videoda elektrokimya konusunu ele alıyoruz. Redoks tepkimeleri, elektroliz, galvanik hücreler ve elektrokimyasal uygulamalar detaylı olarak incelenmektedir."
-    },
-    'Biyoloji': {
-      'Hücre': "Bu videoda hücre konusunu ele alıyoruz. Hücre yapısı, organellerin görevleri ve hücre bölünmesi süreçleri detaylı olarak anlatılmaktadır.",
-      'Kalıtım': "Bu videoda kalıtım konusunu ele alıyoruz. Mendel genetiği, DNA yapısı, gen ifadesi ve genetik hastalıklar örneklerle açıklanmaktadır.",
-      'Sinir Sistemi': "Bu videoda sinir sistemi konusunu ele alıyoruz. Sinir hücreleri, impuls iletimi, merkezi ve çevresel sinir sistemi yapıları detaylı olarak incelenmektedir.",
-      'Ekosistemler': "Bu videoda ekosistemler konusunu ele alıyoruz. Enerji akışı, madde döngüleri, popülasyon dinamikleri ve ekolojik denge örneklerle açıklanmaktadır.",
-      'Hücre Bölünmesi': "Bu videoda hücre bölünmesi konusunu ele alıyoruz. Mitoz ve mayoz bölünme aşamaları, farklılıkları ve hücre döngüsünün kontrol mekanizmaları detaylı olarak anlatılmaktadır.",
-      'Solunum': "Bu videoda solunum konusunu ele alıyoruz. Hücresel solunum, aerobik ve anaerobik solunum, solunumun aşamaları ve enerji üretimi detaylı olarak incelenmektedir.",
-      'Dolaşım Sistemi': "Bu videoda dolaşım sistemi konusunu ele alıyoruz. Kalp yapısı, kan damarları, kan bileşenleri ve dolaşım sisteminin çalışma prensibi detaylı olarak anlatılmaktadır.",
-      'Sindirim Sistemi': "Bu videoda sindirim sistemi konusunu ele alıyoruz. Sindirim organlarının yapısı, besinlerin sindirimi, enzimler ve sindirim sistemi hastalıkları detaylı olarak incelenmektedir.",
-      'Fotosentez': "Bu videoda fotosentez konusunu ele alıyoruz. Fotosentezin aşamaları, ışık ve karanlık reaksiyonları, etkileyen faktörler ve fotosentezin önemi detaylı olarak anlatılmaktadır.",
-      'Moleküler Biyoloji': "Bu videoda moleküler biyoloji konusunu ele alıyoruz. DNA replikasyonu, protein sentezi, gen ifadesinin düzenlenmesi ve biyoteknolojik uygulamalar detaylı olarak incelenmektedir."
+import { mockVideos } from '@/services/video/mockData';
+import { Video } from '@/types/video';
+import { GradeLevel } from '@/data/gradeData';
+import { gradeTopics } from '@/data/gradeData';
+
+// Initialize mock videos with course data
+const initializeMockVideos = () => {
+  // Clear any existing videos
+  mockVideos.length = 0;
+  
+  // Define subjects
+  const subjects = [
+    'Tarih', 'Coğrafya', 'Felsefe', 'Matematik', 
+    'Fizik', 'Kimya', 'Biyoloji', 'İngilizce', 'Edebiyat'
+  ];
+  
+  // Available grade levels
+  const grades: GradeLevel[] = [9, 10, 11, 12];
+  
+  // Create videos for each subject and grade
+  let videoId = 1;
+  subjects.forEach(subject => {
+    grades.forEach(grade => {
+      // Get topics for this subject and grade
+      const topics = gradeTopics[subject][grade] || [];
+      
+      // Create videos for each topic
+      topics.forEach((topic, index) => {
+        const video: Video = {
+          id: videoId++,
+          title: `${subject} ${grade}. Sınıf: ${topic}`,
+          thumbnailUrl: `/placeholder.svg`,
+          duration: `${Math.floor(Math.random() * 10) + 10}:${Math.floor(Math.random() * 60).toString().padStart(2, '0')}`,
+          saved: false,
+          subject: subject,
+          grade: grade,
+          description: getSubjectDescription(subject),
+        };
+        
+        mockVideos.push(video);
+      });
+    });
+  });
+};
+
+// Generate video titles based on subject
+const getVideoTitle = (subject: string, index: number) => {
+  const titlesBySubject = {
+    'Tarih': [
+      'Osmanlı İmparatorluğu\'nun Kuruluşu',
+      'Kurtuluş Savaşı ve Cumhuriyet',
+      'İlk Uygarlıklar',
+      'Orta Çağ Tarihi',
+      'Fransız Devrimi',
+      'Sanayi Devrimi'
+    ],
+    'Coğrafya': [
+      'Türkiye\'nin İklimi',
+      'Dünya\'nın Yapısı',
+      'Nüfus ve Yerleşme',
+      'Ekonomik Coğrafya',
+      'Doğal Afetler',
+      'Enerji Kaynakları'
+    ],
+    'Felsefe': [
+      'Felsefeye Giriş',
+      'Bilgi Felsefesi',
+      'Ahlak Felsefesi',
+      'Varlık Felsefesi',
+      'Siyaset Felsefesi',
+      'Din Felsefesi'
+    ],
+    'Matematik': [
+      'Sayılar ve Cebir',
+      'Fonksiyonlar',
+      'Türev Uygulamaları',
+      'İntegral',
+      'Olasılık',
+      'Geometri'
+    ],
+    'Fizik': [
+      'Mekanik',
+      'Elektrik ve Manyetizma',
+      'Termodinamik',
+      'Optik',
+      'Modern Fizik',
+      'Dalgalar'
+    ],
+    'Kimya': [
+      'Maddenin Yapısı',
+      'Periyodik Tablo',
+      'Kimyasal Tepkimeler',
+      'Asitler ve Bazlar',
+      'Organik Kimya',
+      'Kimya ve Enerji'
+    ],
+    'Biyoloji': [
+      'Hücre Yapısı',
+      'Genetik',
+      'Evrim',
+      'Ekosistemler',
+      'İnsan Anatomisi',
+      'Bitki Biyolojisi'
+    ],
+    'İngilizce': [
+      'Temel Gramer',
+      'Zamanlar ve Kullanımları',
+      'Speaking Practice',
+      'Günlük Konuşmalar',
+      'Akademik Yazma',
+      'İş İngilizcesi'
+    ],
+    'Edebiyat': [
+      'Divan Edebiyatı',
+      'Tanzimat Edebiyatı',
+      'Cumhuriyet Dönemi',
+      'Şiir Analizi',
+      'Roman İncelemesi',
+      'Modern Türk Edebiyatı'
+    ]
+  };
+  
+  return titlesBySubject[subject][index - 1] || `${subject} Konusu ${index}`;
+};
+
+// Initialize mock videos on module load
+initializeMockVideos();
+
+// Get all videos for a specific subject
+export const getSubjectVideos = (subject: string): Video[] => {
+  return mockVideos.filter(video => video.subject === subject);
+};
+
+// Get subject videos for a specific grade
+export const getSubjectGradeVideos = (subject: string, grade: GradeLevel): Video[] => {
+  return mockVideos.filter(
+    video => video.subject === subject && video.grade === grade
+  );
+};
+
+// Update mockVideos array and grade topic data
+export const getGradeTopics = (subject: string, grade: number) => {
+  const topicsByGrade = {
+    'Coğrafya': {
+      9: [
+        'Fiziki Coğrafya Temelleri',
+        'İklim Bilgisi ve İklim Değişikliği',
+        'Ekosistemler ve Biyoçeşitlilik',
+        'Yerleşme Coğrafyası',
+        'Doğal Kaynaklar ve Sürdürülebilirlik',
+        'Afetler ve Yönetimi'
+      ],
+      10: [
+        'Dünya\'nın Tektonik Yapısı',
+        'İklim Sistemleri ve Değişim',
+        'Nüfus ve Göç Politikaları',
+        'Küresel Ekonomi Dinamikleri',
+        'Enerji Kaynakları ve Dağılımı',
+        'Çevre Sorunları ve Çözümleri'
+      ],
+      11: [
+        'Bölgesel Kalkınma Stratejileri',
+        'Ulaşım Sistemleri ve Ağları',
+        'Uluslararası Ticaret ve Ekonomi',
+        'Doğal Kaynak Yönetim Politikaları',
+        'Kent Ekolojisi ve Sürdürülebilir Şehirler',
+        'Küresel Çevre Sorunlarının Analizi'
+      ],
+      12: [
+        'Türkiye\'nin Jeomorfolojik Özellikleri',
+        'Türkiye\'nin İklim Bölgeleri',
+        'Türkiye\'nin Demografik Yapısı',
+        'Türkiye Ekonomi Coğrafyası',
+        'Türkiye\'nin Turizm Potansiyeli',
+        'Türkiye\'nin Çevre Politikaları ve Uygulamaları'
+      ]
     },
     'Tarih': {
-      'Osmanlı İmparatorluğu': "Bu videoda Osmanlı İmparatorluğu konusunu ele alıyoruz. Kuruluş, yükseliş ve gerileme dönemleri, önemli padişahlar ve siyasi olaylar detaylı olarak anlatılmaktadır.",
-      'Türkiye Cumhuriyeti': "Bu videoda Türkiye Cumhuriyeti'nin kuruluş sürecini ele alıyoruz. Kurtuluş Savaşı, Lozan Antlaşması ve Cumhuriyet'in ilanı örneklerle açıklanmaktadır.",
-      'İnkılap Tarihi': "Bu videoda İnkılap Tarihi konusunu ele alıyoruz. Türk inkılabının temel ilkeleri, yapılan reformlar ve çağdaşlaşma süreci detaylı olarak incelenmektedir.",
-      'Orta Çağ Tarihi': "Bu videoda Orta Çağ tarihi konusunu ele alıyoruz. Feodalizm, Haçlı Seferleri, İslamiyet'in yayılışı ve Orta Çağ'da bilim ve kültür detaylı olarak anlatılmaktadır.",
-      'İlk Çağ Uygarlıkları': "Bu videoda İlk Çağ uygarlıkları konusunu ele alıyoruz. Mezopotamya, Mısır, Hitit, Yunan ve Roma uygarlıkları ve bu uygarlıkların kültürel mirasları detaylı olarak incelenmektedir.",
-      'Dünya Savaşları': "Bu videoda Dünya Savaşları konusunu ele alıyoruz. Birinci ve İkinci Dünya Savaşları'nın nedenleri, gelişimi, sonuçları ve dünya üzerindeki etkileri detaylı olarak anlatılmaktadır.",
-      'Soğuk Savaş Dönemi': "Bu videoda Soğuk Savaş dönemini ele alıyoruz. ABD ve SSCB arasındaki rekabet, bloklaşma, NATO ve Varşova Paktı, krizler ve detantın gelişimi detaylı olarak incelenmektedir.",
-      'Türk İslam Tarihi': "Bu videoda Türk İslam tarihi konusunu ele alıyoruz. İslamiyet öncesi Türk devletleri, İslamiyet'in kabulü, Selçuklular ve diğer Türk İslam devletleri detaylı olarak anlatılmaktadır.",
-      "Türklerin Anadoluya Gelişi": "Bu videoda Türklerin Anadoluya gelişini ele alıyoruz. Malazgirt Savaşı, Anadolu Selçuklu Devleti, beylikler dönemi ve Osmanlı'nın kuruluşu detaylı olarak incelenmektedir.",
-      'Yakın Çağ Tarihi': "Bu videoda Yakın Çağ tarihi konusunu ele alıyoruz. Sanayi Devrimi, Fransız İhtilali, milliyetçilik hareketleri ve bu olayların dünya üzerindeki etkileri detaylı olarak anlatılmaktadır."
-    },
-    'Coğrafya': {
-      'Türkiye Fiziki Coğrafyası': "Bu videoda Türkiye'nin fiziki coğrafyası konusunu ele alıyoruz. Dağlar, ovalar, platolar, akarsular ve iklim özellikleri detaylı olarak incelenmektedir.",
-      'İklim Bilgisi': "Bu videoda iklim bilgisi konusunu ele alıyoruz. İklim tipleri, iklim elemanları, basınç sistemleri ve iklim değişikliği detaylı olarak anlatılmaktadır.",
-      'Nüfus ve Yerleşme': "Bu videoda nüfus ve yerleşme konusunu ele alıyoruz. Nüfus artışı, nüfus dağılışı, göçler, kentleşme ve yerleşme tipleri detaylı olarak incelenmektedir.",
-      'Ekonomik Faaliyetler': "Bu videoda ekonomik faaliyetler konusunu ele alıyoruz. Tarım, hayvancılık, sanayi, madencilik, ticaret ve turizm faaliyetleri detaylı olarak anlatılmaktadır.",
-      'Doğal Afetler': "Bu videoda doğal afetler konusunu ele alıyoruz. Depremler, volkanik patlamalar, tsunami, sel, heyelan ve kuraklık gibi doğal afetlerin oluşumu ve etkileri detaylı olarak incelenmektedir.",
-      "Dünyanın Şekli ve Hareketleri": "Bu videoda Dünyanın şekli ve hareketleri konusunu ele alıyoruz. Dünyanın günlük ve yıllık hareketleri, sonuçları ve mevsimler detaylı olarak anlatılmaktadır.",
-      'Harita Bilgisi': "Bu videoda harita bilgisi konusunu ele alıyoruz. Harita çeşitleri, ölçek, projeksiyon, koordinat sistemleri ve harita okuma teknikleri detaylı olarak incelenmektedir.",
-      'Kıtalar ve Okyanuslar': "Bu videoda kıtalar ve okyanuslar konusunu ele alıyoruz. Dünyanın büyük kara parçaları ve su kütleleri, özellikleri ve önemi detaylı olarak anlatılmaktadır.",
-      'Toprak Bilgisi': "Bu videoda toprak bilgisi konusunu ele alıyoruz. Toprak oluşumu, toprak türleri, toprak erozyonu ve toprak koruması konuları detaylı olarak incelenmektedir.",
-      "Türkiyenin Beşeri Coğrafyası": "Bu videoda Türkiyenin beşeri coğrafyası konusunu ele alıyoruz. Nüfus özellikleri, yerleşme tipleri, ekonomik faaliyetler ve kültürel çeşitlilik detaylı olarak anlatılmaktadır."
+      9: [
+        'İlk Çağ Medeniyetleri',
+        'Orta Çağ Avrupa Tarihi',
+        'Türklerin İslamiyet\'i Kabulü',
+        'Osmanlı Devleti Kuruluş Dönemi',
+        'Coğrafi Keşifler ve Rönesans',
+        'Reform ve Aydınlanma Çağı'
+      ],
+      10: [
+        'Osmanlı Devleti Yükselme Dönemi',
+        'Avrupa\'da Devletlerarası İlişkiler',
+        'Osmanlı Devleti Duraklama Dönemi',
+        'Yeni Çağ Avrupa Tarihi',
+        'Osmanlı Devleti Gerileme Dönemi',
+        'Yakın Çağ Avrupa Tarihi'
+      ],
+      11: [
+        'Osmanlı Devleti Dağılma Dönemi',
+        'XX. Yüzyıl Başlarında Dünya',
+        'I. Dünya Savaşı',
+        'Kurtuluş Savaşı Hazırlık Dönemi',
+        'Kurtuluş Savaşı Muharebeler Dönemi',
+        'Türkiye Cumhuriyeti Kuruluş Dönemi'
+      ],
+      12: [
+        'Atatürk İlke ve İnkılapları',
+        'II. Dünya Savaşı',
+        'Soğuk Savaş Dönemi',
+        'Küreselleşme ve Türkiye',
+        'Uluslararası Kuruluşlar',
+        'XXI. Yüzyılda Türkiye ve Dünya'
+      ]
     },
     'Felsefe': {
-      'Varlık Felsefesi': "Bu videoda varlık felsefesi konusunu ele alıyoruz. Ontolojinin temel kavramları, varlık türleri, varlık problemleri ve farklı düşünürlerin varlık görüşleri detaylı olarak anlatılmaktadır.",
-      'Bilgi Felsefesi': "Bu videoda bilgi felsefesi konusunu ele alıyoruz. Epistemolojinin temel kavramları, bilginin kaynağı, doğruluğu ve sınırları detaylı olarak incelenmektedir.",
-      'Ahlak Felsefesi': "Bu videoda ahlak felsefesi konusunu ele alıyoruz. Etik teoriler, ahlaki değerler, özgürlük ve sorumluluk kavramları detaylı olarak anlatılmaktadır.",
-      'Siyaset Felsefesi': "Bu videoda siyaset felsefesi konusunu ele alıyoruz. Devlet teorileri, siyasi sistemler, adalet kavramı ve ideal toplum tartışmaları detaylı olarak incelenmektedir.",
-      'Sanat Felsefesi': "Bu videoda sanat felsefesi konusunu ele alıyoruz. Estetik, güzellik kavramı, sanat eserinin değeri ve sanat türleri detaylı olarak anlatılmaktadır.",
-      'Mantık': "Bu videoda mantık konusunu ele alıyoruz. Mantığın temelleri, akıl yürütme biçimleri, sembolik mantık ve mantık hataları detaylı olarak incelenmektedir.",
-      'Felsefeye Giriş': "Bu videoda felsefeye giriş konusunu ele alıyoruz. Felsefenin anlamı, doğuşu, temel soruları ve diğer disiplinlerle ilişkisi detaylı olarak anlatılmaktadır.",
-      'İslam Felsefesi': "Bu videoda İslam felsefesi konusunu ele alıyoruz. İslam felsefesinin kaynakları, önemli İslam filozofları, Meşşailik ve İşrakilik akımları detaylı olarak anlatılmaktadır.",
-      'Türk İslam Düşüncesi': "Bu videoda Türk İslam düşüncesi konusunu ele alıyoruz. Türk İslam düşünürlerinin görüşleri, Ahmet Yesevi, Yunus Emre ve Mevlana'nın fikirleri detaylı olarak anlatılmaktadır.",
-      'Çağdaş Felsefe': "Bu videoda çağdaş felsefe konusunu ele alıyoruz. Varoluşçuluk, fenomenoloji, postyapısalcılık ve postmodernizm gibi çağdaş felsefe akımları detaylı olarak incelenmektedir."
+      9: [
+        'Felsefenin Anlamı ve Kapsamı',
+        'Bilgi Felsefesi (Epistemoloji)',
+        'Varlık Felsefesi (Ontoloji)',
+        'Ahlak Felsefesi (Etik)',
+        'Siyaset Felsefesi',
+        'Sanat Felsefesi (Estetik)'
+      ],
+      10: [
+        'İlk Çağ Felsefesi',
+        'Orta Çağ Felsefesi',
+        'Rönesans Felsefesi',
+        'Aydınlanma Felsefesi',
+        '18.-19. Yüzyıl Felsefesi',
+        '20. Yüzyıl Felsefesi'
+      ],
+      11: [
+        'Bilim Felsefesi',
+        'Din Felsefesi',
+        'Hukuk Felsefesi',
+        'Eğitim Felsefesi',
+        'Teknoloji Felsefesi',
+        'Çevre Felsefesi'
+      ],
+      12: [
+        'Varoluşçuluk',
+        'Pozitivizm',
+        'Marksizm',
+        'Pragmatizm',
+        'Feminist Felsefe',
+        'Postmodernizm'
+      ]
+    },
+    'Matematik': {
+      9: [
+        'Sayılar ve Cebir',
+        'Kümeler',
+        'Denklemler ve Eşitsizlikler',
+        'Oran ve Orantı',
+        'Yüzdeler',
+        'Geometriye Giriş'
+      ],
+      10: [
+        'Fonksiyonlar',
+        'Polinomlar',
+        'Çarpanlara Ayırma',
+        'Rasyonel İfadeler',
+        'Köklü İfadeler',
+        'Trigonometriye Giriş'
+      ],
+      11: [
+        'Trigonometri',
+        'Logaritma',
+        'Diziler',
+        'Seriler',
+        'Limit ve Süreklilik',
+        'Türevin Temel Kavramları'
+      ],
+      12: [
+        'Türev Uygulamaları',
+        'İntegral',
+        'Olasılık',
+        'İstatistik',
+        'Analitik Geometri',
+        'Karmaşık Sayılar'
+      ]
+    },
+    'Fizik': {
+      9: [
+        'Fizik Bilimine Giriş',
+        'Madde ve Özellikleri',
+        'Kuvvet ve Hareket',
+        'Enerji',
+        'Isı ve Sıcaklık',
+        'Optik'
+      ],
+      10: [
+        'Elektrik',
+        'Manyetizma',
+        'Dalgalar',
+        'Ses',
+        'Basınç',
+        'Kaldırma Kuvveti'
+      ],
+      11: [
+        'Dinamik',
+        'İş, Güç ve Enerji',
+        'Momentum',
+        'Tork',
+        'Denge',
+        'Basit Makineler'
+      ],
+      12: [
+        'Atom Fiziği',
+        'Nükleer Fizik',
+        'Modern Fizik',
+        'Görecelilik',
+        'Kuantum Fiziği',
+        'Astrofizik'
+      ]
+    },
+    'Kimya': {
+      9: [
+        'Kimya Bilimine Giriş',
+        'Maddenin Halleri',
+        'Atom ve Periyodik Sistem',
+        'Kimyasal Türler Arası Etkileşimler',
+        'Kimyasal Hesaplamalar',
+        'Asitler ve Bazlar'
+      ],
+      10: [
+        'Kimyasal Tepkimeler',
+        'Çözeltiler',
+        'Kimyasal Kinetik',
+        'Kimyasal Denge',
+        'Termokimya',
+        'Elektrokimya'
+      ],
+      11: [
+        'Organik Kimyaya Giriş',
+        'Alkanlar',
+        'Alkenler',
+        'Alkinler',
+        'Alkoller',
+        'Eterler'
+      ],
+      12: [
+        'Aldehitler ve Ketonlar',
+        'Karboksilik Asitler',
+        'Esterler',
+        'Aminler',
+        'Amidler',
+        'Polimerler'
+      ]
+    },
+    'Biyoloji': {
+      9: [
+        'Biyoloji Bilimine Giriş',
+        'Hücre',
+        'Canlıların Sınıflandırılması',
+        'Ekoloji',
+        'Genetik',
+        'Evrim'
+      ],
+      10: [
+        'Canlıların Yapısı',
+        'Enzimler',
+        'Fotosentez',
+        'Solunum',
+        'Boşaltım',
+        'Sinir Sistemi'
+      ],
+      11: [
+        'Endokrin Sistem',
+        'Duyu Organları',
+        'Destek ve Hareket Sistemi',
+        'Sindirim Sistemi',
+        'Dolaşım Sistemi',
+        'Bağışıklık Sistemi'
+      ],
+      12: [
+        'Üreme Sistemi',
+        'Embriyonik Gelişim',
+        'Genetik Mühendisliği',
+        'Biyoteknoloji',
+        'Nörobiyoloji',
+        'Davranış Biyolojisi'
+      ]
     },
     'İngilizce': {
-      'Temel Gramer': "Bu videoda temel İngilizce gramer konusunu ele alıyoruz. Zamirler, isimler, sıfatlar, zarflar ve temel cümle yapıları detaylı olarak anlatılmaktadır.",
-      'Zamanlar': "Bu videoda İngilizcede zaman yapıları konusunu ele alıyoruz. Simple Present, Present Continuous, Present Perfect ve diğer zaman yapıları detaylı olarak incelenmektedir.",
-      'Okuma Becerileri': "Bu videoda İngilizce okuma becerileri konusunu ele alıyoruz. Metin okuma stratejileri, anlama teknikleri ve kelime bilgisini geliştirme yöntemleri detaylı olarak anlatılmaktadır.",
-      'Yazma Becerileri': "Bu videoda İngilizce yazma becerileri konusunu ele alıyoruz. Paragraf yazma, kompozisyon oluşturma ve farklı yazı türleri detaylı olarak incelenmektedir.",
-      'Konuşma Becerileri': "Bu videoda İngilizce konuşma becerileri konusunu ele alıyoruz. Günlük konuşma kalıpları, telaffuz çalışmaları ve akıcı konuşma teknikleri detaylı olarak anlatılmaktadır.",
-      'Dinleme Becerileri': "Bu videoda İngilizce dinleme becerileri konusunu ele alıyoruz. Ana fikri bulma, detayları yakalama ve not alma teknikleri detaylı olarak incelenmektedir.",
-      'Kelime Bilgisi': "Bu videoda İngilizce kelime bilgisi konusunu ele alıyoruz. Kelime öğrenme stratejileri, kelime aileleri ve bağlamdan anlam çıkarma teknikleri detaylı olarak anlatılmaktadır.",
-      'Dilbilgisi': "Bu videoda İngilizce dilbilgisi konusunu ele alıyoruz. Karmaşık cümle yapıları, koşul cümleleri, dolaylı anlatım ve pasif yapı detaylı olarak incelenmektedir.",
-      'İletişimsel İngilizce': "Bu videoda iletişimsel İngilizce konusunu ele alıyoruz. Sosyal ortamlarda kullanılan ifadeler, diyaloglar ve kültürel öğeler detaylı olarak anlatılmaktadır.",
-      'Akademik İngilizce': "Bu videoda akademik İngilizce konusunu ele alıyoruz. Akademik yazı türleri, sunum yapma teknikleri ve akademik ortamlarda kullanılan dil özellikleri detaylı olarak incelenmektedir."
+      9: [
+        'Greetings and Introductions',
+        'Daily Routines',
+        'Family and Friends',
+        'Describing People',
+        'Likes and Dislikes',
+        'Hobbies and Interests'
+      ],
+      10: [
+        'Past Simple Tense',
+        'Past Continuous Tense',
+        'Used To',
+        'Present Perfect Tense',
+        'Present Perfect Continuous Tense',
+        'Future Tenses'
+      ],
+      11: [
+        'Conditional Sentences',
+        'Relative Clauses',
+        'Passive Voice',
+        'Reported Speech',
+        'Modal Verbs',
+        'Phrasal Verbs'
+      ],
+      12: [
+        'Advanced Grammar Structures',
+        'Essay Writing',
+        'Reading Comprehension',
+        'Listening Comprehension',
+        'Speaking Practice',
+        'Vocabulary Building'
+      ]
     },
     'Edebiyat': {
-      'Şiir': "Bu videoda şiir konusunu ele alıyoruz. Şiirin unsurları, edebi sanatlar, vezin, kafiye ve şiir türleri detaylı olarak anlatılmaktadır.",
-      'Roman': "Bu videoda roman konusunu ele alıyoruz. Roman unsurları, roman türleri, roman tahlili ve Türk ve dünya edebiyatından önemli romanlar detaylı olarak incelenmektedir.",
-      'Halk Edebiyatı': "Bu videoda halk edebiyatı konusunu ele alıyoruz. Halk şiiri, halk hikâyeleri, destanlar ve anonim edebi ürünler detaylı olarak anlatılmaktadır.",
-      'Divan Edebiyatı': "Bu videoda divan edebiyatı konusunu ele alıyoruz. Divan şiiri özellikleri, nazım şekilleri, mazmunlar ve önemli divan şairleri detaylı olarak anlatılmaktadır.",
-      'Tanzimat Edebiyatı': "Bu videoda Tanzimat edebiyatı konusunu ele alıyoruz. Tanzimat döneminin tarihsel arka planı, Tanzimat edebiyatının özellikleri ve önemli temsilcileri detaylı olarak anlatılmaktadır.",
-      'Servet-i Fünun Edebiyatı': "Bu videoda Servet-i Fünun edebiyatı konusunu ele alıyoruz. Dönemin edebi anlayışı, dil özellikleri ve önemli temsilcileri detaylı olarak anlatılmaktadır.",
-      'Milli Edebiyat': "Bu videoda Milli Edebiyat konusunu ele alıyoruz. Dönemin siyasi ve toplumsal arka planı, edebi anlayışı ve önemli temsilcileri detaylı olarak anlatılmaktadır.",
-      'Cumhuriyet Dönemi Edebiyatı': "Bu videoda Cumhuriyet Dönemi Edebiyatı konusunu ele alıyoruz. Dönemin edebi anlayışı, önemli edebi akımlar ve önemli yazarlar detaylı olarak incelenmektedir.",
-      'Dünya Edebiyatı': "Bu videoda Dünya Edebiyatı konusunu ele alıyoruz. Farklı ülke edebiyatlarından önemli eserler, akımlar ve yazarlar detaylı olarak anlatılmaktadır.",
-      'Edebi Akımlar': "Bu videoda edebi akımlar konusunu ele alıyoruz. Klasizm, romantizm, realizm, natüralizm, modernizm ve postmodernizm gibi akımların özellikleri detaylı olarak incelenmektedir."
+      9: [
+        'Edebiyatın Tanımı ve Kapsamı',
+        'Söz Sanatları',
+        'Şiir Bilgisi',
+        'Düz Yazı Türleri',
+        'Tiyatro',
+        'Halk Edebiyatı'
+      ],
+      10: [
+        'Divan Edebiyatı',
+        'Tanzimat Edebiyatı',
+        'Servet-i Fünun Edebiyatı',
+        'Milli Edebiyat',
+        'Cumhuriyet Dönemi Edebiyatı',
+        'Dünya Edebiyatı'
+      ],
+      11: [
+        'Şiir İncelemesi',
+        'Roman İncelemesi',
+        'Hikaye İncelemesi',
+        'Tiyatro İncelemesi',
+        'Deneme İncelemesi',
+        'Makale İncelemesi'
+      ],
+      12: [
+        'Edebi Akımlar',
+        'Postmodern Edebiyat',
+        'Çağdaş Türk Edebiyatı',
+        'Edebiyat ve Toplum',
+        'Edebiyat ve Psikoloji',
+        'Edebiyat ve Felsefe'
+      ]
     }
   };
   
-  if (!topicDescriptions[subject] || !topicDescriptions[subject][topic]) {
-    return getSubjectDescription(subject);
-  }
-  
-  return topicDescriptions[subject][topic];
+  return topicsByGrade[subject]?.[grade] || [];
 };
 
-/**
- * Get subject-specific examples based on subject name
- */
+// Generate examples for each subject and topic
 export const getSubjectExamples = (subject: string) => {
-  const examplesBySubject: {[key: string]: any[]} = {
+  const examplesBySubject = {
+    'Coğrafya': [
+      {
+        question: "Türkiye'nin iklim özelliklerini etkileyen faktörlerden hangisi en belirleyicidir?",
+        options: ["Yükselti", "Denizlere göre konum", "Enlem", "Bitki örtüsü"],
+        answer: "Denizlere göre konum",
+        explanation: "Türkiye'nin üç tarafının denizlerle çevrili olması, kıyı kesimlerde ılıman iklim özelliklerinin görülmesine neden olur. Bu durum özellikle sıcaklık ve yağış rejimini etkiler."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Akdeniz ikliminin özelliklerinden değildir?",
+        options: ["Yazları sıcak ve kurak", "Kışları ılık ve yağışlı", "Her mevsim yağışlı", "Maki bitki örtüsü"],
+        answer: "Her mevsim yağışlı",
+        explanation: "Akdeniz ikliminde yazlar sıcak ve kurak, kışlar ılık ve yağışlı geçer. Her mevsim yağışlı olma özelliği Karadeniz iklimine aittir."
+      },
+      {
+        question: "İç Anadolu Bölgesi'nde step (bozkır) bitki örtüsünün yaygın olmasının temel nedeni nedir?",
+        options: ["Yükselti", "Yağış azlığı", "Toprak yapısı", "Rüzgar"],
+        answer: "Yağış azlığı",
+        explanation: "İç Anadolu'da yıllık yağış miktarının az olması (300-400 mm) ve yağışın mevsimlere dağılışındaki düzensizlik, step bitki örtüsünün oluşmasına neden olur."
+      },
+      {
+        question: "Türkiye'nin en yüksek dağı hangisidir?",
+        options: ["Erciyes", "Ağrı Dağı", "Uludağ", "Kaçkar Dağı"],
+        answer: "Ağrı Dağı",
+        explanation: "Türkiye'nin en yüksek dağı 5137 metre ile Ağrı Dağı'dır. Volkanik bir dağ olan Ağrı Dağı, Doğu Anadolu Bölgesi'nde yer alır."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bir akarsu aşındırma şekli değildir?",
+        options: ["Kanyon", "Delta", "Menderes", "Çağlayan"],
+        answer: "Delta",
+        explanation: "Delta, akarsuların taşıdığı alüvyonları deniz veya göl kıyısında biriktirmesiyle oluşan bir birikim şeklidir. Kanyon, menderes ve çağlayan aşındırma şekilleridir."
+      },
+      {
+        question: "Türkiye'nin en büyük gölü hangisidir?",
+        options: ["Beyşehir Gölü", "Tuz Gölü", "İznik Gölü", "Van Gölü"],
+        answer: "Van Gölü",
+        explanation: "Türkiye'nin en büyük gölü, 3713 km² yüzölçümüyle Van Gölü'dür. Sodalı bir göl olan Van Gölü tektonik kökenlidir ve Doğu Anadolu Bölgesi'nde yer alır."
+      }
+    ],
     'Fizik': [
       {
         question: "Bir cisim 10 m/s hızla hareket ederken, 5 saniye boyunca 2 m/s² sabit ivme ile hızlanıyor. Son hızı nedir?",
@@ -238,22 +531,22 @@ export const getSubjectExamples = (subject: string) => {
         explanation: "h = (1/2)gt² formülünü kullanarak: 20 m = (1/2) × 10 m/s² × t², t² = 4, t = 2 s"
       },
       {
-        question: "Periyodu 0.5 saniye olan bir sarkacın frekansı nedir?",
-        options: ["0.5 Hz", "1 Hz", "2 Hz", "4 Hz"],
-        answer: "2 Hz",
-        explanation: "Frekans = 1/Periyot, f = 1/0.5 = 2 Hz"
+        question: "1 kilowatt-saat kaç joule enerjiye eşittir?",
+        options: ["3600 J", "36000 J", "360000 J", "3600000 J"],
+        answer: "3600000 J",
+        explanation: "1 kWh = 1000 W × 3600 s = 3600000 J"
       },
       {
-        question: "120 W gücünde çalışan bir elektrikli cihaz 2 saat çalıştırıldığında kaç joule enerji harcar?",
-        options: ["60 J", "240 J", "7200 J", "864.000 J"],
-        answer: "864.000 J",
-        explanation: "E = P × t = 120 W × 2 saat × 3600 s/saat = 120 × 7200 = 864.000 J"
+        question: "Paralel bağlı dirençlerin eşdeğer direnci için aşağıdakilerden hangisi doğrudur?",
+        options: ["Her zaman en büyük dirençten küçüktür", "Her zaman en küçük dirençten büyüktür", "Dirençlerin toplamından büyüktür", "Dirençlerin çarpımına eşittir"],
+        answer: "Her zaman en küçük dirençten küçüktür",
+        explanation: "Paralel bağlı dirençlerde eşdeğer direnç her zaman devredeki en küçük dirençten daha küçüktür. 1/Req = 1/R1 + 1/R2 + ... + 1/Rn formülüne göre hesaplanır."
       },
       {
-        question: "Sürtünmesiz bir yüzeyde durmakta olan 4 kg kütleli bir cisme 20 N'luk kuvvet 10 saniye boyunca uygulanıyor. Cisim bu süre sonunda kaç metre yol almış olur?",
-        options: ["50 m", "100 m", "250 m", "500 m"],
-        answer: "250 m",
-        explanation: "F = ma, a = F/m = 20/4 = 5 m/s². x = (1/2)at² = 0.5 × 5 × 10² = 0.5 × 5 × 100 = 250 m"
+        question: "Elektromanyetik dalgalar için aşağıdakilerden hangisi doğru değildir?",
+        options: ["Boşlukta ışık hızıyla yayılırlar", "Enerjileri frekansları ile doğru orantılıdır", "Yayılmak için maddesel ortama ihtiyaç duyarlar", "Hem elektrik hem manyetik alan içerirler"],
+        answer: "Yayılmak için maddesel ortama ihtiyaç duyarlar",
+        explanation: "Elektromanyetik dalgalar boşlukta yayılabilirler, maddesel ortama ihtiyaç duymazlar. Bu yüzden güneşten gelen ışık, boşlukta yayılarak dünyaya ulaşabilir."
       }
     ],
     'Matematik': [
@@ -276,22 +569,22 @@ export const getSubjectExamples = (subject: string) => {
         explanation: "log₂(8) = log₂(2³) = 3"
       },
       {
-        question: "3x² - 12x + 9 ifadesinin çarpanlarına ayrılmış hali nedir?",
-        options: ["3(x - 1)²", "3(x - 2)²", "3(x² - 4x + 3)", "(3x - 3)²"],
-        answer: "3(x - 2)²",
-        explanation: "3x² - 12x + 9 = 3(x² - 4x + 3) = 3(x² - 4x + 4 - 1) = 3((x - 2)² - 1 + 1) = 3(x - 2)²"
+        question: "f(x) = 3x² - 12x + 5 fonksiyonunun türevi nedir?",
+        options: ["f'(x) = 6x - 12", "f'(x) = 3x - 12", "f'(x) = 6x² - 12", "f'(x) = 3x² - 12"],
+        answer: "f'(x) = 6x - 12",
+        explanation: "f(x) = 3x² - 12x + 5 fonksiyonunun türevi f'(x) = 6x - 12 olur. x² teriminin türevi 2x, sabit terimin türevi ise 0'dır."
       },
       {
-        question: "sin(30°) + cos(60°) değeri nedir?",
-        options: ["0.5", "1", "1.5", "2"],
-        answer: "1",
-        explanation: "sin(30°) = 0.5 ve cos(60°) = 0.5, toplam = 0.5 + 0.5 = 1"
+        question: "∫(2x + 3)dx ifadesinin belirsiz integrali nedir?",
+        options: ["x² + 3x + C", "x² + 3x", "2x² + 3x + C", "x² + 3 + C"],
+        answer: "x² + 3x + C",
+        explanation: "∫(2x + 3)dx = ∫2xdx + ∫3dx = 2∫xdx + 3∫dx = 2(x²/2) + 3x + C = x² + 3x + C"
       },
       {
-        question: "f(x) = x² + 2x ve g(x) = 3x - 1 fonksiyonları için f(g(2)) değeri nedir?",
-        options: ["34", "35", "36", "37"],
-        answer: "35",
-        explanation: "g(2) = 3(2) - 1 = 6 - 1 = 5, f(g(2)) = f(5) = 5² + 2(5) = 25 + 10 = 35"
+        question: "Bir ürünün fiyatı %20 zamlandıktan sonra %10 indirim yapılıyor. Bu ürünün fiyatında net değişim yüzdesi nedir?",
+        options: ["%10 artış", "%10 azalış", "%8 artış", "%12 azalış"],
+        answer: "%8 artış",
+        explanation: "Başlangıç fiyatını 100 birim kabul edelim. %20 zam sonrası 120 birim olur. %10 indirim sonrası 120 × 0,9 = 108 birim olur. Net değişim: (108-100)/100 = 0,08 = %8 artış"
       }
     ],
     'Kimya': [
@@ -314,142 +607,212 @@ export const getSubjectExamples = (subject: string) => {
         explanation: "Bu tepkimede Zn elektronu Cu'ya vererek yükseltgeniyor (Zn⁰ → Zn²⁺ + 2e⁻), Cu ise elektron alarak indirgeniyor (Cu²⁺ + 2e⁻ → Cu⁰)."
       },
       {
-        question: "Atomun çekirdeğinde bulunan parçacıklar hangileridir?",
-        options: ["Proton ve elektron", "Nötron ve elektron", "Proton ve nötron", "Proton, nötron ve elektron"],
-        answer: "Proton ve nötron",
-        explanation: "Atom çekirdeğinde proton ve nötron bulunur, elektronlar ise çekirdeğin etrafındaki katmanlarda yer alır."
+        question: "Aşağıdaki elementlerden hangisi bir metaldir?",
+        options: ["Cl", "S", "P", "Na"],
+        answer: "Na",
+        explanation: "Na (Sodyum) bir alkali metaldir. Cl (Klor), S (Kükürt) ve P (Fosfor) ametaller grubunda yer alır."
       },
       {
-        question: "pH değeri 3 olan bir çözelti, pH değeri 6 olan bir çözeltiden kaç kat daha asidiktir?",
-        options: ["2 kat", "3 kat", "100 kat", "1000 kat"],
-        answer: "1000 kat",
-        explanation: "pH skalası logaritmiktir. pH'daki her birim değişim, asitlik/bazlık konsantrasyonunda 10 katlık değişim anlamına gelir. 6-3 = 3 birim fark olduğundan, 10³ = 1000 kat daha asidiktir."
+        question: "pH değeri 3 olan bir çözeltinin H⁺ iyon derişimi nedir?",
+        options: ["3 M", "0.3 M", "0.001 M", "0.03 M"],
+        answer: "0.001 M",
+        explanation: "pH = -log[H⁺], pH = 3 ise [H⁺] = 10^(-3) M = 0.001 M olur."
       },
       {
-        question: "Aşağıdakilerden hangisi bir amfoter oksittir?",
-        options: ["Na₂O", "CO₂", "Al₂O₃", "MgO"],
-        answer: "Al₂O₃",
-        explanation: "Amfoter oksitler hem asitlerle hem de bazlarla tepkimeye girebilen oksitlerdir. Alüminyum oksit (Al₂O₃) amfoter özellik gösterir."
+        question: "Aşağıdakilerden hangisi bir izotop örneğidir?",
+        options: ["C-O", "H-Cl", "C-12 ve C-14", "O-N"],
+        answer: "C-12 ve C-14",
+        explanation: "İzotoplar, aynı elementin farklı nötron sayısına sahip atomlarıdır. C-12 ve C-14, karbon elementinin farklı izotoplarıdır."
       }
     ],
     'Biyoloji': [
       {
-        question: "Hücre yapısı hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Hücre yapısı hakkında kapsamlı bilgi edineceksiniz."
+        question: "Hücre zarının yapısını açıklayan model hangisidir?",
+        options: ["Akışkan Mozaik Model", "Elektron Transpor Zinciri", "Endosimbiyont Teori", "Santral Dogma"],
+        answer: "Akışkan Mozaik Model",
+        explanation: "Akışkan Mozaik Model, Singer ve Nicolson tarafından önerilen ve hücre zarının yapısını açıklayan modeldir. Fosfolipid çift tabaka içerisinde protein moleküllerinin hareket halinde olduğunu belirtir."
       },
       {
-        question: "Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz."
+        question: "Mitokondri organelinin esas görevi nedir?",
+        options: ["Protein sentezi", "Hücre sindirim", "ATP üretimi", "DNA replikasyonu"],
+        answer: "ATP üretimi",
+        explanation: "Mitokondriler, oksijenli solunum yoluyla hücre için enerji (ATP) üreten organellerdir. Bu nedenle hücrenin enerji santrali olarak bilinirler."
       },
       {
-        question: "Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz."
+        question: "DNA'nın ana bileşenleri nelerdir?",
+        options: ["Amino asitler ve proteinler", "Şeker, fosfat grubu ve bazlar", "Nükleotidler ve yağ asitleri", "RNA ve ribozomlar"],
+        answer: "Şeker, fosfat grubu ve bazlar",
+        explanation: "DNA molekülü, deoksiriboz şekeri, fosfat grupları ve azotlu organik bazlardan (adenin, guanin, sitozin, timin) oluşur."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bitkilerle hayvanlarda ortak olarak bulunan hücre organeli değildir?",
+        options: ["Mitokondri", "Ribozom", "Kloroplast", "Endoplazmik retikulum"],
+        answer: "Kloroplast",
+        explanation: "Kloroplast sadece bitki ve bazı alg hücrelerinde bulunan, fotosentez yapan organelidir. Hayvan hücrelerinde kloroplast bulunmaz."
+      },
+      {
+        question: "Mendel'in kalıtım kanunlarından biri olan 'Ayrılma Kanunu' neyi ifade eder?",
+        options: ["Genlerin protein sentezi", "Homolog kromozomların ayrılması", "DNA'nın replikasyonu", "RNA'nın transkripsiyonu"],
+        answer: "Homolog kromozomların ayrılması",
+        explanation: "Ayrılma Kanunu, homolog kromozomlarda bulunan alel genlerin gamet oluşumu sırasında birbirinden ayrılarak farklı gametlere geçtiğini ifade eder."
+      },
+      {
+        question: "İnsanda hangi kromozomlar cinsiyeti belirler?",
+        options: ["X ve Y kromozomları", "1. kromozom çifti", "21. kromozom çifti", "X ve Z kromozomları"],
+        answer: "X ve Y kromozomları",
+        explanation: "İnsanda cinsiyet kromozomları X ve Y'dir. XX dişi, XY erkek bireyler oluşturur. Cinsiyeti babadan gelen kromozom belirler."
       }
     ],
     'Tarih': [
       {
-        question: "Modern Türkiye'nin kuruluş sürecini öğrenceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. Modern Türkiye'nin kuruluş sürecini öğrenceksiniz."
+        question: "Aşağıdakilerden hangisi Türk tarihinde kurulan ilk Müslüman Türk devletidir?",
+        options: ["Karahanlılar", "Gazneliler", "Selçuklular", "Osmanlılar"],
+        answer: "Karahanlılar",
+        explanation: "Karahanlılar (840-1212), tarihte kurulan ilk Müslüman Türk devletidir. 10. yüzyılda Satuk Buğra Han döneminde İslamiyet'i kabul etmişlerdir."
       },
       {
-        question: "Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz."
+        question: "Osmanlı Devleti'nin kuruluş tarihi aşağıdakilerden hangisidir?",
+        options: ["1071", "1299", "1453", "1517"],
+        answer: "1299",
+        explanation: "Osmanlı Devleti'nin kuruluş tarihi olarak Osman Bey'in Söğüt'te bağımsızlığını ilan ettiği 1299 yılı kabul edilir."
       },
       {
-        question: "Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz."
-      }
-    ],
-    'Coğrafya': [
-      {
-        question: "Türkiye'nin fiziki coğrafyasını öğrenceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Türkiye'nin fiziki coğrafyasını öğrenceksiniz."
+        question: "İstanbul'un fethi hangi padişah döneminde gerçekleşmiştir?",
+        options: ["Yıldırım Bayezid", "Fatih Sultan Mehmet", "Kanuni Sultan Süleyman", "Yavuz Sultan Selim"],
+        answer: "Fatih Sultan Mehmet",
+        explanation: "İstanbul 29 Mayıs 1453'te Fatih Sultan Mehmet tarafından fethedilmiştir. Bu fetihle Orta Çağ kapanıp Yeni Çağ başlamıştır."
       },
       {
-        question: "İklim bilgisi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. İklim bilgisi hakkında kapsamlı bilgi edineceksiniz."
+        question: "Aşağıdakilerden hangisi Kurtuluş Savaşı'nda yapılan ilk anlaşmadır?",
+        options: ["Sevr", "Lozan", "Ankara", "Mudanya"],
+        answer: "Ankara",
+        explanation: "Kurtuluş Savaşı'nda yapılan ilk anlaşma, 20 Ekim 1921'de Fransa ile imzalanan Ankara Antlaşması'dır. Bu anlaşmayla Fransa, Misakı Millî'yi tanıyan ilk İtilaf Devleti olmuştur."
       },
       {
-        question: "Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz."
+        question: "Türkiye Cumhuriyeti'nin ilânı hangi tarihte gerçekleşmiştir?",
+        options: ["23 Nisan 1920", "30 Ağustos 1922", "29 Ekim 1923", "5 Aralık 1934"],
+        answer: "29 Ekim 1923",
+        explanation: "Türkiye Cumhuriyeti, TBMM'de kabul edilen anayasa değişikliği ile 29 Ekim 1923 tarihinde ilan edilmiştir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Atatürk döneminde gerçekleştirilen inkılâplardan biri değildir?",
+        options: ["Soyadı Kanunu", "Şapka İnkılabı", "Çok Partili Hayata Geçiş", "Harf İnkılabı"],
+        answer: "Çok Partili Hayata Geçiş",
+        explanation: "Çok partili hayata kalıcı olarak geçiş, Atatürk'ün vefatından sonra 1946'da gerçekleşmiştir. Diğer seçenekler Atatürk döneminde yapılan inkılâplardır."
       }
     ],
     'Felsefe': [
       {
-        question: "Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz."
+        question: "Aşağıdakilerden hangisi Antik Yunan felsefesinin önemli filozoflarından biridir?",
+        options: ["Descartes", "Socrates", "Kant", "Sartre"],
+        answer: "Socrates",
+        explanation: "Sokrates (Socrates), MÖ 469-399 yılları arasında yaşamış ve Platon ile Aristoteles'i etkilemiş önemli bir Antik Yunan filozofudur."
       },
       {
-        question: "Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz."
+        question: "'Cogito ergo sum' (Düşünüyorum, öyleyse varım) sözü hangi filozofa aittir?",
+        options: ["Aristoteles", "Platon", "Descartes", "Nietzsche"],
+        answer: "Descartes",
+        explanation: "'Cogito ergo sum', 17. yüzyıl Fransız filozof René Descartes'a ait meşhur bir sözdür ve modern felsefenin başlangıç noktası olarak kabul edilir."
       },
       {
-        question: "Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz."
+        question: "Aşağıdakilerden hangisi bir ahlak felsefesi görüşü değildir?",
+        options: ["Hedonizm", "Faydacılık", "Determinizm", "Deontoloji"],
+        answer: "Determinizm",
+        explanation: "Determinizm, evrendeki tüm olayların sebep-sonuç ilişkisine bağlı olduğunu savunan metafizik bir görüştür. Diğerleri ahlak felsefesi (etik) görüşleridir."
+      },
+      {
+        question: "'Kategorik İmperatif' kavramı hangi filozofa aittir?",
+        options: ["Hegel", "Kant", "Locke", "Hume"],
+        answer: "Kant",
+        explanation: "Kategorik İmperatif (Kesin Buyruk), Immanuel Kant'ın ahlak felsefesinin temel kavramıdır. Kant'a göre, eylemlerimizin evrensel bir yasa olabilecek şekilde olmalıdır."
+      },
+      {
+        question: "Varoluşçuluk (Egzistansiyalizm) akımının öncülerinden biri aşağıdakilerden hangisidir?",
+        options: ["Auguste Comte", "Karl Marx", "Jean-Paul Sartre", "John Locke"],
+        answer: "Jean-Paul Sartre",
+        explanation: "Jean-Paul Sartre, 20. yüzyılın en önemli varoluşçu filozoflarındandır. 'Varoluş özden önce gelir' sözü ona aittir."
+      },
+      {
+        question: "'İdea'lar teorisi hangi filozofun öğretisinde merkez kavramdır?",
+        options: ["Platon", "Aristoteles", "Herakleitos", "Thales"],
+        answer: "Platon",
+        explanation: "İdealar teorisi, Platon'un felsefesinin merkezidir. Platon'a göre gerçek dünya, duyularla algıladığımız dünya değil, idealar dünyasıdır."
       }
     ],
     'İngilizce': [
       {
-        question: "Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz."
+        question: "Choose the correct sentence.",
+        options: ["She don't like coffee.", "She doesn't likes coffee.", "She doesn't like coffee.", "She not like coffee."],
+        answer: "She doesn't like coffee.",
+        explanation: "Simple present tense with third person singular subject requires 'doesn't' + base form of the verb."
       },
       {
-        question: "Okuma becerileri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Okuma becerileri hakkında kapsamlı bilgi edineceksiniz."
+        question: "If I _____ rich, I would buy a big house.",
+        options: ["am", "were", "will be", "would be"],
+        answer: "were",
+        explanation: "This is a type 2 conditional sentence (unreal present). The correct form in the if-clause is 'were' for all subjects."
       },
       {
-        question: "Yazma becerileri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. Yazma becerileri hakkında kapsamlı bilgi edineceksiniz."
+        question: "She has been studying English _____ five years.",
+        options: ["since", "for", "during", "while"],
+        answer: "for",
+        explanation: "'For' is used with periods of time (five years), while 'since' is used with specific points in time."
+      },
+      {
+        question: "The passive form of 'They are building a new bridge' is:",
+        options: ["A new bridge is being build.", "A new bridge is build.", "A new bridge is being built.", "A new bridge was built."],
+        answer: "A new bridge is being built.",
+        explanation: "To form the present continuous passive, use 'is/are being + past participle'. The past participle of 'build' is 'built'."
+      },
+      {
+        question: "Which sentence contains a phrasal verb?",
+        options: ["I want to speak English fluently.", "She looks beautiful in that dress.", "We need to look after our environment.", "They always arrive on time."],
+        answer: "We need to look after our environment.",
+        explanation: "'Look after' is a phrasal verb meaning 'to take care of'. Phrasal verbs consist of a verb + adverb/preposition."
+      },
+      {
+        question: "Choose the sentence with correct word order:",
+        options: ["Always she goes to bed early.", "She goes always to bed early.", "She always goes to bed early.", "She goes to bed always early."],
+        answer: "She always goes to bed early.",
+        explanation: "In English, adverbs of frequency (always, never, sometimes, etc.) usually come before the main verb but after auxiliary verbs."
       }
     ],
     'Edebiyat': [
       {
-        question: "Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz."
+        question: "Aşağıdakilerden hangisi Divan edebiyatının özelliklerinden değildir?",
+        options: ["Aruz ölçüsü kullanılır.", "Halk dilinden uzaktır.", "Sade bir dil kullanılır.", "Mazmunlar önemlidir."],
+        answer: "Sade bir dil kullanılır.",
+        explanation: "Divan edebiyatında Arapça ve Farsça kelimeler çok kullanıldığından dil ağır ve süslüdür. Sade dil, halk edebiyatı ve Tanzimat sonrası edebiyatın özelliğidir."
       },
       {
-        question: "Roman türleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Roman türleri hakkında kapsamlı bilgi edineceksiniz."
+        question: "Aşağıdaki eserlerden hangisi Tanzimat dönemine aittir?",
+        options: ["Çalıkuşu", "İntibah", "Sinekli Bakkal", "Yaban"],
+        answer: "İntibah",
+        explanation: "İntibah, Namık Kemal'in 1876'da yazdığı, Tanzimat döneminin önemli romanlarından biridir. Batılı anlamda yazılmış ilk edebi Türk romanı olarak kabul edilir."
       },
       {
-        question: "Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz."
+        question: "Aşağıdakilerden hangisi Servet-i Fünun edebiyatının temsilcilerinden biridir?",
+        options: ["Namık Kemal", "Tevfik Fikret", "Mehmet Akif Ersoy", "Ahmet Hamdi Tanpınar"],
+        answer: "Tevfik Fikret",
+        explanation: "Tevfik Fikret, Servet-i Fünun dergisinin başyazarı ve Servet-i Fünun edebiyatının en önemli temsilcilerindendir. 'Rubab-ı Şikeste' önemli eseridir."
+      },
+      {
+        question: "'Safahat' adlı eser hangi şairimize aittir?",
+        options: ["Yahya Kemal Beyatlı", "Mehmet Akif Ersoy", "Tevfik Fikret", "Necip Fazıl Kısakürek"],
+        answer: "Mehmet Akif Ersoy",
+        explanation: "Safahat, İstiklal Marşı'nın yazarı Mehmet Akif Ersoy'un yedi kitaptan oluşan şiir külliyatıdır."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Ömer Seyfettin'in bir hikayesi değildir?",
+        options: ["Yalnız Efe", "Pembe İncili Kaftan", "Çalıkuşu", "Kaşağı"],
+        answer: "Çalıkuşu",
+        explanation: "Çalıkuşu, Reşat Nuri Güntekin'in romanıdır. Diğerleri Ömer Seyfettin'in hikayeleridir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi edebi bir tür değildir?",
+        options: ["Makale", "Roman", "Hikaye", "Gazel"],
+        answer: "Makale",
+        explanation: "Makale, düşünce yazısı türüdür ve edebi bir tür değildir. Roman, hikaye ve gazel edebi türlerdir."
       }
     ]
   };
@@ -457,337 +820,5 @@ export const getSubjectExamples = (subject: string) => {
   return examplesBySubject[subject] || [];
 };
 
-/**
- * Get topic-specific examples based on subject and topic
- */
-export const getTopicExamples = (subject: string, topic: string) => {
-  const topicExamples: {[key: string]: any[]} = {
-    'Matematik': [
-      {
-        question: "5x + 3 = 18 denklemindeki x değeri nedir?",
-        options: ["2", "3", "4", "5"],
-        answer: "3",
-        explanation: "5x + 3 = 18, 5x = 15, x = 3"
-      },
-      {
-        question: "Bir dairenin alanı 36π cm² ise, yarıçapı kaç cm'dir?",
-        options: ["3", "6", "9", "12"],
-        answer: "6",
-        explanation: "A = πr², 36π = πr², r² = 36, r = 6 cm"
-      },
-      {
-        question: "log₂(8) değeri nedir?",
-        options: ["2", "3", "4", "8"],
-        answer: "3",
-        explanation: "log₂(8) = log₂(2³) = 3"
-      },
-      {
-        question: "3x² - 12x + 9 ifadesinin çarpanlarına ayrılmış hali nedir?",
-        options: ["3(x - 1)²", "3(x - 2)²", "3(x² - 4x + 3)", "(3x - 3)²"],
-        answer: "3(x - 2)²",
-        explanation: "3x² - 12x + 9 = 3(x² - 4x + 3) = 3(x² - 4x + 4 - 1) = 3((x - 2)² - 1 + 1) = 3(x - 2)²"
-      },
-      {
-        question: "sin(30°) + cos(60°) değeri nedir?",
-        options: ["0.5", "1", "1.5", "2"],
-        answer: "1",
-        explanation: "sin(30°) = 0.5 ve cos(60°) = 0.5, toplam = 0.5 + 0.5 = 1"
-      },
-      {
-        question: "f(x) = x² + 2x ve g(x) = 3x - 1 fonksiyonları için f(g(2)) değeri nedir?",
-        options: ["34", "35", "36", "37"],
-        answer: "35",
-        explanation: "g(2) = 3(2) - 1 = 6 - 1 = 5, f(g(2)) = f(5) = 5² + 2(5) = 25 + 10 = 35"
-      }
-    ],
-    'Fizik': [
-      {
-        question: "Bir cisim 10 m/s hızla hareket ederken, 5 saniye boyunca 2 m/s² sabit ivme ile hızlanıyor. Son hızı nedir?",
-        options: ["20 m/s", "15 m/s", "18 m/s", "22 m/s"],
-        answer: "20 m/s",
-        explanation: "v = v₀ + at formülünü kullanarak: v = 10 m/s + (2 m/s² × 5 s) = 10 m/s + 10 m/s = 20 m/s"
-      },
-      {
-        question: "Bir cismin kütlesi 5 kg ve üzerine 10 N kuvvet uygulanıyor. Cismin ivmesi nedir?",
-        options: ["1 m/s²", "2 m/s²", "5 m/s²", "10 m/s²"],
-        answer: "2 m/s²",
-        explanation: "F = ma formülünü kullanarak: a = F/m = 10 N / 5 kg = 2 m/s²"
-      },
-      {
-        question: "Yerden 20 metre yükseklikten serbest bırakılan bir cisim yere kaç saniyede ulaşır? (g = 10 m/s²)",
-        options: ["1 s", "2 s", "3 s", "4 s"],
-        answer: "2 s",
-        explanation: "h = (1/2)gt² formülünü kullanarak: 20 m = (1/2) × 10 m/s² × t², t² = 4, t = 2 s"
-      },
-      {
-        question: "Periyodu 0.5 saniye olan bir sarkacın frekansı nedir?",
-        options: ["0.5 Hz", "1 Hz", "2 Hz", "4 Hz"],
-        answer: "2 Hz",
-        explanation: "Frekans = 1/Periyot, f = 1/0.5 = 2 Hz"
-      },
-      {
-        question: "120 W gücünde çalışan bir elektrikli cihaz 2 saat çalıştırıldığında kaç joule enerji harcar?",
-        options: ["60 J", "240 J", "7200 J", "864.000 J"],
-        answer: "864.000 J",
-        explanation: "E = P × t = 120 W × 2 saat × 3600 s/saat = 120 × 7200 = 864.000 J"
-      },
-      {
-        question: "Sürtünmesiz bir yüzeyde durmakta olan 4 kg kütleli bir cisme 20 N'luk kuvvet 10 saniye boyunca uygulanıyor. Cisim bu süre sonunda kaç metre yol almış olur?",
-        options: ["50 m", "100 m", "250 m", "500 m"],
-        answer: "250 m",
-        explanation: "F = ma, a = F/m = 20/4 = 5 m/s². x = (1/2)at² = 0.5 × 5 × 10² = 0.5 × 5 × 100 = 250 m"
-      }
-    ],
-    'Kimya': [
-      {
-        question: "Periyodik tabloda asal gazlar hangi gruptadır?",
-        options: ["1A", "7A", "8A", "3B"],
-        answer: "8A",
-        explanation: "Asal gazlar periyodik tablonun en sağında 8A (veya 18. grup) olarak bulunur."
-      },
-      {
-        question: "H₂O molekülünde bulunan toplam elektron sayısı kaçtır?",
-        options: ["8", "10", "18", "20"],
-        answer: "10",
-        explanation: "H atomu 1, O atomu 8 elektron içerir. H₂O'da toplam: 2×1 + 8 = 10 elektron bulunur."
-      },
-      {
-        question: "Aşağıdakilerden hangisi bir redoks tepkimesidir?",
-        options: ["NaCl + AgNO₃ → AgCl + NaNO₃", "HCl + NaOH → NaCl + H₂O", "Zn + CuSO₄ → ZnSO₄ + Cu", "CaCO₃ → CaO + CO₂"],
-        answer: "Zn + CuSO₄ → ZnSO₄ + Cu",
-        explanation: "Bu tepkimede Zn elektronu Cu'ya vererek yükseltgeniyor (Zn⁰ → Zn²⁺ + 2e⁻), Cu ise elektron alarak indirgeniyor (Cu²⁺ + 2e⁻ → Cu⁰)."
-      },
-      {
-        question: "Atomun çekirdeğinde bulunan parçacıklar hangileridir?",
-        options: ["Proton ve elektron", "Nötron ve elektron", "Proton ve nötron", "Proton, nötron ve elektron"],
-        answer: "Proton ve nötron",
-        explanation: "Atom çekirdeğinde proton ve nötron bulunur, elektronlar ise çekirdeğin etrafındaki katmanlarda yer alır."
-      },
-      {
-        question: "pH değeri 3 olan bir çözelti, pH değeri 6 olan bir çözeltiden kaç kat daha asidiktir?",
-        options: ["2 kat", "3 kat", "100 kat", "1000 kat"],
-        answer: "1000 kat",
-        explanation: "pH skalası logaritmiktir. pH'daki her birim değişim, asitlik/bazlık konsantrasyonunda 10 katlık değişim anlamına gelir. 6-3 = 3 birim fark olduğundan, 10³ = 1000 kat daha asidiktir."
-      },
-      {
-        question: "Aşağıdakilerden hangisi bir amfoter oksittir?",
-        options: ["Na₂O", "CO₂", "Al₂O₃", "MgO"],
-        answer: "Al₂O₃",
-        explanation: "Amfoter oksitler hem asitlerle hem de bazlarla tepkimeye girebilen oksitlerdir. Alüminyum oksit (Al₂O₃) amfoter özellik gösterir."
-      }
-    ],
-    'Biyoloji': [
-      {
-        question: "Hücre yapısı hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Hücre yapısı hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz."
-      }
-    ],
-    'Tarih': [
-      {
-        question: "Modern Türkiye'nin kuruluş sürecini öğrenceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. Modern Türkiye'nin kuruluş sürecini öğrenceksiniz."
-      },
-      {
-        question: "Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz."
-      },
-      {
-        question: "Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz."
-      }
-    ],
-    'Coğrafya': [
-      {
-        question: "Türkiye'nin fiziki coğrafyasını öğrenceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Türkiye'nin fiziki coğrafyasını öğrenceksiniz."
-      },
-      {
-        question: "İklim bilgisi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. İklim bilgisi hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz."
-      }
-    ],
-    'Felsefe': [
-      {
-        question: "Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz."
-      }
-    ],
-    'İngilizce': [
-      {
-        question: "Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Okuma becerileri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Okuma becerileri hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Yazma becerileri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "A seçeneği",
-        explanation: "Bu sorunun cevabı A seçeneğidir. Yazma becerileri hakkında kapsamlı bilgi edineceksiniz."
-      }
-    ],
-    'Edebiyat': [
-      {
-        question: "Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: "Bu sorunun cevabı B seçeneğidir. Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Roman türleri hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "C seçeneği",
-        explanation: "Bu sorunun cevabı C seçeneğidir. Roman türleri hakkında kapsamlı bilgi edineceksiniz."
-      },
-      {
-        question: "Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz.",
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "D seçeneği",
-        explanation: "Bu sorunun cevabı D seçeneğidir. Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz."
-      }
-    ]
-  };
-  
-  // Eğer konu için örnek bulunamazsa, dersin genel örneklerini gönder
-  if (!topicExamples[subject] || !topicExamples[subject][topic] || topicExamples[subject][topic].length === 0) {
-    // Her konu için 6 soru içeren bir dizi üret
-    const baseExamples = getSubjectExamples(subject);
-    const newExamples = [];
-    
-    // Mevcut sorulardan 6 tanesini al veya yeterli soru yoksa tümünü al
-    for (let i = 0; i < 6 && i < baseExamples.length; i++) {
-      newExamples.push(baseExamples[i]);
-    }
-    
-    // Eğer 6'dan az soru varsa, eksik kalan kısmı varsayılan sorularla doldur
-    while (newExamples.length < 6) {
-      const questionIndex = newExamples.length + 1;
-      newExamples.push({
-        question: `${subject} - ${topic} için Soru ${questionIndex}`,
-        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-        answer: "B seçeneği",
-        explanation: `Bu sorunun cevabı B seçeneğidir. ${subject} - ${topic} konusunda önemli bir bilgiyi test etmektedir.`
-      });
-    }
-    
-    return newExamples;
-  }
-  
-  const topicSpecificExamples = topicExamples[subject][topic];
-  
-  // Eğer 6'dan az soru varsa, eksik kalan kısmı varsayılan sorularla doldur
-  while (topicSpecificExamples.length < 6) {
-    const questionIndex = topicSpecificExamples.length + 1;
-    topicSpecificExamples.push({
-      question: `${subject} - ${topic} için Soru ${questionIndex}`,
-      options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
-      answer: "C seçeneği",
-      explanation: `Bu sorunun cevabı C seçeneğidir. ${subject} - ${topic} konusunda önemli bir bilgiyi test etmektedir.`
-    });
-  }
-  
-  return topicSpecificExamples;
-};
-
-/**
- * Generate subject, grade and topic specific video data
- */
-export const generateTopicVideoData = (subject: string, grade: GradeLevel, topic: string): Video => {
-  const videoId = Math.floor(Math.random() * 10000) + 1;
-  
-  return {
-    id: videoId,
-    title: `${subject} ${grade}. Sınıf - ${topic} Konu Anlatımı`,
-    thumbnailUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=1171&auto=format&fit=crop",
-    duration: `${Math.floor(Math.random() * 20) + 5}:${Math.floor(Math.random() * 59).toString().padStart(2, '0')}`,
-    saved: false,
-    subject: subject,
-    grade: grade,
-    topic: topic,
-    description: getTopicDescription(subject, topic),
-    examples: getTopicExamples(subject, topic),
-    videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-  };
-};
-
-/**
- * Ensure videos exist for specific subject, grade and topic
- */
-export const ensureTopicVideos = (
-  subject: string, 
-  grade: GradeLevel, 
-  topic: string, 
-  allVideos: Video[] = mockVideos
-): Video[] => {
-  const existingVideos = allVideos.filter(video => 
-    video.subject === subject && 
-    video.grade === grade &&
-    video.topic === topic
-  );
-  
-  // If we already have 6 or more videos, return the first 6
-  return existingVideos.slice(0, 6);
-};
-
-/**
- * Get topic-specific videos for a subject and grade
- */
-export const getSubjectGradeTopicVideos = (
-  subject: string,
-  grade: GradeLevel,
-  topic: string,
-  allVideos: Video[] = mockVideos
-): Video[] => {
-  // Ensure we have at least 6 videos for this topic
-  return ensureTopicVideos(subject, grade, topic, allVideos);
-};
+// Initialize mock videos on module load
+initializeMockVideos();

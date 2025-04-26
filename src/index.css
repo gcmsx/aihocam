@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -74,8 +73,7 @@
 
   body {
     @apply bg-background text-foreground font-sans text-[15px];
-    /* Update: Use the new background image */
-    background-image: url('https://i.pinimg.com/736x/3d/62/e1/3d62e167c49ee2adf49a0cc11dd6f50a.jpg');
+    background-image: url('/background-pattern.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
