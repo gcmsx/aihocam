@@ -1,11 +1,10 @@
-
 import React, { useState, useRef } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
 
 interface VideoPlayerProps {
   thumbnailUrl: string;
   title: string;
-  videoUrl?: string; // Actual video URL, will use a placeholder if not provided
+  videoUrl: string;
 }
 
 const VideoPlayer = ({ thumbnailUrl, title, videoUrl }: VideoPlayerProps) => {
@@ -16,9 +15,6 @@ const VideoPlayer = ({ thumbnailUrl, title, videoUrl }: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
   
-  // Default video URL if not provided
-  const actualVideoUrl = videoUrl || "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -73,7 +69,7 @@ const VideoPlayer = ({ thumbnailUrl, title, videoUrl }: VideoPlayerProps) => {
       
       <video
         ref={videoRef}
-        src={actualVideoUrl}
+        src={videoUrl}
         className="w-full h-full object-contain"
         onEnded={handleVideoEnd}
         onClick={togglePlay}
