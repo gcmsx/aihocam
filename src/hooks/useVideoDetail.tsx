@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Video } from '@/types/video';
 import { getSavedVideosFromStorage, updateRecentlyViewed, downloadVideo } from '@/services/videoService';
@@ -28,7 +29,8 @@ const getVideoDetails = (videoId: string): VideoDetails => {
     saved: false,
     subject: currentSubject,
     description: getSubjectDescription(currentSubject),
-    examples: getSubjectExamples(currentSubject)
+    examples: getSubjectExamples(currentSubject),
+    videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" // Add default video URL
   };
 };
 
