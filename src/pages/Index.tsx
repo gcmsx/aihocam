@@ -1,15 +1,18 @@
-
 import React, { useState, useEffect } from 'react';
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
+import HomeTabs from '@/components/home/HomeTabs';
+import HomeSearchResults from '@/components/home/HomeSearchResults';
 import SubjectGrid from '@/components/SubjectGrid';
-import { useHomeSearch } from '@/hooks/useHomeSearch';
+import { useHomeVideos } from '@/hooks/useHomeVideos';
 
 const Index = () => {
   const [version, setVersion] = useState('0.345');
   
+  // Load version from localStorage
   useEffect(() => {
-    localStorage.setItem('appVersion', '0.345');
+    const storedVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0345';
+    setVersion(storedVersion);
     
     const handleVersionUpdate = (e: CustomEvent) => {
       if (e.detail && e.detail.version) {
@@ -23,20 +26,46 @@ const Index = () => {
       window.removeEventListener('versionUpdated', handleVersionUpdate as EventListener);
     };
   }, []);
-
-  const { searchQuery, handleSearch } = useHomeSearch([]);
+  
+  const { 
+    activeTab,
+    setActiveTab,
+    searchQuery,
+    videos,
+    filteredAllVideos,
+    handleSearch,
+    handleVideoClick,
+    handleSaveVideo
+  } = useHomeVideos();
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="p-4 flex-1">
-        <h1 className="text-2xl font-bold mb-4 text-center">
+    <div className="pb-16">
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">
           AI Hocam <span className="text-sm text-muted-foreground">(Kapalı Beta GEN-1 final v.{version})</span>
         </h1>
         <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         
-        <div className="flex justify-center items-center flex-1">
-          <SubjectGrid />
-        </div>
+        <HomeSearchResults 
+          searchQuery={searchQuery}
+          filteredVideos={filteredAllVideos}
+          handleVideoClick={handleVideoClick}
+          handleSaveVideo={handleSaveVideo}
+        />
+        
+        {(!searchQuery || filteredAllVideos.length === 0) && (
+          <>
+            <SubjectGrid />
+            
+            <HomeTabs 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              videos={videos}
+              handleVideoClick={handleVideoClick}
+              handleSaveVideo={handleSaveVideo}
+            />
+          </>
+        )}
       </div>
       <NavBar />
     </div>

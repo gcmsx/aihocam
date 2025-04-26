@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Video } from '@/types/video';
 import { getSavedVideosFromStorage, updateRecentlyViewed, downloadVideo } from '@/services/videoService';
-import { getSubjectExamples, getSubjectDescription } from '@/services/video';
+import { getSubjectExamples, getSubjectDescription } from '@/services/video/videoUtils';
 
 export interface Example {
   question: string;
@@ -29,8 +29,7 @@ const getVideoDetails = (videoId: string): VideoDetails => {
     saved: false,
     subject: currentSubject,
     description: getSubjectDescription(currentSubject),
-    examples: getSubjectExamples(currentSubject),
-    videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" // Add default video URL
+    examples: getSubjectExamples(currentSubject)
   };
 };
 

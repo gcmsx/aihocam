@@ -4,9 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import NavBar from '@/components/NavBar';
 import { Video } from '@/types/video';
 import { 
-  updateRecentlyViewed,
-  downloadVideo,
-  getSavedVideosFromStorage
+  updateRecentlyViewed 
 } from '@/services/video';
 import SubjectHeader from '@/components/subject/SubjectHeader';
 import VideoSection from '@/components/subject/VideoSection';
@@ -44,77 +42,15 @@ const SubjectPage = () => {
   useEffect(() => {
     // Get videos for this subject
     const subjectVideos = getSubjectVideos(subject);
-    
-    // Update with saved status
-    const savedIds = getSavedVideosFromStorage();
-    const updatedVideos = subjectVideos.map(video => ({
-      ...video,
-      saved: savedIds.includes(video.id)
-    }));
-    
-    setVideos(updatedVideos);
-  }, [subject]);
-  
-  // Listen for video save/download events
-  useEffect(() => {
-    const handleVideoUpdate = () => {
-      if (!subject) return;
-      
-      const savedIds = getSavedVideosFromStorage();
-      
-      setVideos(prevVideos => 
-        prevVideos.map(video => ({
-          ...video,
-          saved: savedIds.includes(video.id)
-        }))
-      );
-    };
-    
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'savedVideos') {
-        handleVideoUpdate();
-      }
-    };
-    
-    window.addEventListener('videoSaved', handleVideoUpdate);
-    window.addEventListener('videoDownloaded', handleVideoUpdate);
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      window.removeEventListener('videoSaved', handleVideoUpdate);
-      window.removeEventListener('videoDownloaded', handleVideoUpdate);
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    setVideos(subjectVideos);
   }, [subject]);
   
   const handleVideoClick = (videoId: number) => {
+    // Add to recently viewed videos
     updateRecentlyViewed(videoId);
+    
+    // Navigate to video detail page
     navigate(`/video/${videoId}`);
-  };
-  
-  const handleSaveVideo = async (videoId: number) => {
-    try {
-      const video = videos.find(v => v.id === videoId);
-      if (!video) return;
-      
-      setVideos(prevVideos => 
-        prevVideos.map(v => 
-          v.id === videoId ? { ...v, saved: !v.saved } : v
-        )
-      );
-      
-      await downloadVideo(videoId, video);
-    } catch (error) {
-      console.error("Error saving video:", error);
-      const savedIds = getSavedVideosFromStorage();
-      
-      setVideos(prevVideos => 
-        prevVideos.map(v => ({
-          ...v,
-          saved: savedIds.includes(v.id)
-        }))
-      );
-    }
   };
   
   return (
@@ -124,8 +60,7 @@ const SubjectPage = () => {
       <div className="p-4">
         <VideoSection 
           videos={videos} 
-          onVideoClick={handleVideoClick}
-          onSaveVideo={handleSaveVideo}
+          onVideoClick={handleVideoClick} 
         />
         
         <ProgressSection topics={topics} color={color} />

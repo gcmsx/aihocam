@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { mockVideos } from '@/services/video/mockData';
 import { Button } from './ui/button';
 import { subjectIcons } from '@/data/subjectIcons';
 import { subjectColors } from '@/data/subjectData';
@@ -26,11 +27,11 @@ const SubjectGrid = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[70vh]">
+    <div className="mt-6 mb-8">
       <h2 className="text-xl font-semibold mb-4">Dersler</h2>
       
-      {/* Subject Buttons Grid - Perfectly centered with max-width */}
-      <div className="grid grid-cols-3 gap-3 mb-5 max-w-md mx-auto w-full">
+      {/* Subject Buttons Grid */}
+      <div className="grid grid-cols-3 gap-3 mb-5">
         {allSubjects.map((subject) => (
           <Button
             key={subject}
