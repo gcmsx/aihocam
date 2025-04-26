@@ -121,7 +121,7 @@ export const getTopicDescription = (subject: string, topic: string): string => {
       'İş, Güç ve Enerji': "Bu videoda iş, güç ve enerji konularını ele alıyoruz. İş kavramı, güç hesaplamaları, kinetik ve potansiyel enerji, enerji dönüşümleri ve korunumu detaylı olarak incelenmektedir."
     },
     'Kimya': {
-      'Atom Yapısı': "Bu videoda atom yapısı konusunu ele alıyoruz. Atomun parçacıkları, elektron dizilimi ve periyodik tablodaki yerleşim düzeni detaylı olarak anlatılmaktadır.",
+      'Atom Yapısı': "Bu videoda atom yapısı konusunu ele alıyoruz. Atomun parçacıkları, elektron dizilimi ve periyodik tablonun yerleşim düzeni detaylı olarak anlatılmaktadır.",
       'Kimyasal Bağlar': "Bu videoda kimyasal bağlar konusunu ele alıyoruz. İyonik, kovalent ve metalik bağların oluşumu ve özellikleri örneklerle açıklanmaktadır.",
       'Asitler ve Bazlar': "Bu videoda asitler ve bazlar konusunu ele alıyoruz. Asit-baz tanımları, pH kavramı, nötrleşme tepkimeleri detaylı olarak incelenmektedir.",
       'Organik Kimya': "Bu videoda organik kimya konusunu ele alıyoruz. Karbon bileşikleri, fonksiyonel gruplar ve organik tepkimeler örneklerle açıklanmaktadır.",
@@ -196,7 +196,7 @@ export const getTopicDescription = (subject: string, topic: string): string => {
       'Şiir': "Bu videoda şiir konusunu ele alıyoruz. Şiirin unsurları, edebi sanatlar, vezin, kafiye ve şiir türleri detaylı olarak anlatılmaktadır.",
       'Roman': "Bu videoda roman konusunu ele alıyoruz. Roman unsurları, roman türleri, roman tahlili ve Türk ve dünya edebiyatından önemli romanlar detaylı olarak incelenmektedir.",
       'Halk Edebiyatı': "Bu videoda halk edebiyatı konusunu ele alıyoruz. Halk şiiri, halk hikâyeleri, destanlar ve anonim edebi ürünler detaylı olarak anlatılmaktadır.",
-      'Divan Edebiyatı': "Bu videoda divan edebiyatı konusunu ele alıyoruz. Divan şiiri özellikleri, nazım şekilleri, mazmunlar ve önemli divan şairleri detaylı olarak incelenmektedir.",
+      'Divan Edebiyatı': "Bu videoda divan edebiyatı konusunu ele alıyoruz. Divan şiiri özellikleri, nazım şekilleri, mazmunlar ve önemli divan şairleri detaylı olarak anlatılmaktadır.",
       'Tanzimat Edebiyatı': "Bu videoda Tanzimat edebiyatı konusunu ele alıyoruz. Tanzimat döneminin tarihsel arka planı, Tanzimat edebiyatının özellikleri ve önemli temsilcileri detaylı olarak anlatılmaktadır.",
       'Servet-i Fünun Edebiyatı': "Bu videoda Servet-i Fünun edebiyatı konusunu ele alıyoruz. Dönemin edebi anlayışı, dil özellikleri ve önemli temsilcileri detaylı olarak anlatılmaktadır.",
       'Milli Edebiyat': "Bu videoda Milli Edebiyat konusunu ele alıyoruz. Dönemin siyasi ve toplumsal arka planı, edebi anlayışı ve önemli temsilcileri detaylı olarak anlatılmaktadır.",
@@ -330,3 +330,464 @@ export const getSubjectExamples = (subject: string) => {
         options: ["Na₂O", "CO₂", "Al₂O₃", "MgO"],
         answer: "Al₂O₃",
         explanation: "Amfoter oksitler hem asitlerle hem de bazlarla tepkimeye girebilen oksitlerdir. Alüminyum oksit (Al₂O₃) amfoter özellik gösterir."
+      }
+    ],
+    'Biyoloji': [
+      {
+        question: "Hücre yapısı hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Hücre yapısı hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Tarih': [
+      {
+        question: "Modern Türkiye'nin kuruluş sürecini öğrenceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. Modern Türkiye'nin kuruluş sürecini öğrenceksiniz."
+      },
+      {
+        question: "Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz."
+      },
+      {
+        question: "Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Coğrafya': [
+      {
+        question: "Türkiye'nin fiziki coğrafyasını öğrenceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Türkiye'nin fiziki coğrafyasını öğrenceksiniz."
+      },
+      {
+        question: "İklim bilgisi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. İklim bilgisi hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Felsefe': [
+      {
+        question: "Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'İngilizce': [
+      {
+        question: "Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Okuma becerileri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Okuma becerileri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Yazma becerileri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. Yazma becerileri hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Edebiyat': [
+      {
+        question: "Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Roman türleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Roman türleri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ]
+  };
+  
+  return examplesBySubject[subject] || [];
+};
+
+/**
+ * Get topic-specific examples based on subject and topic
+ */
+export const getTopicExamples = (subject: string, topic: string) => {
+  const topicExamples: {[key: string]: any[]} = {
+    'Matematik': [
+      {
+        question: "5x + 3 = 18 denklemindeki x değeri nedir?",
+        options: ["2", "3", "4", "5"],
+        answer: "3",
+        explanation: "5x + 3 = 18, 5x = 15, x = 3"
+      },
+      {
+        question: "Bir dairenin alanı 36π cm² ise, yarıçapı kaç cm'dir?",
+        options: ["3", "6", "9", "12"],
+        answer: "6",
+        explanation: "A = πr², 36π = πr², r² = 36, r = 6 cm"
+      },
+      {
+        question: "log₂(8) değeri nedir?",
+        options: ["2", "3", "4", "8"],
+        answer: "3",
+        explanation: "log₂(8) = log₂(2³) = 3"
+      },
+      {
+        question: "3x² - 12x + 9 ifadesinin çarpanlarına ayrılmış hali nedir?",
+        options: ["3(x - 1)²", "3(x - 2)²", "3(x² - 4x + 3)", "(3x - 3)²"],
+        answer: "3(x - 2)²",
+        explanation: "3x² - 12x + 9 = 3(x² - 4x + 3) = 3(x² - 4x + 4 - 1) = 3((x - 2)² - 1 + 1) = 3(x - 2)²"
+      },
+      {
+        question: "sin(30°) + cos(60°) değeri nedir?",
+        options: ["0.5", "1", "1.5", "2"],
+        answer: "1",
+        explanation: "sin(30°) = 0.5 ve cos(60°) = 0.5, toplam = 0.5 + 0.5 = 1"
+      },
+      {
+        question: "f(x) = x² + 2x ve g(x) = 3x - 1 fonksiyonları için f(g(2)) değeri nedir?",
+        options: ["34", "35", "36", "37"],
+        answer: "35",
+        explanation: "g(2) = 3(2) - 1 = 6 - 1 = 5, f(g(2)) = f(5) = 5² + 2(5) = 25 + 10 = 35"
+      }
+    ],
+    'Fizik': [
+      {
+        question: "Bir cisim 10 m/s hızla hareket ederken, 5 saniye boyunca 2 m/s² sabit ivme ile hızlanıyor. Son hızı nedir?",
+        options: ["20 m/s", "15 m/s", "18 m/s", "22 m/s"],
+        answer: "20 m/s",
+        explanation: "v = v₀ + at formülünü kullanarak: v = 10 m/s + (2 m/s² × 5 s) = 10 m/s + 10 m/s = 20 m/s"
+      },
+      {
+        question: "Bir cismin kütlesi 5 kg ve üzerine 10 N kuvvet uygulanıyor. Cismin ivmesi nedir?",
+        options: ["1 m/s²", "2 m/s²", "5 m/s²", "10 m/s²"],
+        answer: "2 m/s²",
+        explanation: "F = ma formülünü kullanarak: a = F/m = 10 N / 5 kg = 2 m/s²"
+      },
+      {
+        question: "Yerden 20 metre yükseklikten serbest bırakılan bir cisim yere kaç saniyede ulaşır? (g = 10 m/s²)",
+        options: ["1 s", "2 s", "3 s", "4 s"],
+        answer: "2 s",
+        explanation: "h = (1/2)gt² formülünü kullanarak: 20 m = (1/2) × 10 m/s² × t², t² = 4, t = 2 s"
+      },
+      {
+        question: "Periyodu 0.5 saniye olan bir sarkacın frekansı nedir?",
+        options: ["0.5 Hz", "1 Hz", "2 Hz", "4 Hz"],
+        answer: "2 Hz",
+        explanation: "Frekans = 1/Periyot, f = 1/0.5 = 2 Hz"
+      },
+      {
+        question: "120 W gücünde çalışan bir elektrikli cihaz 2 saat çalıştırıldığında kaç joule enerji harcar?",
+        options: ["60 J", "240 J", "7200 J", "864.000 J"],
+        answer: "864.000 J",
+        explanation: "E = P × t = 120 W × 2 saat × 3600 s/saat = 120 × 7200 = 864.000 J"
+      },
+      {
+        question: "Sürtünmesiz bir yüzeyde durmakta olan 4 kg kütleli bir cisme 20 N'luk kuvvet 10 saniye boyunca uygulanıyor. Cisim bu süre sonunda kaç metre yol almış olur?",
+        options: ["50 m", "100 m", "250 m", "500 m"],
+        answer: "250 m",
+        explanation: "F = ma, a = F/m = 20/4 = 5 m/s². x = (1/2)at² = 0.5 × 5 × 10² = 0.5 × 5 × 100 = 250 m"
+      }
+    ],
+    'Kimya': [
+      {
+        question: "Periyodik tabloda asal gazlar hangi gruptadır?",
+        options: ["1A", "7A", "8A", "3B"],
+        answer: "8A",
+        explanation: "Asal gazlar periyodik tablonun en sağında 8A (veya 18. grup) olarak bulunur."
+      },
+      {
+        question: "H₂O molekülünde bulunan toplam elektron sayısı kaçtır?",
+        options: ["8", "10", "18", "20"],
+        answer: "10",
+        explanation: "H atomu 1, O atomu 8 elektron içerir. H₂O'da toplam: 2×1 + 8 = 10 elektron bulunur."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bir redoks tepkimesidir?",
+        options: ["NaCl + AgNO₃ → AgCl + NaNO₃", "HCl + NaOH → NaCl + H₂O", "Zn + CuSO₄ → ZnSO₄ + Cu", "CaCO₃ → CaO + CO₂"],
+        answer: "Zn + CuSO₄ → ZnSO₄ + Cu",
+        explanation: "Bu tepkimede Zn elektronu Cu'ya vererek yükseltgeniyor (Zn⁰ → Zn²⁺ + 2e⁻), Cu ise elektron alarak indirgeniyor (Cu²⁺ + 2e⁻ → Cu⁰)."
+      },
+      {
+        question: "Atomun çekirdeğinde bulunan parçacıklar hangileridir?",
+        options: ["Proton ve elektron", "Nötron ve elektron", "Proton ve nötron", "Proton, nötron ve elektron"],
+        answer: "Proton ve nötron",
+        explanation: "Atom çekirdeğinde proton ve nötron bulunur, elektronlar ise çekirdeğin etrafındaki katmanlarda yer alır."
+      },
+      {
+        question: "pH değeri 3 olan bir çözelti, pH değeri 6 olan bir çözeltiden kaç kat daha asidiktir?",
+        options: ["2 kat", "3 kat", "100 kat", "1000 kat"],
+        answer: "1000 kat",
+        explanation: "pH skalası logaritmiktir. pH'daki her birim değişim, asitlik/bazlık konsantrasyonunda 10 katlık değişim anlamına gelir. 6-3 = 3 birim fark olduğundan, 10³ = 1000 kat daha asidiktir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi bir amfoter oksittir?",
+        options: ["Na₂O", "CO₂", "Al₂O₃", "MgO"],
+        answer: "Al₂O₃",
+        explanation: "Amfoter oksitler hem asitlerle hem de bazlarla tepkimeye girebilen oksitlerdir. Alüminyum oksit (Al₂O₃) amfoter özellik gösterir."
+      }
+    ],
+    'Biyoloji': [
+      {
+        question: "Hücre yapısı hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Hücre yapısı hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Organellerin görevleri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Hücre bölünmesi süreçleri hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Tarih': [
+      {
+        question: "Modern Türkiye'nin kuruluş sürecini öğrenceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. Modern Türkiye'nin kuruluş sürecini öğrenceksiniz."
+      },
+      {
+        question: "Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Cumhuriyet'in ilanına giden olaylar zincirini öğrenceksiniz."
+      },
+      {
+        question: "Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Orta Çağ tarihi hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Coğrafya': [
+      {
+        question: "Türkiye'nin fiziki coğrafyasını öğrenceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Türkiye'nin fiziki coğrafyasını öğrenceksiniz."
+      },
+      {
+        question: "İklim bilgisi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. İklim bilgisi hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Nüfus ve yerleşme hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Felsefe': [
+      {
+        question: "Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Varoluşçuluk akımının tarihsel gelişimi hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Bilgi felsefesi hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. Ahlak felsefesi hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'İngilizce': [
+      {
+        question: "Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Günlük konuşma kalıpları hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Okuma becerileri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Okuma becerileri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Yazma becerileri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "A seçeneği",
+        explanation: "Bu sorunun cevabı A seçeneğidir. Yazma becerileri hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ],
+    'Edebiyat': [
+      {
+        question: "Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: "Bu sorunun cevabı B seçeneğidir. Şiir analizi teknikleri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Roman türleri hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "C seçeneği",
+        explanation: "Bu sorunun cevabı C seçeneğidir. Roman türleri hakkında kapsamlı bilgi edineceksiniz."
+      },
+      {
+        question: "Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz.",
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "D seçeneği",
+        explanation: "Bu sorunun cevabı D seçeneğidir. Halk edebiyatı hakkında kapsamlı bilgi edineceksiniz."
+      }
+    ]
+  };
+  
+  // Eğer konu için örnek bulunamazsa, dersin genel örneklerini gönder
+  if (!topicExamples[subject] || !topicExamples[subject][topic] || topicExamples[subject][topic].length === 0) {
+    // Her konu için 6 soru içeren bir dizi üret
+    const baseExamples = getSubjectExamples(subject);
+    const newExamples = [];
+    
+    // Mevcut sorulardan 6 tanesini al veya yeterli soru yoksa tümünü al
+    for (let i = 0; i < 6 && i < baseExamples.length; i++) {
+      newExamples.push(baseExamples[i]);
+    }
+    
+    // Eğer 6'dan az soru varsa, eksik kalan kısmı varsayılan sorularla doldur
+    while (newExamples.length < 6) {
+      const questionIndex = newExamples.length + 1;
+      newExamples.push({
+        question: `${subject} - ${topic} için Soru ${questionIndex}`,
+        options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+        answer: "B seçeneği",
+        explanation: `Bu sorunun cevabı B seçeneğidir. ${subject} - ${topic} konusunda önemli bir bilgiyi test etmektedir.`
+      });
+    }
+    
+    return newExamples;
+  }
+  
+  const topicSpecificExamples = topicExamples[subject][topic];
+  
+  // Eğer 6'dan az soru varsa, eksik kalan kısmı varsayılan sorularla doldur
+  while (topicSpecificExamples.length < 6) {
+    const questionIndex = topicSpecificExamples.length + 1;
+    topicSpecificExamples.push({
+      question: `${subject} - ${topic} için Soru ${questionIndex}`,
+      options: ["A seçeneği", "B seçeneği", "C seçeneği", "D seçeneği"],
+      answer: "C seçeneği",
+      explanation: `Bu sorunun cevabı C seçeneğidir. ${subject} - ${topic} konusunda önemli bir bilgiyi test etmektedir.`
+    });
+  }
+  
+  return topicSpecificExamples;
+};
+
+/**
+ * Generate subject, grade and topic specific video data
+ */
+export const generateTopicVideoData = (subject: string, grade: GradeLevel, topic: string): Video => {
+  const videoId = Math.floor(Math.random() * 10000) + 1;
+  
+  return {
+    id: videoId,
+    title: `${subject} ${grade}. Sınıf - ${topic} Konu Anlatımı`,
+    thumbnailUrl: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?q=80&w=1171&auto=format&fit=crop",
+    duration: `${Math.floor(Math.random() * 20) + 5}:${Math.floor(Math.random() * 59).toString().padStart(2, '0')}`,
+    saved: false,
+    subject: subject,
+    grade: grade,
+    topic: topic,
+    description: getTopicDescription(subject, topic),
+    examples: getTopicExamples(subject, topic),
+    videoUrl: "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+  };
+};
+
+/**
+ * Ensure videos exist for specific subject, grade and topic
+ */
+export const ensureTopicVideos = (
+  subject: string, 
+  grade: GradeLevel, 
+  topic: string, 
+  allVideos: Video[] = mockVideos
+): Video[] => {
+  const existingVideos = allVideos.filter(video => 
+    video.subject === subject && 
+    video.grade === grade &&
+    video.topic === topic
+  );
+  
+  // If we already have 6 or more videos, return the first 6
+  return existingVideos.slice(0, 6);
+};
+
+/**
+ * Get topic-specific videos for a subject and grade
+ */
+export const getSubjectGradeTopicVideos = (
+  subject: string,
+  grade: GradeLevel,
+  topic: string,
+  allVideos: Video[] = mockVideos
+): Video[] => {
+  // Ensure we have at least 6 videos for this topic
+  return ensureTopicVideos(subject, grade, topic, allVideos);
+};
