@@ -1,4 +1,3 @@
-
 // Grade levels for the Turkish education system
 export const gradeNames = {
   9: "9. Sınıf",
@@ -12,57 +11,57 @@ export type GradeLevel = 9 | 10 | 11 | 12;
 // Video topics by grade for each subject
 export const gradeTopics: Record<string, Record<GradeLevel, string[]>> = {
   'Fizik': {
-    9: ['Fizik Bilimine Giriş', 'Madde ve Özellikleri', 'Hareket ve Kuvvet', 'Enerji'],
-    10: ['Basınç ve Kaldırma Kuvveti', 'Elektrostatik', 'Elektrik Akımı', 'Manyetizma'],
-    11: ['Kuvvet ve Hareket', 'Elektrik ve Manyetizma', 'Dalgalar', 'Modern Fizik'],
-    12: ['Çembersel Hareket', 'Basit Harmonik Hareket', 'Dalga Mekaniği', 'Atom Fiziği']
+    9: ['Fizik Bilimine Giriş', 'Madde ve Özellikleri', 'Hareket ve Kuvvet', 'Enerji', 'Isı ve Sıcaklık', 'Elektrik'],
+    10: ['Basınç ve Kaldırma Kuvveti', 'Elektrostatik', 'Elektrik ve Manyetizma', 'Optik', 'Dalgalar', 'Modern Fizik'],
+    11: ['Vektörler', 'Newton Yasaları', 'İş ve Enerji', 'Atışlar', 'İmpuls ve Momentum', 'Tork'],
+    12: ['Çembersel Hareket', 'Basit Harmonik Hareket', 'Dalga Mekaniği', 'Atom Fiziği', 'Nükleer Fizik', 'Görelilik']
   },
   'Kimya': {
-    9: ['Kimya Bilimi', 'Atom ve Yapısı', 'Periyodik Sistem', 'Kimyasal Bağlar'],
-    10: ['Kimyasal Tepkimeler', 'Karışımlar', 'Asit, Baz ve Tuzlar', 'Kimya ve Çevre'],
-    11: ['Gazlar', 'Sıvı Çözeltiler', 'Kimyasal Tepkimelerde Enerji', 'Karbon Kimyası'],
-    12: ['Kimyasal Kinetik', 'Kimyasal Denge', 'Elektrokimya', 'Organik Kimya']
+    9: ['Kimyanın Temel Kanunları', 'Atom ve Yapısı', 'Periyodik Sistem', 'Kimyasal Türler', 'Mol Kavramı', 'Karışımlar'],
+    10: ['Asitler ve Bazlar', 'Karışımlar', 'Kimyasal Tepkimeler', 'Gazlar', 'Sıvılar', 'Çözeltiler'],
+    11: ['Katılar', 'Modern Atom Teorisi', 'Gazlar', 'Çözünürlük', 'Kimyasal Tepkimeler', 'Kimyasal Hesaplamalar'],
+    12: ['Kimyasal Kinetik', 'Kimyasal Denge', 'Asit-Baz Dengesi', 'Çözünürlük Dengesi', 'Elektrokimya', 'Organik Kimya']
   },
   'Biyoloji': {
-    9: ['Yaşam Bilimi', 'Hücre', 'Canlıların Çeşitliliği', 'Canlı Sistemler'],
-    10: ['Hücre Bölünmesi', 'Kalıtım', 'Ekosistem Ekolojisi', 'Güncel Çevre Sorunları'],
-    11: ['İnsan Fizyolojisi', 'Sinir Sistemi', 'Endokrin Sistem', 'Duyu Organları'],
-    12: ['Genden Proteine', 'Biyoteknoloji', 'Canlılarda Enerji Dönüşümleri', 'Bitki Biyolojisi']
+    9: ['Canlıların Ortak Özellikleri', 'Hücre', 'Canlı Çeşitliliği', 'Ekosistem', 'Güncel Çevre Sorunları', 'Biyolojik Çeşitlilik'],
+    10: ['Hücre Bölünmeleri', 'Kalıtım', 'Ekosistem Ekolojisi', 'Güncel Çevre Sorunları', 'Doğal Kaynaklar', 'Biyolojik Çeşitlilik'],
+    11: ['İnsan Fizyolojisi', 'Sinir Sistemi', 'Endokrin Sistem', 'Duyu Organları', 'Destek ve Hareket Sistemi', 'Sindirim Sistemi'],
+    12: ['Genden Proteine', 'Biyoteknoloji', 'Canlılarda Enerji', 'Bitki Biyolojisi', 'Metabolizma', 'Fotosentez']
   },
   'Matematik': {
-    9: ['Kümeler', 'Denklemler ve Eşitsizlikler', 'Üçgenler', 'Veri Analizi'],
-    10: ['Fonksiyonlar', 'Polinomlar', 'İkinci Dereceden Denklemler', 'Dörtgenler ve Çokgenler'],
-    11: ['Trigonometri', 'Analitik Geometri', 'Fonksiyonlarda Limit ve Süreklilik', 'Türev'],
-    12: ['İntegral', 'Diziler', 'Olasılık', 'İstatistik']
+    9: ['Kümeler', 'Denklemler', 'Üçgenler', 'Mantık', 'Fonksiyonlar', 'Olasılık'],
+    10: ['Fonksiyonlar', 'Polinomlar', 'Trigonometri', 'İkinci Dereceden Denklemler', 'Permütasyon', 'Kombinasyon'],
+    11: ['Trigonometri', 'Analitik Geometri', 'Fonksiyonlarda Limit', 'Türev', 'İntegral', 'Olasılık'],
+    12: ['Üstel ve Logaritmik Fonksiyonlar', 'Diziler', 'Karmaşık Sayılar', 'Türev', 'İntegral', 'Analitik Geometri']
   },
   'Tarih': {
-    9: ['İnsanlığın İlk Dönemleri', 'İlk Türk Devletleri', 'İslam Tarihi', 'Türk İslam Devletleri'],
-    10: ['Beylikten Devlete', 'Dünya Gücü Osmanlı', 'Arayış Yılları', 'Avrupa ve Osmanlı Devleti'],
-    11: ['Değişen Dünya Dengeleri', 'Milliyetçilik ve Bağımsızlık', 'Milli Mücadele', 'Türkiye Cumhuriyeti'],
-    12: ['İki Savaş Arasındaki Dönem', 'İkinci Dünya Savaşı', 'Soğuk Savaş Dönemi', 'Yumuşama Dönemi ve Sonrası']
+    9: ['İlk Uygarlıklar', 'İlk Türk Devletleri', 'İslam Tarihi', 'Türk-İslam Devletleri', 'Türkiye Tarihi', 'Osmanlı Kuruluş'],
+    10: ['Osmanlı Kuruluş', 'Osmanlı Yükselme', 'Osmanlı Duraklama', 'Osmanlı Gerileme', 'Avrupa Tarihi', 'Yeni Çağ'],
+    11: ['Değişim Çağında Avrupa', 'Osmanlı Modernleşmesi', 'Milli Mücadele', 'TBMM Dönemi', 'Türk İnkılabı', 'Atatürk Dönemi'],
+    12: ['İkinci Dünya Savaşı', 'Soğuk Savaş', 'Türkiye Cumhuriyeti', 'Demokrasi Tarihi', 'Yakın Tarih', 'Çağdaş Türk Dünyası']
   },
   'Coğrafya': {
-    9: ['Doğal Sistemler', 'Beşeri Sistemler', 'Küresel Ortam', 'Çevre ve Toplum'],
-    10: ['Doğal Sistemler', 'Beşeri Sistemler', 'Mekansal Sentez', 'Küresel Ortam'],
-    11: ['Doğal Sistemler', 'Beşeri Sistemler', 'Küresel Ortam', 'Çevre ve Toplum'],
-    12: ['Doğal Sistemler', 'Beşeri Sistemler', 'Mekansal Sentez', 'Küresel Ortam']
+    9: ['Doğal Sistemler', 'İklim Bilgisi', 'Yerşekilleri', 'Nüfus', 'Yerleşme', 'Ekonomik Faaliyetler'],
+    10: ['Ekosistemler', 'Nüfus Politikaları', 'Şehirleşme', 'Ekonomik Faaliyetler', 'Ulaşım Sistemleri', 'Bölgesel Kalkınma'],
+    11: ['Türkiye Fiziki Coğrafyası', 'Türkiye İklimi', 'Türkiye Bitki Örtüsü', 'Türkiye Nüfusu', 'Türkiye Ekonomisi', 'Türkiye Bölgeleri'],
+    12: ['Doğal Kaynaklar', 'Çevre Sorunları', 'Küresel İklim Değişikliği', 'Afetler', 'Küreselleşme', 'Uluslararası Örgütler']
   },
   'İngilizce': {
-    9: ['Günlük İletişim', 'Okul Hayatı', 'İnsan ve Toplum', 'Çevre'],
-    10: ['Seyahat', 'Gençlik Sorunları', 'Spor', 'Doğal Afetler'],
-    11: ['Müzik', 'Sinema', 'İletişim', 'İnsan İlişkileri'],
-    12: ['Gelecek Planları', 'İş Hayatı', 'Alternatif Enerji', 'Dünya Sorunları']
+    9: ['Simple Present Tense', 'Present Continuous', 'Simple Past Tense', 'Future Tense', 'Present Perfect', 'Modal Verbs'],
+    10: ['Past Continuous', 'Past Perfect', 'Conditionals', 'Passive Voice', 'Reported Speech', 'Relative Clauses'],
+    11: ['Advanced Grammar', 'Academic Writing', 'Business English', 'Literature', 'Public Speaking', 'TOEFL Preparation'],
+    12: ['Advanced Writing', 'Critical Reading', 'Research Skills', 'Presentation Skills', 'Job Interviews', 'Academic Essays']
   },
   'Edebiyat': {
-    9: ['Giriş', 'Şiir', 'Öykü ve Roman', 'Tiyatro'],
-    10: ['Destan ve Efsane', 'Şiir', 'Anlatmaya Bağlı Edebi Metinler', 'Tiyatro'],
-    11: ['Tanzimat Dönemi Edebiyatı', 'Servet-i Fünun Edebiyatı', 'Milli Edebiyat', 'Cumhuriyet Dönemi'],
-    12: ['1923-1940 Dönemi', '1940-1960 Dönemi', '1960 Sonrası Dönem', 'Dünya Edebiyatı']
+    9: ['Edebiyata Giriş', 'Hikaye', 'Roman', 'Şiir', 'Tiyatro', 'Masal ve Destan'],
+    10: ['Divan Edebiyatı', 'Halk Edebiyatı', 'Tanzimat Edebiyatı', 'Servet-i Fünun', 'Fecr-i Ati', 'Milli Edebiyat'],
+    11: ['Cumhuriyet Dönemi', 'Modern Şiir', 'Modern Roman', 'Modern Tiyatro', 'Öykü', 'Deneme'],
+    12: ['Çağdaş Türk Edebiyatı', 'Dünya Edebiyatı', 'Edebi Akımlar', 'Edebi Sanatlar', 'Metin İnceleme', 'Eleştiri']
   },
   'Felsefe': {
-    9: ['Felsefeye Giriş', 'Bilgi Felsefesi', 'Varlık Felsefesi', 'Ahlak Felsefesi'],
-    10: ['Din Felsefesi', 'Sanat Felsefesi', 'Siyaset Felsefesi', 'Bilim Felsefesi'],
-    11: ['Felsefi Akımlar', 'MÖ 6. Yüzyıl-MS 2. Yüzyıl Felsefesi', 'MS 2. Yüzyıl-15. Yüzyıl Felsefesi', '15. Yüzyıl-17. Yüzyıl Felsefesi'],
-    12: ['18. Yüzyıl-19. Yüzyıl Felsefesi', '20. Yüzyıl Felsefesi', 'Türk İslam Düşüncesi', 'Çağdaş Türk Düşüncesi']
+    9: ['Felsefeye Giriş', 'Bilgi Felsefesi', 'Varlık Felsefesi', 'Ahlak Felsefesi', 'Din Felsefesi', 'Sanat Felsefesi'],
+    10: ['Antik Yunan', 'Orta Çağ', 'Rönesans', 'Aydınlanma', 'Modern Felsefe', 'Çağdaş Felsefe'],
+    11: ['Epistemoloji', 'Ontoloji', 'Etik', 'Estetik', 'Siyaset Felsefesi', 'Bilim Felsefesi'],
+    12: ['20. Yüzyıl Felsefesi', 'Varoluşçuluk', 'Fenomenoloji', 'Postyapısalcılık', 'Türk Düşüncesi', 'İslam Felsefesi']
   }
 };
