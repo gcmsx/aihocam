@@ -1,3 +1,4 @@
+
 import { Video } from '@/types/video';
 import { GradeLevel } from '@/data/gradeData';
 
@@ -463,3 +464,28 @@ export const getSubjectExamples = (subject: string) => {
         question: "Osmanlı Devleti hangi yıl kurulmuştur?",
         options: ["1299", "1326", "1453", "1517"],
         answer: "1299",
+        explanation: "Osmanlı Devleti, 1299 yılında Osman Bey tarafından kurulmuştur. 1326 Bursa'nın fethi, 1453 İstanbul'un fethi, 1517 ise Mısır'ın fethidir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi Atatürk'ün ölüm tarihidir?",
+        options: ["10 Kasım 1935", "10 Kasım 1936", "10 Kasım 1937", "10 Kasım 1938"],
+        answer: "10 Kasım 1938",
+        explanation: "Mustafa Kemal Atatürk, 10 Kasım 1938 tarihinde İstanbul Dolmabahçe Sarayı'nda hayatını kaybetmiştir."
+      },
+      {
+        question: "Türkiye Cumhuriyeti hangi tarihte ilan edilmiştir?",
+        options: ["23 Nisan 1920", "30 Ağustos 1922", "29 Ekim 1923", "3 Mart 1924"],
+        answer: "29 Ekim 1923",
+        explanation: "Türkiye Cumhuriyeti, 29 Ekim 1923 tarihinde ilan edilmiştir. 23 Nisan 1920 TBMM'nin açılışı, 30 Ağustos 1922 Büyük Taarruz'un zaferi, 3 Mart 1924 ise Halifeliğin kaldırılması tarihidir."
+      },
+      {
+        question: "Aşağıdakilerden hangisi İstiklal Marşı'nın yazarıdır?",
+        options: ["Namık Kemal", "Mehmet Akif Ersoy", "Tevfik Fikret", "Ziya Gökalp"],
+        answer: "Mehmet Akif Ersoy",
+        explanation: "İstiklal Marşı, Mehmet Akif Ersoy tarafından yazılmış ve 12 Mart 1921'de TBMM tarafından milli marş olarak kabul edilmiştir."
+      }
+    ]
+  };
+  
+  return examplesBySubject[subject] || [];
+};
