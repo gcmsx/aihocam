@@ -1,4 +1,3 @@
-
 // Grade levels for the Turkish education system
 export const gradeNames = {
   9: "9. Sınıf",
@@ -9,60 +8,247 @@ export const gradeNames = {
 
 export type GradeLevel = 9 | 10 | 11 | 12;
 
-// Video topics by grade for each subject
-export const gradeTopics: Record<string, Record<GradeLevel, string[]>> = {
+// Define the structure for a topic with associated video IDs
+export interface Topic {
+  name: string;
+  videoIds: number[]; // IDs referencing videos in mockData or a database
+}
+
+// Updated structure: Video topics and their associated video IDs by grade for each subject
+export const gradeTopics: Record<string, Record<GradeLevel, Topic[]>> = {
   'Fizik': {
-    9: ['Fizik Bilimine Giriş', 'Madde ve Özellikleri', 'Hareket ve Kuvvet', 'Enerji'],
-    10: ['Basınç ve Kaldırma Kuvveti', 'Elektrostatik', 'Elektrik Akımı', 'Manyetizma'],
-    11: ['Kuvvet ve Hareket', 'Elektrik ve Manyetizma', 'Dalgalar', 'Modern Fizik'],
-    12: ['Çembersel Hareket', 'Basit Harmonik Hareket', 'Dalga Mekaniği', 'Atom Fiziği']
+    9: [
+      { name: 'Fizik Bilimine Giriş', videoIds: [] }, // Assign relevant video IDs here
+      { name: 'Madde ve Özellikleri', videoIds: [] },
+      { name: 'Hareket ve Kuvvet', videoIds: [] },
+      { name: 'Enerji', videoIds: [] }
+    ],
+    10: [
+      { name: 'Basınç ve Kaldırma Kuvveti', videoIds: [] },
+      { name: 'Elektrostatik', videoIds: [] },
+      { name: 'Elektrik Akımı', videoIds: [] },
+      { name: 'Manyetizma', videoIds: [] }
+    ],
+    11: [
+      { name: 'Kuvvet ve Hareket', videoIds: [] },
+      { name: 'Elektrik ve Manyetizma', videoIds: [] },
+      { name: 'Dalgalar', videoIds: [] },
+      { name: 'Modern Fizik', videoIds: [] }
+    ],
+    12: [
+      { name: 'Çembersel Hareket', videoIds: [] },
+      { name: 'Basit Harmonik Hareket', videoIds: [] },
+      { name: 'Dalga Mekaniği', videoIds: [] },
+      { name: 'Atom Fiziği', videoIds: [] }
+    ]
   },
   'Kimya': {
-    9: ['Kimya Bilimi', 'Atom ve Yapısı', 'Periyodik Sistem', 'Kimyasal Bağlar'],
-    10: ['Kimyasal Tepkimeler', 'Karışımlar', 'Asit, Baz ve Tuzlar', 'Kimya ve Çevre'],
-    11: ['Gazlar', 'Sıvı Çözeltiler', 'Kimyasal Tepkimelerde Enerji', 'Karbon Kimyası'],
-    12: ['Kimyasal Kinetik', 'Kimyasal Denge', 'Elektrokimya', 'Organik Kimya']
+    9: [
+      { name: 'Kimya Bilimi', videoIds: [] },
+      { name: 'Atom ve Yapısı', videoIds: [] },
+      { name: 'Periyodik Sistem', videoIds: [] },
+      { name: 'Kimyasal Bağlar', videoIds: [] }
+    ],
+    10: [
+      { name: 'Kimyasal Tepkimeler', videoIds: [] },
+      { name: 'Karışımlar', videoIds: [] },
+      { name: 'Asit, Baz ve Tuzlar', videoIds: [] },
+      { name: 'Kimya ve Çevre', videoIds: [] }
+    ],
+    11: [
+      { name: 'Gazlar', videoIds: [] },
+      { name: 'Sıvı Çözeltiler', videoIds: [] },
+      { name: 'Kimyasal Tepkimelerde Enerji', videoIds: [] },
+      { name: 'Karbon Kimyası', videoIds: [] }
+    ],
+    12: [
+      { name: 'Kimyasal Kinetik', videoIds: [] },
+      { name: 'Kimyasal Denge', videoIds: [] },
+      { name: 'Elektrokimya', videoIds: [] },
+      { name: 'Organik Kimya', videoIds: [] }
+    ]
   },
   'Biyoloji': {
-    9: ['Yaşam Bilimi', 'Hücre', 'Canlıların Çeşitliliği', 'Canlı Sistemler'],
-    10: ['Hücre Bölünmesi', 'Kalıtım', 'Ekosistem Ekolojisi', 'Güncel Çevre Sorunları'],
-    11: ['İnsan Fizyolojisi', 'Sinir Sistemi', 'Endokrin Sistem', 'Duyu Organları'],
-    12: ['Genden Proteine', 'Biyoteknoloji', 'Canlılarda Enerji Dönüşümleri', 'Bitki Biyolojisi']
+    9: [
+      { name: 'Yaşam Bilimi', videoIds: [] },
+      { name: 'Hücre', videoIds: [] },
+      { name: 'Canlıların Çeşitliliği', videoIds: [] },
+      { name: 'Canlı Sistemler', videoIds: [] }
+    ],
+    10: [
+      { name: 'Hücre Bölünmesi', videoIds: [] },
+      { name: 'Kalıtım', videoIds: [] },
+      { name: 'Ekosistem Ekolojisi', videoIds: [] },
+      { name: 'Güncel Çevre Sorunları', videoIds: [] }
+    ],
+    11: [
+      { name: 'İnsan Fizyolojisi', videoIds: [] },
+      { name: 'Sinir Sistemi', videoIds: [] },
+      { name: 'Endokrin Sistem', videoIds: [] },
+      { name: 'Duyu Organları', videoIds: [] }
+    ],
+    12: [
+      { name: 'Genden Proteine', videoIds: [] },
+      { name: 'Biyoteknoloji', videoIds: [] },
+      { name: 'Canlılarda Enerji Dönüşümleri', videoIds: [] },
+      { name: 'Bitki Biyolojisi', videoIds: [] }
+    ]
   },
   'Matematik': {
-    9: ['Kümeler', 'Denklemler ve Eşitsizlikler', 'Üçgenler', 'Veri Analizi'],
-    10: ['Fonksiyonlar', 'Polinomlar', 'İkinci Dereceden Denklemler', 'Dörtgenler ve Çokgenler'],
-    11: ['Trigonometri', 'Analitik Geometri', 'Fonksiyonlarda Limit ve Süreklilik', 'Türev'],
-    12: ['İntegral', 'Diziler', 'Olasılık', 'İstatistik']
+    9: [
+      { name: 'Kümeler', videoIds: [] },
+      { name: 'Denklemler ve Eşitsizlikler', videoIds: [] },
+      { name: 'Üçgenler', videoIds: [] },
+      { name: 'Veri Analizi', videoIds: [] }
+    ],
+    10: [
+      { name: 'Fonksiyonlar', videoIds: [] },
+      { name: 'Polinomlar', videoIds: [] },
+      { name: 'İkinci Dereceden Denklemler', videoIds: [] },
+      { name: 'Dörtgenler ve Çokgenler', videoIds: [] }
+    ],
+    11: [
+      { name: 'Trigonometri', videoIds: [] },
+      { name: 'Analitik Geometri', videoIds: [] },
+      { name: 'Fonksiyonlarda Limit ve Süreklilik', videoIds: [] },
+      { name: 'Türev', videoIds: [7] } // Example: Assign video ID 7 to 'Türev'
+    ],
+    12: [
+      { name: 'İntegral', videoIds: [] },
+      { name: 'Diziler', videoIds: [] },
+      { name: 'Olasılık', videoIds: [] },
+      { name: 'İstatistik', videoIds: [] }
+    ]
   },
   'Tarih': {
-    9: ['İnsanlığın İlk Dönemleri', 'İlk Türk Devletleri', 'İslam Tarihi', 'Türk İslam Devletleri'],
-    10: ['Beylikten Devlete', 'Dünya Gücü Osmanlı', 'Arayış Yılları', 'Avrupa ve Osmanlı Devleti'],
-    11: ['Değişen Dünya Dengeleri', 'Milliyetçilik ve Bağımsızlık', 'Milli Mücadele', 'Türkiye Cumhuriyeti'],
-    12: ['İki Savaş Arasındaki Dönem', 'İkinci Dünya Savaşı', 'Soğuk Savaş Dönemi', 'Yumuşama Dönemi ve Sonrası']
+    9: [
+      { name: 'İnsanlığın İlk Dönemleri', videoIds: [] },
+      { name: 'İlk Türk Devletleri', videoIds: [] },
+      { name: 'İslam Tarihi', videoIds: [] },
+      { name: 'Türk İslam Devletleri', videoIds: [] }
+    ],
+    10: [
+      { name: 'Beylikten Devlete', videoIds: [] },
+      { name: 'Dünya Gücü Osmanlı', videoIds: [2] }, // Example: Assign video ID 2
+      { name: 'Arayış Yılları', videoIds: [] },
+      { name: 'Avrupa ve Osmanlı Devleti', videoIds: [] }
+    ],
+    11: [
+      { name: 'Değişen Dünya Dengeleri', videoIds: [] },
+      { name: 'Milliyetçilik ve Bağımsızlık', videoIds: [] },
+      { name: 'Milli Mücadele', videoIds: [3] }, // Example: Assign video ID 3
+      { name: 'Türkiye Cumhuriyeti', videoIds: [1] } // Example: Assign video ID 1
+    ],
+    12: [
+      { name: 'İki Savaş Arasındaki Dönem', videoIds: [] },
+      { name: 'İkinci Dünya Savaşı', videoIds: [] },
+      { name: 'Soğuk Savaş Dönemi', videoIds: [] },
+      { name: 'Yumuşama Dönemi ve Sonrası', videoIds: [] }
+    ]
   },
   'Coğrafya': {
-    9: ['Doğal Sistemler', 'Beşeri Sistemler', 'Küresel Ortam', 'Çevre ve Toplum'],
-    10: ['Doğal Sistemler', 'Beşeri Sistemler', 'Mekansal Sentez', 'Küresel Ortam'],
-    11: ['Doğal Sistemler', 'Beşeri Sistemler', 'Küresel Ortam', 'Çevre ve Toplum'],
-    12: ['Doğal Sistemler', 'Beşeri Sistemler', 'Mekansal Sentez', 'Küresel Ortam']
+    9: [
+      { name: 'Doğal Sistemler', videoIds: [4] }, // Example: Assign video ID 4
+      { name: 'Beşeri Sistemler', videoIds: [] },
+      { name: 'Küresel Ortam', videoIds: [] },
+      { name: 'Çevre ve Toplum', videoIds: [] }
+    ],
+    10: [
+      { name: 'Doğal Sistemler', videoIds: [5] }, // Example: Assign video ID 5
+      { name: 'Beşeri Sistemler', videoIds: [] },
+      { name: 'Mekansal Sentez', videoIds: [6] }, // Example: Assign video ID 6
+      { name: 'Küresel Ortam', videoIds: [] }
+    ],
+    11: [
+      { name: 'Doğal Sistemler', videoIds: [] },
+      { name: 'Beşeri Sistemler', videoIds: [] },
+      { name: 'Küresel Ortam', videoIds: [] },
+      { name: 'Çevre ve Toplum', videoIds: [] }
+    ],
+    12: [
+      { name: 'Doğal Sistemler', videoIds: [] },
+      { name: 'Beşeri Sistemler', videoIds: [] },
+      { name: 'Mekansal Sentez', videoIds: [] },
+      { name: 'Küresel Ortam', videoIds: [] }
+    ]
   },
   'İngilizce': {
-    9: ['Günlük İletişim', 'Okul Hayatı', 'İnsan ve Toplum', 'Çevre'],
-    10: ['Seyahat', 'Gençlik Sorunları', 'Spor', 'Doğal Afetler'],
-    11: ['Müzik', 'Sinema', 'İletişim', 'İnsan İlişkileri'],
-    12: ['Gelecek Planları', 'İş Hayatı', 'Alternatif Enerji', 'Dünya Sorunları']
+    9: [
+      { name: 'Günlük İletişim', videoIds: [] },
+      { name: 'Okul Hayatı', videoIds: [] },
+      { name: 'İnsan ve Toplum', videoIds: [] },
+      { name: 'Çevre', videoIds: [] }
+    ],
+    10: [
+      { name: 'Seyahat', videoIds: [] },
+      { name: 'Gençlik Sorunları', videoIds: [] },
+      { name: 'Spor', videoIds: [] },
+      { name: 'Doğal Afetler', videoIds: [] }
+    ],
+    11: [
+      { name: 'Müzik', videoIds: [] },
+      { name: 'Sinema', videoIds: [] },
+      { name: 'İletişim', videoIds: [] },
+      { name: 'İnsan İlişkileri', videoIds: [] }
+    ],
+    12: [
+      { name: 'Gelecek Planları', videoIds: [] },
+      { name: 'İş Hayatı', videoIds: [] },
+      { name: 'Alternatif Enerji', videoIds: [] },
+      { name: 'Dünya Sorunları', videoIds: [] }
+    ]
   },
   'Edebiyat': {
-    9: ['Giriş', 'Şiir', 'Öykü ve Roman', 'Tiyatro'],
-    10: ['Destan ve Efsane', 'Şiir', 'Anlatmaya Bağlı Edebi Metinler', 'Tiyatro'],
-    11: ['Tanzimat Dönemi Edebiyatı', 'Servet-i Fünun Edebiyatı', 'Milli Edebiyat', 'Cumhuriyet Dönemi'],
-    12: ['1923-1940 Dönemi', '1940-1960 Dönemi', '1960 Sonrası Dönem', 'Dünya Edebiyatı']
+    9: [
+      { name: 'Giriş', videoIds: [] },
+      { name: 'Şiir', videoIds: [] },
+      { name: 'Öykü ve Roman', videoIds: [] },
+      { name: 'Tiyatro', videoIds: [] }
+    ],
+    10: [
+      { name: 'Destan ve Efsane', videoIds: [] },
+      { name: 'Şiir', videoIds: [] },
+      { name: 'Anlatmaya Bağlı Edebi Metinler', videoIds: [] },
+      { name: 'Tiyatro', videoIds: [] }
+    ],
+    11: [
+      { name: 'Tanzimat Dönemi Edebiyatı', videoIds: [] },
+      { name: 'Servet-i Fünun Edebiyatı', videoIds: [] },
+      { name: 'Milli Edebiyat', videoIds: [] },
+      { name: 'Cumhuriyet Dönemi', videoIds: [] }
+    ],
+    12: [
+      { name: '1923-1940 Dönemi', videoIds: [] },
+      { name: '1940-1960 Dönemi', videoIds: [] },
+      { name: '1960 Sonrası Dönem', videoIds: [] },
+      { name: 'Dünya Edebiyatı', videoIds: [] }
+    ]
   },
   'Felsefe': {
-    9: ['Felsefeye Giriş', 'Bilgi Felsefesi', 'Varlık Felsefesi', 'Ahlak Felsefesi'],
-    10: ['Din Felsefesi', 'Sanat Felsefesi', 'Siyaset Felsefesi', 'Bilim Felsefesi'],
-    11: ['Felsefi Akımlar', 'MÖ 6. Yüzyıl-MS 2. Yüzyıl Felsefesi', 'MS 2. Yüzyıl-15. Yüzyıl Felsefesi', '15. Yüzyıl-17. Yüzyıl Felsefesi'],
-    12: ['18. Yüzyıl-19. Yüzyıl Felsefesi', '20. Yüzyıl Felsefesi', 'Türk İslam Düşüncesi', 'Çağdaş Türk Düşüncesi']
+    9: [
+      { name: 'Felsefeye Giriş', videoIds: [] },
+      { name: 'Bilgi Felsefesi', videoIds: [] },
+      { name: 'Varlık Felsefesi', videoIds: [] },
+      { name: 'Ahlak Felsefesi', videoIds: [] }
+    ],
+    10: [
+      { name: 'Din Felsefesi', videoIds: [] },
+      { name: 'Sanat Felsefesi', videoIds: [] },
+      { name: 'Siyaset Felsefesi', videoIds: [] },
+      { name: 'Bilim Felsefesi', videoIds: [] }
+    ],
+    11: [
+      { name: 'Felsefi Akımlar', videoIds: [] },
+      { name: 'MÖ 6. Yüzyıl-MS 2. Yüzyıl Felsefesi', videoIds: [] },
+      { name: 'MS 2. Yüzyıl-15. Yüzyıl Felsefesi', videoIds: [] },
+      { name: '15. Yüzyıl-17. Yüzyıl Felsefesi', videoIds: [] }
+    ],
+    12: [
+      { name: '18. Yüzyıl-19. Yüzyıl Felsefesi', videoIds: [] },
+      { name: '20. Yüzyıl Felsefesi', videoIds: [] },
+      { name: 'Türk İslam Düşüncesi', videoIds: [] },
+      { name: 'Çağdaş Türk Düşüncesi', videoIds: [] }
+    ]
   }
 };
+
