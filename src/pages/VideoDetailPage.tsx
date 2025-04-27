@@ -170,24 +170,24 @@ const VideoDetailPage = () => {
   return (
     <div className="pb-16">
       <VideoHeader 
-        title={video?.title || ''}
-        subject={video?.subject}
-        duration={video?.duration || ''}
+        title={video.title}
+        subject={video.subject}
+        duration={video.duration}
         saved={saved}
         onSave={handleSaveVideo}
       />
       
       <div className="p-4">
         <VideoPlayer 
-          thumbnailUrl={video?.thumbnailUrl || ''}
-          title={video?.title || ''}
-          videoUrl={video?.videoUrl || ''}
+          thumbnailUrl={video.thumbnailUrl}
+          title={video.title}
+          videoUrl={video.videoUrl || "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"}
         />
         
         <ContentTabs 
           description={description}
           examples={examples}
-          videoId={video?.id}
+          videoId={video.id}
         />
       </div>
       

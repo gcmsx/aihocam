@@ -10,12 +10,11 @@ export interface Video {
   subject?: string;
   grade?: GradeLevel;
   description?: string;
-  topic?: string;  // Add topic field
-  videoUrl: string; // Make videoUrl required
   examples?: Array<{
     question: string;
     options?: string[];
     answer?: string;
     explanation?: string;
   }>;
+  videoUrl?: string;
 }
