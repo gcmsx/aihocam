@@ -7,128 +7,112 @@ import { toast } from '@/hooks/use-toast';
 const Profile = () => {
   // Update the beta version when making changes to this page
   useEffect(() => {
-    const currentVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0345';
-    localStorage.setItem('appVersion', currentVersion);
+    // Set the version to 0.345
+    localStorage.setItem('appVersion', '0.345');
     
     // Dispatch an event to notify index page to update version
     window.dispatchEvent(new CustomEvent('versionUpdated', {
-      detail: { version: currentVersion }
+      detail: { version: '0.345' }
     }));
     
-    // Check if this is the first time visiting the profile page today
-    const today = new Date().toLocaleDateString();
-    const lastVisit = localStorage.getItem('lastProfileVisit');
-    
-    if (lastVisit !== today) {
-      localStorage.setItem('lastProfileVisit', today);
-      
-      // Reset daily progress for a new day if needed
-      const dailyProgressKey = `dailyProgress_${today}`;
-      if (!localStorage.getItem(dailyProgressKey)) {
-        localStorage.setItem(dailyProgressKey, JSON.stringify({
-          videosWatched: 0,
-          goalReached: false
-        }));
-        
-        toast({
-          title: "Yeni Gün!",
-          description: "Bugün için yeni bir hedefin var: 5 video izle.",
-          variant: "default",
-        });
-      }
-    }
+    // Clear all lesson data
+    clearAllLessonData();
     
     // Initialize selected grade if not set
     if (!localStorage.getItem('selected_grade')) {
       localStorage.setItem('selected_grade', '9');
     }
+  }, []);
+  
+  // Function to clear all lesson data from the application
+  const clearAllLessonData = () => {
+    // Clear all localStorage data
+    localStorage.clear();
     
-    // Add subject and grade fields to completed questions if needed
-    const completedQuestionsStr = localStorage.getItem('completedQuestions');
-    if (completedQuestionsStr) {
-      const completedQuestions = JSON.parse(completedQuestionsStr);
-      let hasChanges = false;
+    // Reset critical app settings
+    localStorage.setItem('appVersion', '0.345');
+    localStorage.setItem('selected_grade', '9');
+    
+    // Clear IndexedDB database for videos
+    clearAllDatabases();
+    
+    // Show toast notification
+    toast({
+      title: "Tüm ders verileri silindi",
+      description: "İzlenen videolar, tamamlanan sorular ve ilerleme durumu başarıyla temizlendi.",
+      variant: "default",
+    });
+    
+    // Notify all components about data reset
+    window.dispatchEvent(new CustomEvent('lessonDataCleared'));
+    window.dispatchEvent(new CustomEvent('allContentCleared'));
+    
+    // Reset trending, recommended and popular videos
+    window.dispatchEvent(new CustomEvent('resetHomeContent'));
+  };
+  
+  // Function to clear all IndexedDB databases
+  const clearAllDatabases = () => {
+    try {
+      // Get all database names
+      const databases = indexedDB.databases ? indexedDB.databases() : Promise.resolve([]);
       
-      Object.entries(completedQuestions).forEach(([videoId, data]: [string, any]) => {
-        // Add subject if missing
-        if (!data.subject) {
-          // Assign a random subject for existing data
-          const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-          data.subject = subjects[Math.floor(Math.random() * subjects.length)];
-          hasChanges = true;
-        }
+      databases.then((dbs) => {
+        dbs.forEach(db => {
+          if (db.name) {
+            try {
+              console.log(`Deleting database: ${db.name}`);
+              const request = indexedDB.deleteDatabase(db.name);
+              
+              request.onsuccess = () => {
+                console.log(`Database ${db.name} successfully deleted`);
+              };
+              
+              request.onerror = (error) => {
+                console.error(`Error deleting database ${db.name}:`, error);
+              };
+            } catch (error) {
+              console.error(`Error accessing database ${db.name}:`, error);
+            }
+          }
+        });
+      }).catch(error => {
+        console.error('Error listing databases:', error);
         
-        // Add grade if missing
-        if (!data.grade) {
-          // Assign a grade based on videoId to ensure consistent assignment
-          const videoIdNum = parseInt(videoId);
-          const grades = [9, 10, 11, 12];
-          data.grade = grades[videoIdNum % 4];
-          hasChanges = true;
+        // Fallback: try to delete VideoDatabase directly
+        try {
+          const request = indexedDB.deleteDatabase('VideoDatabase');
+          
+          request.onsuccess = () => {
+            console.log('Video database successfully deleted');
+          };
+          
+          request.onerror = (error) => {
+            console.error('Error deleting video database:', error);
+          };
+        } catch (error) {
+          console.error('Error accessing IndexedDB:', error);
         }
       });
+    } catch (error) {
+      console.error('Error accessing IndexedDB:', error);
       
-      if (hasChanges) {
-        localStorage.setItem('completedQuestions', JSON.stringify(completedQuestions));
-      }
-    }
-    
-    // Add subject and grade fields to recently viewed videos if needed
-    const recentlyViewedStr = localStorage.getItem('recentlyViewedVideos');
-    if (recentlyViewedStr) {
+      // Fallback: try to delete VideoDatabase directly
       try {
-        const recentlyViewed = JSON.parse(recentlyViewedStr);
+        const request = indexedDB.deleteDatabase('VideoDatabase');
         
-        // Check if recentlyViewed is an array
-        if (Array.isArray(recentlyViewed)) {
-          let hasChanges = false;
-          let updatedRecentlyViewed = [...recentlyViewed];
-          
-          // Convert to proper format if it's just an array of numbers
-          if (recentlyViewed.length > 0 && typeof recentlyViewed[0] !== 'object') {
-            const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-            const grades = [9, 10, 11, 12];
-            
-            updatedRecentlyViewed = recentlyViewed.map((videoId: any) => {
-              // Ensure the videoId is treated correctly whether it's a number or an object
-              if (typeof videoId === 'object' && videoId !== null) return videoId;
-              
-              return {
-                id: Number(videoId),
-                subject: subjects[Number(videoId) % subjects.length],
-                grade: grades[Number(videoId) % grades.length]
-              };
-            });
-            
-            hasChanges = true;
-          } else {
-            // It's already an array of objects, add subject and grade if missing
-            updatedRecentlyViewed.forEach((video: any) => {
-              if (!video) return;
-              
-              if (!video.subject) {
-                const subjects = ['Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Edebiyat', 'Felsefe', 'İngilizce'];
-                video.subject = subjects[video.id % subjects.length];
-                hasChanges = true;
-              }
-              
-              if (!video.grade) {
-                const grades = [9, 10, 11, 12];
-                video.grade = grades[video.id % grades.length];
-                hasChanges = true;
-              }
-            });
-          }
-          
-          if (hasChanges) {
-            localStorage.setItem('recentlyViewedVideos', JSON.stringify(updatedRecentlyViewed));
-          }
-        }
+        request.onsuccess = () => {
+          console.log('Video database successfully deleted');
+        };
+        
+        request.onerror = (error) => {
+          console.error('Error deleting video database:', error);
+        };
       } catch (error) {
-        console.error('Error processing recently viewed videos:', error);
+        console.error('Error accessing IndexedDB:', error);
       }
     }
-  }, []);
+  };
   
   return (
     <div className="pb-16">

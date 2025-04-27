@@ -13,10 +13,13 @@ import {
   getAllRecentVideos,
   getVideoFromIndexedDB 
 } from './videoStorage';
+
 import { 
-  getSubjectExamples, 
-  getSubjectDescription 
-} from './videoUtils';
+  getSubjectDescription,
+  getSubjectExamples,
+  getSubjectVideos,
+  getSubjectGradeVideos
+} from '@/utils/videoUtils';
 
 // Export the imported functions
 export {
@@ -29,8 +32,10 @@ export {
   getAllSavedVideos,
   getAllRecentVideos,
   getVideoFromIndexedDB,
+  getSubjectDescription,
   getSubjectExamples,
-  getSubjectDescription
+  getSubjectVideos,
+  getSubjectGradeVideos
 };
 
 // Provide a centralized API for getting videos

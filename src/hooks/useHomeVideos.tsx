@@ -1,6 +1,5 @@
 
-import { useState, useEffect } from 'react';
-import { useHomeTabState } from './useHomeTabState';
+import { useState, useEffect, useCallback } from 'react';
 import { useHomeSearch } from './useHomeSearch';
 import { useNavigate } from 'react-router-dom';
 import { Video } from '@/types/video';
@@ -14,11 +13,7 @@ import {
 
 export const useHomeVideos = () => {
   const navigate = useNavigate();
-  const [videos, setVideos] = useState<{[key: string]: Video[]}>({
-    trend: [],
-    recommended: [],
-    popular: []
-  });
+  const [videos, setVideos] = useState<Video[]>([]);
   const [allVideos, setAllVideos] = useState<Video[]>([]);
 
   // Load all videos
@@ -34,16 +29,15 @@ export const useHomeVideos = () => {
     
     setAllVideos(videosWithSavedStatus);
     
-    // Categorize videos
-    const trendVideos = videosWithSavedStatus.slice(0, 3);
-    const recommendedVideos = videosWithSavedStatus.slice(3, 6);
-    const popularVideos = videosWithSavedStatus.slice(6, 9);
-    
-    setVideos({
-      trend: trendVideos,
-      recommended: recommendedVideos,
-      popular: popularVideos
-    });
+    // Select a subset of videos to display
+    const displayVideos = videosWithSavedStatus.slice(0, 12);
+    setVideos(displayVideos);
+  }, []);
+
+  // Function to clear all home videos
+  const clearHomeVideos = useCallback(() => {
+    setVideos([]);
+    setAllVideos([]);
   }, []);
 
   // Listen for video save/download events
@@ -59,19 +53,13 @@ export const useHomeVideos = () => {
         }))
       );
       
-      // Update videos object with saved status
-      setVideos(prevVideos => {
-        const updatedVideos = { ...prevVideos };
-        
-        for (const category in updatedVideos) {
-          updatedVideos[category] = updatedVideos[category].map(video => ({
-            ...video,
-            saved: savedIds.includes(video.id)
-          }));
-        }
-        
-        return updatedVideos;
-      });
+      // Update videos with saved status
+      setVideos(prevVideos => 
+        prevVideos.map(video => ({
+          ...video,
+          saved: savedIds.includes(video.id)
+        }))
+      );
     };
     
     const handleStorageChange = (e: StorageEvent) => {
@@ -80,19 +68,23 @@ export const useHomeVideos = () => {
       }
     };
     
+    const handleLessonDataCleared = () => {
+      clearHomeVideos();
+    };
+    
     window.addEventListener('videoSaved', handleVideoUpdate);
     window.addEventListener('videoDownloaded', handleVideoUpdate);
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('lessonDataCleared', handleLessonDataCleared);
     
     return () => {
       window.removeEventListener('videoSaved', handleVideoUpdate);
       window.removeEventListener('videoDownloaded', handleVideoUpdate);
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('lessonDataCleared', handleLessonDataCleared);
     };
-  }, []);
+  }, [clearHomeVideos]);
 
-  // Use our refactored hooks
-  const { activeTab, setActiveTab } = useHomeTabState();
   const { searchQuery, handleSearch, filteredAllVideos } = useHomeSearch(allVideos);
 
   const handleVideoClick = (videoId: number) => {
@@ -116,56 +108,53 @@ export const useHomeVideos = () => {
         )
       );
       
-      setVideos(prevVideos => {
-        const updatedVideos = { ...prevVideos };
-        
-        for (const category in updatedVideos) {
-          updatedVideos[category] = updatedVideos[category].map(v => 
-            v.id === videoId ? { ...v, saved: !v.saved } : v
-          );
-        }
-        
-        return updatedVideos;
-      });
-      
-      // Process the download
-      await downloadVideo(videoId, video);
-    } catch (error) {
-      console.error("Error saving video:", error);
-      // If there's an error, revert UI changes by re-fetching the saved IDs
-      const savedIds = getSavedVideosFromStorage();
-      
-      setAllVideos(prevVideos => 
-        prevVideos.map(v => ({
-          ...v,
-          saved: savedIds.includes(v.id)
-        }))
+      setVideos(prevVideos => 
+        prevVideos.map(v => 
+          v.id === videoId ? { ...v, saved: !v.saved } : v
+        )
       );
       
-      setVideos(prevVideos => {
-        const updatedVideos = { ...prevVideos };
-        
-        for (const category in updatedVideos) {
-          updatedVideos[category] = updatedVideos[category].map(v => ({
-            ...v,
-            saved: savedIds.includes(v.id)
-          }));
-        }
-        
-        return updatedVideos;
+      // Process the download
+      await downloadVideo(videoId, video).catch(error => {
+        console.error("Error saving video:", error);
+        // Revert UI state if there's an error
+        updateVideoSavedStatus();
       });
+      
+    } catch (error) {
+      console.error("Error handling save video:", error);
+      // Make sure to revert the UI state on error
+      updateVideoSavedStatus();
     }
   };
 
+  // Helper to update the saved status of all videos
+  const updateVideoSavedStatus = () => {
+    const savedIds = getSavedVideosFromStorage();
+    
+    setAllVideos(prevVideos => 
+      prevVideos.map(video => ({
+        ...video,
+        saved: savedIds.includes(video.id)
+      }))
+    );
+    
+    setVideos(prevVideos => 
+      prevVideos.map(video => ({
+        ...video,
+        saved: savedIds.includes(video.id)
+      }))
+    );
+  };
+
   return {
-    activeTab,
-    setActiveTab,
-    searchQuery,
     videos,
     allVideos,
+    searchQuery,
     filteredAllVideos,
     handleSearch,
     handleVideoClick,
-    handleSaveVideo
+    handleSaveVideo,
+    clearHomeVideos
   };
 };

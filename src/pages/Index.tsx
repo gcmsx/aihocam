@@ -1,18 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import SearchBar from '@/components/SearchBar';
 import NavBar from '@/components/NavBar';
-import HomeTabs from '@/components/home/HomeTabs';
-import HomeSearchResults from '@/components/home/HomeSearchResults';
 import SubjectGrid from '@/components/SubjectGrid';
-import { useHomeVideos } from '@/hooks/useHomeVideos';
+import { useHomeSearch } from '@/hooks/useHomeSearch';
 
 const Index = () => {
   const [version, setVersion] = useState('0.345');
   
-  // Load version from localStorage
   useEffect(() => {
-    const storedVersion = localStorage.getItem('appVersion') || 'GEN-1 final v.0345';
-    setVersion(storedVersion);
+    localStorage.setItem('appVersion', '0.345');
     
     const handleVersionUpdate = (e: CustomEvent) => {
       if (e.detail && e.detail.version) {
@@ -26,46 +23,21 @@ const Index = () => {
       window.removeEventListener('versionUpdated', handleVersionUpdate as EventListener);
     };
   }, []);
-  
-  const { 
-    activeTab,
-    setActiveTab,
-    searchQuery,
-    videos,
-    filteredAllVideos,
-    handleSearch,
-    handleVideoClick,
-    handleSaveVideo
-  } = useHomeVideos();
+
+  const { searchQuery, handleSearch } = useHomeSearch([]);
 
   return (
-    <div className="pb-16">
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">
+    <div className="flex flex-col min-h-screen relative">
+      <div className="p-4 flex-1 relative z-10">
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10" />
+        <h1 className="text-2xl font-bold mb-4 text-center">
           AI Hocam <span className="text-sm text-muted-foreground">(Kapalı Beta GEN-1 final v.{version})</span>
         </h1>
         <SearchBar onChange={handleSearch} placeholder="Tüm videolarda arayın..." />
         
-        <HomeSearchResults 
-          searchQuery={searchQuery}
-          filteredVideos={filteredAllVideos}
-          handleVideoClick={handleVideoClick}
-          handleSaveVideo={handleSaveVideo}
-        />
-        
-        {(!searchQuery || filteredAllVideos.length === 0) && (
-          <>
-            <SubjectGrid />
-            
-            <HomeTabs 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              videos={videos}
-              handleVideoClick={handleVideoClick}
-              handleSaveVideo={handleSaveVideo}
-            />
-          </>
-        )}
+        <div className="flex justify-center items-center flex-1">
+          <SubjectGrid />
+        </div>
       </div>
       <NavBar />
     </div>

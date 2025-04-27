@@ -1,59 +1,26 @@
 
 import React from 'react';
 import VideoCard from '@/components/VideoCard';
+import { Video } from '@/types/video';
 
 interface HomeTabsProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  videos: {
-    [key: string]: {
-      id: number;
-      title: string;
-      thumbnailUrl: string;
-      duration: string;
-      saved: boolean;
-    }[];
-  };
+  videos: Video[];
   handleVideoClick: (videoId: number) => void;
   handleSaveVideo: (videoId: number) => void;
 }
 
-const HomeTabs = ({ activeTab, setActiveTab, videos, handleVideoClick, handleSaveVideo }: HomeTabsProps) => {
-  const getActiveVideos = () => {
-    const activeVideos = videos[activeTab] || [];
-    return activeVideos;
-  };
-
+const HomeTabs = ({ videos, handleVideoClick, handleSaveVideo }: HomeTabsProps) => {
   return (
     <div className="mt-8">
-      <div className="flex border-b mb-4">
-        <button 
-          className={`pb-2 px-4 text-sm font-medium ${activeTab === 'trend' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-          onClick={() => setActiveTab('trend')}
-        >
-          Trend
-        </button>
-        <button 
-          className={`pb-2 px-4 text-sm font-medium ${activeTab === 'recommended' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-          onClick={() => setActiveTab('recommended')}
-        >
-          Önerilen
-        </button>
-        <button 
-          className={`pb-2 px-4 text-sm font-medium ${activeTab === 'popular' ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground'}`}
-          onClick={() => setActiveTab('popular')}
-        >
-          Popüler
-        </button>
-      </div>
+      <h2 className="text-xl font-semibold mb-4">Videolar</h2>
       
-      {getActiveVideos().length === 0 ? (
+      {videos.length === 0 ? (
         <div className="text-center py-10 text-muted-foreground">
           Arama sonucu bulunamadı.
         </div>
       ) : (
-        <div className="flex flex-col space-y-4">
-          {getActiveVideos().map(video => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {videos.map(video => (
             <VideoCard 
               key={video.id}
               id={video.id}
@@ -61,6 +28,8 @@ const HomeTabs = ({ activeTab, setActiveTab, videos, handleVideoClick, handleSav
               thumbnailUrl={video.thumbnailUrl}
               duration={video.duration}
               onClick={() => handleVideoClick(video.id)}
+              saved={video.saved}
+              onSave={() => handleSaveVideo(video.id)}
             />
           ))}
         </div>
