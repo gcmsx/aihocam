@@ -24,7 +24,7 @@ const AIAssistant = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const OPENAI_API_KEY = "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";
+  const OPENAI_API_KEY = "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";
   
   useEffect(() => {
     const savedMessages = localStorage.getItem(CHAT_STORAGE_KEY);
